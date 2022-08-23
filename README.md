@@ -1,2 +1,2 @@
 # Sea
-Sea, my second programming language.
+<README WIP>
