@@ -7,9 +7,24 @@ namespace Sea
     {
         public static void Main()
         {
-            new Lexer().Lex("global gwa gwa int8 hat int16 hhhhhhhhh global + - * / % = [ { (", true);
+            new Lexer().Lex("global gwa gwa int8 hat int16 hhhhhhhhh global + - * / % = [ { (");
+            new Parser().Parse(Lexer._tokens, true);
         }
     }
+    internal class Message{
+        internal static bool _errored = false;
+
+        internal static void _writeWithColor(ConsoleColor color, string text){
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            Console.ResetColor();
+        }
+        internal static void _throw(byte severity, string message){
+            if(severity==1) _writeWithColor(ConsoleColor.Gray, $"INFO: {message}");
+            if(severity==2) _writeWithColor(ConsoleColor.Yellow, $"WARNING: {message}");
+            if(severity==3){ _writeWithColor(ConsoleColor.Red, $"ERROR: {message}"); _errored = true; };
+        }
+    };
     internal class Lexer
     {
         internal readonly string[] _toks =
@@ -73,10 +88,13 @@ namespace Sea
         }
         internal void MakeObjectNode(){} //soon (for things within curly braces)
 
-        internal void Parse(string text, bool debug=false){
+        internal void Parse(List<string> toks, bool debug=false){
             for (int i = 0; i < Lexer._tokens.Count; i++)
             {
-                //Need Errors
+                if(Message._errored) break;
+                if(debug) Message._throw(1, "Info Test");
+                if(debug) Message._throw(2, "Warn Test");
+                if(debug) Message._throw(3, "Error Test");
             }
         }
     };
