@@ -7,6 +7,7 @@ namespace Sea
     {
         public static void Main()
         {
+            new ErrorConfig().ErrorSetup();
             new Lexer().Lex("global gwa gwa int8 hat int16 hhhhhhhhh global + - * / % = [ { (");
             new Parser().Parse(Lexer._tokens, true);
         }
