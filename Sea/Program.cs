@@ -12,20 +12,20 @@ namespace Sea
     }
     internal class Lexer
     {
-        static readonly string[] _toks =
+        internal readonly string[] _toks =
         {
             "+", "-", "*", "/", "%", "=",
             "[", "{", "(",
         };
 
-        static readonly string[] _keywords =
+        internal readonly string[] _keywords =
         {
             "global", "local", "embedded",
-            "bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64",
             "const", "simple", "unsigned",
+            "bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64",
             "break", "return", "continue"
         };
-        static List<string> _tokens = new List<string>{};
+        internal static List<string> _tokens = new List<string>{};
         internal void Lex(string text, bool debug=false)
         {
             StringBuilder keyBuilder = new StringBuilder();
@@ -56,9 +56,29 @@ namespace Sea
                 if(debug) Console.WriteLine("'{0}' repeated at position {1}", groups[0].Value, groups[0].Index);
 
             }
-            if(debug) Console.WriteLine(pattern);
-            if(debug){ for (int i = 0; i < _tokens.Count; i++){ Console.WriteLine(_tokens[i]); } }
         }
     }
+    internal class Parser{
+        internal static List<string> _nodes = new List<string>{};
+
+        private string[] aMods = {"global", "local", "embedded"};
+        private string[] mods = {"const", "simple", "unsigned"};
+        private string[] types = {"bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64"};
+        private string[] lManagers = {"break", "return", "continue"};
+        private string[] operators = {"+", "-", "*", "/", "%", "="};
+        private string[] specialToks = {"[", "(", "{"};
+
+        internal void MakeValueNode(string aMod, string mod, string type, string value, string all, string? special = null){
+
+        }
+        internal void MakeObjectNode(){} //soon (for things within curly braces)
+
+        internal void Parse(string text, bool debug=false){
+            for (int i = 0; i < Lexer._tokens.Count; i++)
+            {
+                //Need Errors
+            }
+        }
+    };
 }
 
