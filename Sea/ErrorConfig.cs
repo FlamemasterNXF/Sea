@@ -31,10 +31,10 @@ namespace Sea{
         // Don't edit beyond this point :)
 
         private byte ReadableToValue(string readable){
-            if(readable=="NONE") return 0;
-            if(readable=="WARN") return 1;
-            if(readable=="ERROR") return 2;
-            if(readable=="FORBIDDEN") return 2;
+            if(readable=="NONE") return 1;
+            if(readable=="WARN") return 2;
+            if(readable=="ERROR") return 3;
+            if(readable=="FORBIDDEN") return 3;
             else return 0;
         }
         internal static List<string> errorNames = new List<string>{};
@@ -44,7 +44,6 @@ namespace Sea{
             {
                 errorNames.Add(entry.Key);
                 errorFlags.Add(ReadableToValue(entry.Value));
-                Console.WriteLine(ReadableToValue(entry.Value));
             } 
         }
     };

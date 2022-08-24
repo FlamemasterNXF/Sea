@@ -42,6 +42,7 @@ namespace Sea
             "break", "return", "continue"
         };
         internal static List<string> _tokens = new List<string>{};
+        internal static List<int> _tokIndexes = new List<int>{};
         internal void Lex(string text, bool debug=false)
         {
             StringBuilder keyBuilder = new StringBuilder();
@@ -69,6 +70,7 @@ namespace Sea
             {
                 GroupCollection groups = match.Groups;
                 _tokens.Add(groups[0].Value);
+                _tokIndexes.Add(groups[0].Index);
                 if(debug) Console.WriteLine("'{0}' repeated at position {1}", groups[0].Value, groups[0].Index);
 
             }
@@ -89,6 +91,10 @@ namespace Sea
         }
         internal void MakeObjectNode(){} //soon (for things within curly braces)
 
+        private void simpleError(int i, int x){
+            if(ErrorConfig.errorFlags[i] > 1) Message._throw(ErrorConfig.errorFlags[i], $"{ErrorConfig.errorNames[i]} at {Lexer._tokIndexes[x]}");
+        }
+
         internal void Parse(List<string> toks, bool debug=false){
             for (int i = 0; i < Lexer._tokens.Count; i++)
             {
@@ -96,6 +102,22 @@ namespace Sea
                 if(debug) Message._throw(1, "Info Test");
                 if(debug) Message._throw(2, "Warn Test");
                 if(debug) Message._throw(3, "Error Test");
+
+                if(Array.Exists(aMods, x => x == toks[i])){
+                    List<string> strings = new List<string>(){toks[i]};
+
+                    if(!Array.Exists(mods, x=> x== toks[i+1])){ 
+                        simpleError(1, Lexer._tokIndexes[i]);
+                        if(!Message._errored) strings.Add("simple");
+                    }
+                    else strings.Add(toks[i+1]);
+
+                    if(!Array.Exists(types, x=> x== toks[i+2])){
+                        simpleError(2, Lexer._tokIndexes[i]);
+                        //no implicit casts for now
+                    }
+                    else strings.Add(toks[i+2]);
+                }
             }
         }
     };
