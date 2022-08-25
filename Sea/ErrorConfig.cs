@@ -14,6 +14,8 @@ namespace Sea{
             {"NO_TYPE", "ERROR"},
             {"NO_NAME", "FORBIDDEN"}, //Don't change me!
             {"NULL_VALUE", "WARN"},
+            {"NO_VALUE", "FORBIDDEN"}, //Don't change me!
+            /* ^^^ The difference between this and NULL_VALUE is NULL_VALUE means you didn't put an '=', this means you put one and didn't have a value after it. */
             {"DUPLICATE_VARIABLE", "ERROR"},
             {"COMP_INEQ_TYPES", "ERROR"},
             {"INT_TO_FLOAT", "ERROR"},

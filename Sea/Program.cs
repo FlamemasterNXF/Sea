@@ -8,8 +8,8 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("+ 123 += \"HELLO CHAT\" ++ gwa");
-            //new Parser().Parse(Lexer._tokens, true);
+            new Lexer().Lex("global float32 theFirst = 96");
+            new Parser().Parse(Lexer._tokens, true);
         }
     }
     internal class Message{
@@ -77,6 +77,7 @@ namespace Sea
         internal static List<string> _ids = new List<string>{};
         internal static List<string> _numbers = new List<string>{};
         internal static List<string> _strings = new List<string>{};
+        private readonly List<string> numberTypes = new List<string>(){ "int8", "int16", "int", "int32", "int64", "float32", "float64" };
         private char? currentChar;
         private char? previousChar;
         private bool shouldLex = true;
@@ -87,8 +88,9 @@ namespace Sea
             Position pos = new Position(text, 0, 0, 0);
             string digits = "0123456789";
             string digitsF = "0123456789.";
-            string letters = "abcdefghijklmnopqrstuvwxyz";
-            string lettersF = "abcdefghijklmnopqrstuvwxyz_";
+            string digitsT = "123468";
+            string letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string lettersF = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
             
             void advance(){
                 previousChar = currentChar;
@@ -114,6 +116,7 @@ namespace Sea
                 }
                 if(debug)Console.WriteLine($"Added {number}");
                 _numbers.Add(number);
+                _tokens.Add(number);
             }
             void makeID(){
                 string id = "";
@@ -123,7 +126,17 @@ namespace Sea
                     advance();
                 }
                 if(debug)Console.WriteLine($"Added {id}");
-                _ids.Add(id);
+                if(id=="int" || id=="float"){ makeNumberType(id); if(debug)Console.WriteLine("shifted to numberType"); }
+                else{ _ids.Add(id); _tokens.Add(id); }
+            }
+            void makeNumberType(string t){
+                string type = t;
+                while(shouldLex && digitsT.Contains(currentChar.ToString())){
+                    type += currentChar;
+                    advance();
+                }
+                if(!numberTypes.Contains(type)) Message._throw(3, "Invalid Type");
+                if(!Message._errored) _tokens.Add(type);
             }
             void makeString(){
                 string str = "";
@@ -136,6 +149,7 @@ namespace Sea
                 advance();
                 if(debug)Console.WriteLine($"Added {str}");
                 _strings.Add(str);
+                _tokens.Add(str);
             }
             void makeOp(char type){
                 if(!shouldLex) return;
@@ -218,50 +232,109 @@ namespace Sea
                 if(currentChar == '{') _tokens.Add("{");
                 if(currentChar == '}') _tokens.Add("}");
                 if(currentChar == ' ') advance();
+                else{ shouldLex = false; }
             }
         }
     }
     internal class Parser{
         internal static List<string> _nodes = new List<string>{};
 
-        private string[] aMods = {"global", "local", "embedded"};
-        private string[] mods = {"const", "simple", "unsigned"};
-        private string[] types = {"bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64"};
-        private string[] lManagers = {"break", "return", "continue"};
-        private string[] operators = {"+", "-", "*", "/", "%", "="};
-        private string[] specialToks = {"[", "(", "{"};
+        private List<string> aMods = new List<string>(){"global", "local", "embedded"};
+        private List<string> mods = new List<string>(){"const", "simple", "unsigned"};
+        private List<string> types = new List<string>(){"bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64"};
+        private List<string> lManagers = new List<string>(){"break", "return", "continue"};
+        private List<string> operators = new List<string>(){"+", "-", "*", "/", "%", "="};
+        private List<string> specialToks = new List<string>(){"[", "(", "{"};
 
-        internal void MakeValueNode(string aMod, string mod, string type, string value, string all, string? special = null){
+        internal void MakeValueNode(string aMod, string mod, string type, string id, string all, string value = "null", string special = "null"){
 
         }
         internal void MakeObjectNode(){} //soon (for things within curly braces)
 
-        private void simpleError(int i, int x){
-            if(ErrorConfig.errorFlags[i] > 1) Message._throw(ErrorConfig.errorFlags[i], $"{ErrorConfig.errorNames[i]} at {Lexer._tokens[x]}");
+        private void simpleError(int i, string x){
+            if(ErrorConfig.errorFlags[i] > 1) Message._throw(ErrorConfig.errorFlags[i], $"{ErrorConfig.errorNames[i]} at {x}");
+        }
+
+        private string all(List<string> strings){
+            StringBuilder allBuilder = new StringBuilder();
+            foreach (string str in strings)
+            {   
+                allBuilder.Append(str);
+            }
+            return(allBuilder.ToString());
         }
 
         internal void Parse(List<string> toks, bool debug=false){
             for (int i = 0; i < Lexer._tokens.Count; i++)
             {
+                bool shouldParse(){
+                     return i < toks.Count;
+                }
+
                 if(Message._errored) break;
                 if(debug) Message._throw(1, "Info Test");
                 if(debug) Message._throw(2, "Warn Test");
                 if(debug) Message._throw(3, "Error Test");
 
-                if(Array.Exists(aMods, x => x == toks[i])){
-                    List<string> strings = new List<string>(){toks[i]};
+                if(aMods.Contains(toks[i]) && shouldParse()){
+                    List<string> strings = new List<string>(){};
+                    bool typeGot = false;
+                    bool hasValue = false;
+                    strings.Add(toks[i]);
+                    i = i+1;
 
-                    if(!Array.Exists(mods, x=> x== toks[i+1])){ 
-                        //simpleError(1, Lexer._tokIndexes[i]);
-                        if(!Message._errored) strings.Add("simple");
+                    if(mods.Contains(toks[i]) && shouldParse()){
+                        strings.Add(toks[i]);
+                        i=i+1;
                     }
-                    else strings.Add(toks[i+1]);
+                    else if(types.Contains(toks[i]) && shouldParse()){
+                        strings.Add("simple");
+                        strings.Add(toks[i]);
+                        i=i+1;
+                        typeGot = true;
+                    }
+                    else{
+                        Message._throw(3, "Expected type or modifier");
+                    }
 
-                    if(!Array.Exists(types, x=> x== toks[i+2])){
-                        //simpleError(2, Lexer._tokIndexes[i]);
-                        //no implicit casts for now
+                    if(!typeGot && Message._errored && shouldParse()){
+                        if(types.Contains(toks[i])){
+                            strings.Add(toks[i]);
+                            i=i+1;
+                            typeGot = true;
+                        }
+                        else{
+                            Message._throw(3, "Expected type");
+                        }
                     }
-                    else strings.Add(toks[i+2]);
+
+                    if(Lexer._ids.Contains(toks[i]) && shouldParse()){
+                        strings.Add(toks[i]);
+                        i=i+1;
+                    }
+                    else{
+                        Message._throw(3, "Expected ID");
+                    }
+
+                    if(shouldParse() && toks[i]=="="){
+                        strings.Add(toks[i]);
+                        i=i+1;
+                        hasValue = true;
+                    }
+                    else{
+                        Console.WriteLine(strings.Count);
+                        MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings));
+                        if(debug)Console.WriteLine(all(strings));
+                    }
+
+                    if(shouldParse() && hasValue && Lexer._numbers.Contains(toks[i])){
+                        strings.Add(toks[i]);
+                        MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings), strings[5]);
+                        if(debug)Console.WriteLine(all(strings));
+                    }
+                    else{
+                        Message._throw(3, "Expected Value");
+                    }
                 }
             }
         }
