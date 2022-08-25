@@ -8,7 +8,7 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("global float32 theFirst = 96 local const string theSecond = \"hat!!!\" local simple float64 theThird");
+            new Lexer().Lex("global const int16 b = 96");
             new Parser().Parse(Lexer._tokens, true);
         }
     }
@@ -323,14 +323,14 @@ namespace Sea
             else{
                 MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings));
                 Message._throw(2, $"{strings[3]} is null");
-                if(debug)Console.WriteLine(all(strings));
+                if(debug)Console.WriteLine($"Variable declared: {all(strings)}");
                 return;
             }
 
             if(shouldParse() && hasValue && Lexer._variables.Contains(toks[tokIdx])){
                 strings.Add(toks[tokIdx]);
                 MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings), strings[5]);
-                if(debug)Console.WriteLine(all(strings));
+                if(debug)Console.WriteLine($"Variable declared: {all(strings)}");
             }
             else{
                 Message._throw(3, "Expected Value");
