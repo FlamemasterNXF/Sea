@@ -8,7 +8,7 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("global float32 theFirst = \"cogger\"");
+            new Lexer().Lex("global float32 theFirst = 96 local const string theSecond = \"hat!!!\" local simple float64 theThird");
             new Parser().Parse(Lexer._tokens, true);
         }
     }
@@ -77,6 +77,7 @@ namespace Sea
         internal static List<string> _ids = new List<string>{};
         internal static List<string> _numbers = new List<string>{};
         internal static List<string> _strings = new List<string>{};
+        internal static List<string> _variables = new List<string>{};
         private readonly List<string> numberTypes = new List<string>(){ "int8", "int16", "int", "int32", "int64", "float32", "float64" };
         private char? currentChar;
         private char? previousChar;
@@ -115,6 +116,7 @@ namespace Sea
                     advance();
                 }
                 if(debug)Console.WriteLine($"Added {number}");
+                _variables.Add(number);
                 _numbers.Add(number);
                 _tokens.Add(number);
             }
@@ -148,6 +150,7 @@ namespace Sea
                 }
                 advance();
                 if(debug)Console.WriteLine($"Added {str}");
+                _variables.Add(str); 
                 _strings.Add(str);
                 _tokens.Add(str);
             }
@@ -263,79 +266,81 @@ namespace Sea
             }
             return(allBuilder.ToString());
         }
+        int tokIdx = -1;
+        private bool shouldParse(){
+            return tokIdx < Lexer._tokens.Count;
+        }
+        private void advance(){
+           if(shouldParse()) ++tokIdx;
+        }
+        private void makeValue(List<string> toks, bool debug){
+            List<string> strings = new List<string>(){};
+            bool typeGot = false;
+            bool hasValue = false;
+            strings.Add(toks[tokIdx]);
+            advance();
+            if(mods.Contains(toks[tokIdx]) && shouldParse()){
+                strings.Add(toks[tokIdx]);
+                advance();
+            }
+            else if(types.Contains(toks[tokIdx]) && shouldParse()){
+                strings.Add("simple");
+                strings.Add(toks[tokIdx]);
+                advance();
+                typeGot = true;
+            }
+            else{
+                Message._throw(3, "Expected type or modifier");
+                return;
+            }
 
+            if(!typeGot && !Message._errored && shouldParse()){
+                if(types.Contains(toks[tokIdx])){
+                    strings.Add(toks[tokIdx]);
+                    advance();
+                    typeGot = true;
+                }
+                else{
+                    Message._throw(3, "Expected type");
+                    return;
+                }
+            }
+
+            if(shouldParse() && Lexer._ids.Contains(toks[tokIdx])){
+                strings.Add(toks[tokIdx]);
+                advance();
+            }
+            else{
+                Message._throw(3, "Expected ID");
+                return;
+            }
+
+            if(shouldParse() && toks[tokIdx]=="="){
+                strings.Add(toks[tokIdx]);
+                advance();
+                hasValue = true;
+            }
+            else{
+                MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings));
+                Message._throw(2, $"{strings[3]} is null");
+                if(debug)Console.WriteLine(all(strings));
+                return;
+            }
+
+            if(shouldParse() && hasValue && Lexer._variables.Contains(toks[tokIdx])){
+                strings.Add(toks[tokIdx]);
+                MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings), strings[5]);
+                if(debug)Console.WriteLine(all(strings));
+            }
+            else{
+                Message._throw(3, "Expected Value");
+                return;
+            }
+        }
         internal void Parse(List<string> toks, bool debug=false){
-            for (int i = 0; i < Lexer._tokens.Count; i++)
-            {
-                bool shouldParse(){
-                     return i < toks.Count;
-                }
-
-                if(Message._errored) break;
-                if(debug) Message._throw(1, "Info Test");
-                if(debug) Message._throw(2, "Warn Test");
-                if(debug) Message._throw(3, "Error Test");
-
-                if(aMods.Contains(toks[i]) && shouldParse()){
-                    List<string> strings = new List<string>(){};
-                    bool typeGot = false;
-                    bool hasValue = false;
-                    strings.Add(toks[i]);
-                    i = i+1;
-
-                    if(mods.Contains(toks[i]) && shouldParse()){
-                        strings.Add(toks[i]);
-                        i=i+1;
-                    }
-                    else if(types.Contains(toks[i]) && shouldParse()){
-                        strings.Add("simple");
-                        strings.Add(toks[i]);
-                        i=i+1;
-                        typeGot = true;
-                    }
-                    else{
-                        Message._throw(3, "Expected type or modifier");
-                    }
-
-                    if(!typeGot && Message._errored && shouldParse()){
-                        if(types.Contains(toks[i])){
-                            strings.Add(toks[i]);
-                            i=i+1;
-                            typeGot = true;
-                        }
-                        else{
-                            Message._throw(3, "Expected type");
-                        }
-                    }
-
-                    if(Lexer._ids.Contains(toks[i]) && shouldParse()){
-                        strings.Add(toks[i]);
-                        i=i+1;
-                    }
-                    else{
-                        Message._throw(3, "Expected ID");
-                    }
-
-                    if(shouldParse() && toks[i]=="="){
-                        strings.Add(toks[i]);
-                        i=i+1;
-                        hasValue = true;
-                    }
-                    else{
-                        Console.WriteLine(strings.Count);
-                        MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings));
-                        if(debug)Console.WriteLine(all(strings));
-                    }
-
-                    if(shouldParse() && hasValue && (Lexer._numbers.Contains(toks[i]) || Lexer._strings.Contains(toks[i]))){
-                        strings.Add(toks[i]);
-                        MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings), strings[5]);
-                        if(debug)Console.WriteLine(all(strings));
-                    }
-                    else{
-                        Message._throw(3, "Expected Value");
-                    }
-                }
+            while (shouldParse()){
+                advance();
+                if(shouldParse() && aMods.Contains(toks[tokIdx])){ makeValue(toks, debug); }
             }
         }
     };
