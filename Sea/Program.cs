@@ -8,7 +8,7 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("global float32 theFirst = 96");
+            new Lexer().Lex("global float32 theFirst = \"cogger\"");
             new Parser().Parse(Lexer._tokens, true);
         }
     }
@@ -327,7 +327,7 @@ namespace Sea
                         if(debug)Console.WriteLine(all(strings));
                     }
 
-                    if(shouldParse() && hasValue && Lexer._numbers.Contains(toks[i])){
+                    if(shouldParse() && hasValue && (Lexer._numbers.Contains(toks[i]) || Lexer._strings.Contains(toks[i]))){
                         strings.Add(toks[i]);
                         MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings), strings[5]);
                         if(debug)Console.WriteLine(all(strings));
