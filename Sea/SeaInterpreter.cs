@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Collections;
 using System.Text.RegularExpressions;
 namespace Sea
 {
@@ -8,8 +9,9 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("global int16 b = 19");
+            new Lexer().Lex("global int16 b global simple float64 c = 2.2");
             new Parser().Parse(Lexer._tokens, true);
+            new Interpreter().Interpret(Parser._nodes, true);
         }
     }
     internal class Message
@@ -58,6 +60,7 @@ namespace Sea
             return new Position(text, index, lineIdx, line);
         }
     }
+    
     internal class Lexer
     {
         internal static string digits = "0123456789";
@@ -93,6 +96,7 @@ namespace Sea
                     if (isDecimal) { Message._throw(3, "Cannot have multipe decimal points in a float."); return; }
                     isDecimal = true;
                     number += ".";
+                    advance(text, debug);
                 }
                 else
                 {
@@ -250,10 +254,16 @@ namespace Sea
             }
         }
     }
+   
     internal class Parser
     {
-        internal static List<ValueNode> _valueNodes = new List<ValueNode>(){};
-        internal static List<EquationNode> _equationNodes = new List<EquationNode>(){};
+        internal static readonly Dictionary<string, ArrayList> _nodes = new Dictionary<string, ArrayList>(){
+            {"valueNodes", new ArrayList()},
+            {"equationNodes", new ArrayList()},
+        };
+
+        private record ValueNode(string aMod, string mod, string type, string id, string all, string value, string special);
+        private record EquationNode(string v1, string op, string v2);
         private List<string> aMods = new List<string>() { "global", "local", "embedded" };
         private List<string> mods = new List<string>() { "const", "simple", "unsigned" };
         private List<string> types = new List<string>() { "bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64" };
@@ -261,16 +271,15 @@ namespace Sea
         private List<string> operators = new List<string>() { "+", "-", "*", "/", "%" };
         private List<string> specialToks = new List<string>() { "[", "]", "(", ")", "{", "}" };
 
-        internal record ValueNode(string aMod, string mod, string type, string id, string all, string value, string special);
-        internal record EquationNode(string v1, string op, string v2);
-
         private void MakeValueNode(string aMod, string mod, string type, string id, string all, string value = "null", string special = "null")
         {
-            _valueNodes.Add(new ValueNode(aMod, mod, type, id, all, value, special)); 
+            _nodes["valueNodes"].Add(new ValueNode(aMod, mod, type, id, all, value, special)); 
+            foreach ( Object obj in _nodes["valueNodes"] )
+                Console.WriteLine(obj);
         }
         private void MakeEquationNode(string v1, string op, string v2)
         {
-            _equationNodes.Add(new EquationNode(v1, op, v2));
+            _nodes["equationNodes"].Add(new EquationNode(v1, op, v2));
         }
         private void MakeObjectNode() { } //soon (for things within curly braces)
 
@@ -424,5 +433,11 @@ namespace Sea
             }
         }
     };
+    
+    internal class Interpreter{
+        internal void Interpret(Dictionary<string, ArrayList> nodes, bool debug){
+
+        }
+    }
 }
 

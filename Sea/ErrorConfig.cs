@@ -3,7 +3,7 @@ namespace Sea{
     public class ErrorConfig
     {
         // Edit this Dictionary to change what certain Flags do!
-        private Dictionary<string, string> EDIT_ME_HUMANS = new Dictionary<string, string>()
+        private readonly Dictionary<string, string> EDIT_ME_HUMANS = new Dictionary<string, string>()
         {
             // NONE, WARN, or ERROR 
             // Don't change FORBIDDEN things unless you want your code to break :)
@@ -55,7 +55,7 @@ namespace Sea{
             if(readable=="FORBIDDEN") return 3;
             else{ Message._throw(3, $"Invalid Error Flag Value.\n\"{readable}\" is not a valid Flag Value."); return 0; };
         }
-        internal static Dictionary<string, byte> _errors = new Dictionary<string, byte>(){};
+        internal static readonly Dictionary<string, byte> _errors = new Dictionary<string, byte>(){};
         internal void ErrorSetup(){
             foreach (KeyValuePair<string, string> entry in EDIT_ME_HUMANS)
             {
