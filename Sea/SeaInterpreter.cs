@@ -8,7 +8,7 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("1+1");
+            new Lexer().Lex("global int16 b = 19");
             new Parser().Parse(Lexer._tokens, true);
         }
     }
@@ -252,8 +252,8 @@ namespace Sea
     }
     internal class Parser
     {
-        internal static List<string> _nodes = new List<string> { };
-
+        internal static List<ValueNode> _valueNodes = new List<ValueNode>(){};
+        internal static List<EquationNode> _equationNodes = new List<EquationNode>(){};
         private List<string> aMods = new List<string>() { "global", "local", "embedded" };
         private List<string> mods = new List<string>() { "const", "simple", "unsigned" };
         private List<string> types = new List<string>() { "bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64" };
@@ -261,15 +261,18 @@ namespace Sea
         private List<string> operators = new List<string>() { "+", "-", "*", "/", "%" };
         private List<string> specialToks = new List<string>() { "[", "]", "(", ")", "{", "}" };
 
-        internal void MakeValueNode(string aMod, string mod, string type, string id, string all, string value = "null", string special = "null")
-        {
+        internal record ValueNode(string aMod, string mod, string type, string id, string all, string value, string special);
+        internal record EquationNode(string v1, string op, string v2);
 
-        }
-        internal void MakeEquationNode(string v1, string op, string v2)
+        private void MakeValueNode(string aMod, string mod, string type, string id, string all, string value = "null", string special = "null")
         {
-
+            _valueNodes.Add(new ValueNode(aMod, mod, type, id, all, value, special)); 
         }
-        internal void MakeObjectNode() { } //soon (for things within curly braces)
+        private void MakeEquationNode(string v1, string op, string v2)
+        {
+            _equationNodes.Add(new EquationNode(v1, op, v2));
+        }
+        private void MakeObjectNode() { } //soon (for things within curly braces)
 
         private void simpleError(string i)
         {
@@ -292,7 +295,7 @@ namespace Sea
         private bool shouldParse()
         {
             if(Message._errored) return false;
-            else{ return tokIdx+1 < Lexer._tokens.Count; }
+            else{ return tokIdx < Lexer._tokens.Count; }
         }
         private void advance()
         {
