@@ -8,7 +8,7 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("(1+1) 2+2", true);
+            new Lexer().Lex("1+1");
             new Parser().Parse(Lexer._tokens, true);
         }
     }
@@ -271,9 +271,12 @@ namespace Sea
         }
         internal void MakeObjectNode() { } //soon (for things within curly braces)
 
-        private void simpleError(int i, string x)
+        private void simpleError(string i)
         {
-            if (ErrorConfig.errorFlags[i] > 1) Message._throw(ErrorConfig.errorFlags[i], $"{ErrorConfig.errorNames[i]} at {x}");
+            if (ErrorConfig._errors[i] > 1) Message._throw(ErrorConfig._errors[i], i);
+        }
+        private bool severe(string i){
+            return (ErrorConfig._errors[i] == 3);
         }
 
         private string all(List<string> strings)
@@ -288,7 +291,8 @@ namespace Sea
         int tokIdx = -1;
         private bool shouldParse()
         {
-            return tokIdx < Lexer._tokens.Count;
+            if(Message._errored) return false;
+            else{ return tokIdx+1 < Lexer._tokens.Count; }
         }
         private void advance()
         {
@@ -306,16 +310,17 @@ namespace Sea
                 strings.Add(toks[tokIdx]);
                 advance();
             }
-            else if (types.Contains(toks[tokIdx]) && shouldParse())
+            else if (types.Contains(toks[tokIdx]) && shouldParse() && !severe("NO_MOD"))
             {
                 strings.Add("simple");
                 strings.Add(toks[tokIdx]);
                 advance();
                 typeGot = true;
+                simpleError("NO_MOD");
             }
             else
             {
-                Message._throw(3, "Expected type or modifier");
+                if(severe("NO_MOD")){ simpleError("NO_MOD"); } else { simpleError("NO_TYPE"); }
                 return;
             }
 
@@ -329,7 +334,7 @@ namespace Sea
                 }
                 else
                 {
-                    Message._throw(3, "Expected type");
+                    simpleError("NO_TYPE");
                     return;
                 }
             }
@@ -341,7 +346,7 @@ namespace Sea
             }
             else
             {
-                Message._throw(3, "Expected ID");
+                simpleError("NO_NAME");
                 return;
             }
 
@@ -354,7 +359,7 @@ namespace Sea
             else
             {
                 MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings));
-                Message._throw(2, $"{strings[3]} is null");
+                simpleError("NULL_VALUE");
                 if (debug) Console.WriteLine($"Variable declared: {all(strings)}");
                 return;
             }
@@ -367,7 +372,7 @@ namespace Sea
             }
             else
             {
-                Message._throw(3, "Expected Value");
+                simpleError("NO_VALUE");
                 return;
             }
         }
@@ -375,16 +380,16 @@ namespace Sea
         {
             if (toks[tokIdx] == "(")
             {
-                while (toks[tokIdx] != ")")
+                while (toks[tokIdx] != ")" && shouldParse())
                 {
                     advance();
-                    if (!Lexer._numbers.Contains(toks[tokIdx])) { Message._throw(3, "Number Expected"); return; }
+                    if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM"); return; }
                     string num1 = toks[tokIdx];
                     advance();
-                    if (!operators.Contains(toks[tokIdx])) { Message._throw(3, "Operator Expected"); return; }
+                    if (!operators.Contains(toks[tokIdx])) { simpleError("EXPECTED_OP"); return; }
                     string op = toks[tokIdx];
                     advance();
-                    if (!Lexer._numbers.Contains(toks[tokIdx])) { Message._throw(3, "Number Expected"); return; }
+                    if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM");; return; }
                     MakeEquationNode(num1, op, toks[tokIdx]);
                     if(debug)Console.WriteLine($"Equation declared: ({num1} {op} {toks[tokIdx]})");
                     advance();
@@ -395,10 +400,10 @@ namespace Sea
             {
                     string num1 = toks[tokIdx];
                     advance();
-                    if (!operators.Contains(toks[tokIdx])) { Message._throw(3, "Operator Expected"); return; }
+                    if (!operators.Contains(toks[tokIdx])) { simpleError("EXPECTED_OP"); return; }
                     string op = toks[tokIdx];
                     advance();
-                    if (!Lexer._numbers.Contains(toks[tokIdx])) { Message._throw(3, "Number Expected"); return; }
+                    if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM");; return; }
                     MakeEquationNode(num1, op, toks[tokIdx]);
                     if(debug)Console.WriteLine($"Equation declared: {num1} {op} {toks[tokIdx]}");
                 
