@@ -33,10 +33,6 @@ namespace Sea
     }
     internal class Position
     {
-        internal int index;
-        internal int lineIdx;
-        internal int line;
-        string text;
         public Position(string txt, int idx, int lnIdx, int ln)
         {
             index = idx;
@@ -44,6 +40,10 @@ namespace Sea
             line = ln;
             text = txt;
         }
+        internal int index;
+        internal int lineIdx;
+        internal int line;
+        private readonly string text;
         internal void advance(char cChar)
         {
             ++this.index;
@@ -55,16 +55,13 @@ namespace Sea
             }
             */
         }
-        internal Position copy()
-        {
-            return new Position(text, index, lineIdx, line);
-        }
+        internal Position copy(){ return new Position(text, index, lineIdx, line);}
     }
     
     internal class Lexer
     {
-        internal static string digits = "0123456789";
-        internal static string letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        internal static readonly string digits = "0123456789";
+        internal static readonly string letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         internal static List<string> _tokens = new List<string> { };
         internal static List<string> _ids = new List<string> { };
         internal static List<string> _numbers = new List<string> { };
@@ -262,14 +259,19 @@ namespace Sea
             {"equationNodes", new ArrayList()},
         };
 
+        private readonly Dictionary<string, List<string>> tokens = new Dictionary<string, List<string>>(){
+            {"aMods", new List<string>() { "global", "local", "embedded" }},
+            {"mods", new List<string>() { "const", "simple", "unsigned" }},
+            {"types", new List<string>() { "bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64" }},
+            {"lManagers", new List<string>() { "break", "return", "continue" }},
+            {"ops", new List<string>() { "+", "-", "*", "/", "%" }},
+            {"special", new List<string>() { "[", "]", "(", ")", "{", "}" }}
+        };
+
         private record ValueNode(string aMod, string mod, string type, string id, string all, string value, string special);
         private record EquationNode(string v1, string op, string v2);
-        private List<string> aMods = new List<string>() { "global", "local", "embedded" };
-        private List<string> mods = new List<string>() { "const", "simple", "unsigned" };
-        private List<string> types = new List<string>() { "bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64" };
-        private List<string> lManagers = new List<string>() { "break", "return", "continue" };
-        private List<string> operators = new List<string>() { "+", "-", "*", "/", "%" };
-        private List<string> specialToks = new List<string>() { "[", "]", "(", ")", "{", "}" };
+
+        private int tokIdx = -1;
 
         private void MakeValueNode(string aMod, string mod, string type, string id, string all, string value = "null", string special = "null")
         {
@@ -300,7 +302,6 @@ namespace Sea
             }
             return (allBuilder.ToString());
         }
-        int tokIdx = -1;
         private bool shouldParse()
         {
             if(Message._errored) return false;
@@ -317,12 +318,12 @@ namespace Sea
             bool hasValue = false;
             strings.Add(toks[tokIdx]);
             advance();
-            if (mods.Contains(toks[tokIdx]) && shouldParse())
+            if (tokens["mods"].Contains(toks[tokIdx]) && shouldParse())
             {
                 strings.Add(toks[tokIdx]);
                 advance();
             }
-            else if (types.Contains(toks[tokIdx]) && shouldParse() && !severe("NO_MOD"))
+            else if (tokens["types"].Contains(toks[tokIdx]) && shouldParse() && !severe("NO_MOD"))
             {
                 strings.Add("simple");
                 strings.Add(toks[tokIdx]);
@@ -338,7 +339,7 @@ namespace Sea
 
             if (!typeGot && !Message._errored && shouldParse())
             {
-                if (types.Contains(toks[tokIdx]))
+                if (tokens["types"].Contains(toks[tokIdx]))
                 {
                     strings.Add(toks[tokIdx]);
                     advance();
@@ -398,7 +399,7 @@ namespace Sea
                     if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM"); return; }
                     string num1 = toks[tokIdx];
                     advance();
-                    if (!operators.Contains(toks[tokIdx])) { simpleError("EXPECTED_OP"); return; }
+                    if (!tokens["ops"].Contains(toks[tokIdx])) { simpleError("EXPECTED_OP"); return; }
                     string op = toks[tokIdx];
                     advance();
                     if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM");; return; }
@@ -412,7 +413,7 @@ namespace Sea
             {
                     string num1 = toks[tokIdx];
                     advance();
-                    if (!operators.Contains(toks[tokIdx])) { simpleError("EXPECTED_OP"); return; }
+                    if (!tokens["ops"].Contains(toks[tokIdx])) { simpleError("EXPECTED_OP"); return; }
                     string op = toks[tokIdx];
                     advance();
                     if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM");; return; }
@@ -427,7 +428,7 @@ namespace Sea
             while (shouldParse())
             {
                 advance();
-                if (shouldParse() && aMods.Contains(toks[tokIdx])) { makeValue(toks, debug); }
+                if (shouldParse() && tokens["aMods"].Contains(toks[tokIdx])) { makeValue(toks, debug); }
                 else if (shouldParse() && (toks[tokIdx] == "(")) { makeEquation(toks, debug); }
                 else if (shouldParse() && Lexer.digits.Contains(toks[tokIdx])) { makeEquation(toks, debug); }
             }
