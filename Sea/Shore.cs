@@ -469,8 +469,8 @@ namespace Sea
             { 
                 varAccess.Add(node.id, node.aMod);
 
-                if(node.aMod == "global"){ globals.Add(node.id, new List<string>(){node.mod, node.type, node.value}); Console.WriteLine($"Made Global Var {node.id} with Type {node.type}"); }
-                else{ locals.Add(node.id, new List<string>(){node.scope, node.mod, node.type, node.value}); Console.WriteLine($"Made Local Var {node.id} with Scope {node.scope} and Type {node.type}"); }
+                if(node.aMod == "global"){ globals.Add(node.id, new List<string>(){node.mod, node.type, node.value}); if(debug)Console.WriteLine($"Made Global Var {node.id} with Type {node.type}"); }
+                else{ locals.Add(node.id, new List<string>(){node.scope, node.mod, node.type, node.value}); if(debug)Console.WriteLine($"Made Local Var {node.id} with Scope {node.scope} and Type {node.type}"); }
             }
             foreach (var node in nodes["accessNodes"]){
                 try
