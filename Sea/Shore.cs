@@ -9,8 +9,8 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("global int16 b global simple float64 c = 2.2");
-            new Parser().Parse(Lexer._tokens, true);
+            new Lexer().Lex("local string localTest = \"hat!!!!!!\" localTest global int16 globalTest");
+            new Parser().Parse(Lexer._tokens);
             new Interpreter().Interpret(Parser._nodes, true);
         }
     }
@@ -221,6 +221,7 @@ namespace Sea
 
         internal void Lex(string text, bool debug = false)
         {
+            Console.WriteLine($"Your input was: {text}");
             pos = new Position(text, -1, -1, 0);
             advance(text, debug);
             cChar = text[pos.index];
@@ -254,11 +255,12 @@ namespace Sea
    
     internal class Parser
     {
-        internal static readonly Dictionary<string, ArrayList> _nodes = new Dictionary<string, ArrayList>(){
-            {"valueNodes", new ArrayList()},
-            {"equationNodes", new ArrayList()},
+        internal static readonly Dictionary<string, dynamic> _nodes = new Dictionary<string, dynamic>(){
+            {"valueNodes", new List<ValueNode>(){}},
+            {"equationNodes", new List<EquationNode>(){}},
+            {"accessNodes", new List<string>(){}},
         };
-
+        
         private readonly Dictionary<string, List<string>> tokens = new Dictionary<string, List<string>>(){
             {"aMods", new List<string>() { "global", "local", "embedded" }},
             {"mods", new List<string>() { "const", "simple", "unsigned" }},
@@ -268,20 +270,33 @@ namespace Sea
             {"special", new List<string>() { "[", "]", "(", ")", "{", "}" }}
         };
 
-        private record ValueNode(string aMod, string mod, string type, string id, string all, string value, string special);
-        private record EquationNode(string v1, string op, string v2);
-
+        internal record ValueNode(string aMod, string mod, string type, string id, string scope, string all, string value, string special){
+            internal string aMod{get; init;} = aMod;
+            internal string mod{get; init;} = mod;
+            internal string type{get; init;} = type;
+            internal string id{get; init;} = id;
+            internal string scope{get; init;} = scope;
+            internal string all{get; init;} = all;
+            internal string value{get; init;} = value;
+            internal string special{get; init;} = special;
+        }
+        private record EquationNode(string v1, string op, string v2){
+            internal string v1{get; init;} = v1;
+            internal string op{get; init;} = op;
+            internal string v2{get; init;} = v2;
+        }
         private int tokIdx = -1;
 
-        private void MakeValueNode(string aMod, string mod, string type, string id, string all, string value = "null", string special = "null")
+        private void MakeValueNode(string aMod, string mod, string type, string id, string scope, string all, string value = "null", string special = "null")
         {
-            _nodes["valueNodes"].Add(new ValueNode(aMod, mod, type, id, all, value, special)); 
-            foreach ( Object obj in _nodes["valueNodes"] )
-                Console.WriteLine(obj);
+            _nodes["valueNodes"].Add(new ValueNode(aMod, mod, type, id, scope, all, value, special));
         }
         private void MakeEquationNode(string v1, string op, string v2)
         {
             _nodes["equationNodes"].Add(new EquationNode(v1, op, v2));
+        }
+        private void MakeAccessNode(string name){
+            _nodes["accessNodes"].Add(name);
         }
         private void MakeObjectNode() { } //soon (for things within curly braces)
 
@@ -371,16 +386,17 @@ namespace Sea
             }
             else
             {
-                MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings));
+                MakeValueNode(strings[0], strings[1], strings[2], strings[3], "TOP_LEVEL", all(strings));
                 simpleError("NULL_VALUE");
                 if (debug) Console.WriteLine($"Variable declared: {all(strings)}");
+                tokIdx = tokIdx-1;
                 return;
             }
 
             if (shouldParse() && hasValue && Lexer._variables.Contains(toks[tokIdx]))
             {
                 strings.Add(toks[tokIdx]);
-                MakeValueNode(strings[0], strings[1], strings[2], strings[3], all(strings), strings[5]);
+                MakeValueNode(strings[0], strings[1], strings[2], strings[3], "TOP_LEVEL", all(strings), strings[5]);
                 if (debug) Console.WriteLine($"Variable declared: {all(strings)}");
             }
             else
@@ -431,13 +447,48 @@ namespace Sea
                 if (shouldParse() && tokens["aMods"].Contains(toks[tokIdx])) { makeValue(toks, debug); }
                 else if (shouldParse() && (toks[tokIdx] == "(")) { makeEquation(toks, debug); }
                 else if (shouldParse() && Lexer.digits.Contains(toks[tokIdx])) { makeEquation(toks, debug); }
+                else if (shouldParse() && Lexer._ids.Contains(toks[tokIdx])) { MakeAccessNode(toks[tokIdx]); }
             }
         }
     };
     
     internal class Interpreter{
-        internal void Interpret(Dictionary<string, ArrayList> nodes, bool debug){
+        /* NOTE: This is the best I can do for now.
+            globals[node][0] = mod
+            globals[node][1] = type
+            globals[node][2] = type
 
+            For locals increase those indexes by 1
+            locals[node][0] = scope
+        */
+        private Dictionary<string, string> varAccess = new Dictionary<string, string>(){};
+        private Dictionary<string, List<string>> globals = new Dictionary<string, List<string>>(){};
+        private Dictionary<string, List<string>> locals = new Dictionary<string, List<string>>(){};
+        internal void Interpret(Dictionary<string, dynamic> nodes, bool debug){
+            foreach (var node in nodes["valueNodes"])
+            { 
+                varAccess.Add(node.id, node.aMod);
+
+                if(node.aMod == "global"){ globals.Add(node.id, new List<string>(){node.mod, node.type, node.value}); Console.WriteLine($"Made Global Var {node.id} with Type {node.type}"); }
+                else{ locals.Add(node.id, new List<string>(){node.scope, node.mod, node.type, node.value}); Console.WriteLine($"Made Local Var {node.id} with Scope {node.scope} and Type {node.type}"); }
+            }
+            foreach (var node in nodes["accessNodes"]){
+                try
+                {
+                    if(varAccess[node] == "local"){
+                        if(locals[node][2] == "null"){ Console.WriteLine("null"); }
+                        else{ Console.WriteLine(locals[node][3]); }
+                    }
+                    else if(varAccess[node] == "global"){
+                        if(globals[node][2] == "null"){ Console.WriteLine("null"); }
+                        else{ Console.WriteLine(globals[node][2]); }
+                    }
+                }
+                catch (System.Exception)
+                {
+                    Message._throw(3, $"{node} is undefined!");
+                }
+            }
         }
     }
 }
