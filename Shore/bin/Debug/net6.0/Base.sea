@@ -1,0 +1,2 @@
+local string greeter = "Hello from Base.sea! ~If you're seeing this you probably directly ran Shore, the Sea Interpreter. ~What you probably want to do is make a file with the .sea extension and double click it to run it! :) ~Goodluck, ~Flame <3"
+greeter
