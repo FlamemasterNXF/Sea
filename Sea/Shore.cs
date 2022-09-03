@@ -1,17 +1,29 @@
 ﻿using System;
 using System.Text;
-using System.Collections;
-using System.Text.RegularExpressions;
 namespace Sea
 {
     public class Program
     {
-        public static void Main()
+        public static void Main(string[] args)
         {
+            // DEFAULT FILE
+            string path = File.Exists($"{Directory.GetCurrentDirectory()}/Base.sea")?$"{Directory.GetCurrentDirectory()}/Base.sea":"bin/Debug/net6.0/Base.sea";
+            if(args.Length == 0){ args = new string[]{$"{path}"}; }
+
+            // READING FILE
+            string text = File.ReadAllText(args[0]).Replace(Environment.NewLine, " ");
+            Console.WriteLine($"CONTENTS: {{\n{text}\n}}");
+
+            // INTERPRETER 
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("local string localTest = \"hat!!!!!!\" localTest global int16 globalTest", true);
+            new Lexer().Lex(text, true);
             new Parser().Parse(Lexer._tokens);
             new Interpreter().Interpret(Parser._nodes, true);
+
+            // CONSOLE WINDOW CONTROL
+            Console.WriteLine("Press C to close this window :)");
+            try{ while(Console.ReadKey(true).Key != ConsoleKey.C){ Console.Read(); } }
+            catch (System.Exception){ Console.WriteLine($"Console Window not found!"); }
         }
     }
     internal class Message
@@ -20,9 +32,10 @@ namespace Sea
 
         internal static void _writeWithColor(ConsoleColor color, string text)
         {
+            ConsoleColor def = Console.ForegroundColor;
             Console.ForegroundColor = color;
             Console.WriteLine(text);
-            Console.ResetColor();
+            Console.ForegroundColor = def; 
         }
         internal static void _throw(byte severity, string message)
         {
@@ -49,11 +62,10 @@ namespace Sea
             ++this.index;
             ++this.lineIdx;
 
-            /*if(cChar == "\n"){
+            /*if(cChar.ToString() == Environment.NewLine){
                 ++this.line;
-                this.lineIdx = 0;
-            }
-            */
+                this.lineIdx = -1;
+            }*/
         }
         internal Position copy(){ return new Position(text, index, lineIdx, line);}
     }
