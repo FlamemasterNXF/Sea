@@ -15,9 +15,10 @@ namespace Shore
 
             // INTERPRETER 
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex(text);
-            new Parser().Parse(Lexer._tokens);
-            new Interpreter().Interpret(Parser._nodes, true);
+            new Docks().Dock(text);
+            new Lexer().Lex(text, Docks._dockValues["LEX_INPUT_RETURN"], Docks._dockValues["LEX_DEBUG"]);
+            new Parser().Parse(Lexer._tokens, Docks._dockValues["PARSE_DEBUG"]);
+            new Interpreter().Interpret(Parser._nodes, Docks._dockValues["INTERPRET_DEBUG"]);
 
             // CONSOLE WINDOW CONTROL
             Console.WriteLine("Press C to close this window :)");
@@ -67,6 +68,95 @@ namespace Shore
             }*/
         }
         internal Position copy(){ return new Position(text, index, lineIdx, line);}
+    }
+    
+    internal class Docks
+    {
+        internal static bool _hasDocks;
+        internal static Dictionary<string, bool> _dockValues = new Dictionary<string, bool>{
+            {"LEX_INPUT_RETURN", false}, {"LEX_DEBUG", false}, {"PARSE_DEBUG", false}, {"INTERPRET_DEBUG", false}
+        };
+        internal static int _dockEndIndex = -1;
+        private readonly List<string> docks = new List<string>{"DOCKS", "LEX_INPUT_RETURN", "LEX_DEBUG", "PARSE_DEBUG", "INTERPRET_DEBUG"};
+        private char cChar;
+        private char pChar;
+        private Position pos;
+        private bool end = false;
+        private void advance(string text)
+        {
+            pChar = cChar;
+            pos.advance(cChar);
+            if(cChar == ';'){ end = true; _dockEndIndex = pos.index; return;}
+            if (pos.index < text.Length) { cChar = text[pos.index]; }
+            else end = true;
+        }
+        private bool readableToBool(string r){
+            if(r=="FALSE")return false;
+            else if(r=="TRUE")return true;
+            else return false;
+        }
+        private void dockCheck(string text){
+            string txt = "";
+            Position positionStart = pos.copy();
+            while (cChar != '"')
+            {
+                if(cChar == ' ') advance(text);
+                else{ 
+                    txt += cChar;
+                    advance(text);
+                }
+            }
+            if(txt == "DOCKS=") _hasDocks = true;
+            else{ Message._throw(3, "Expected \"DOCKS= ...\""); _hasDocks = false; return; }
+        }
+        private void makeKeyword(string text)
+        {
+            string key = "";
+            Position positionStart = pos.copy();
+            advance(text);
+            while(cChar == ' ') advance(text);
+            while (cChar != '"' && !end)
+            {
+                key += cChar;
+                advance(text);
+            }
+            advance(text);
+            while(cChar == ' ') advance(text);
+            if(docks.Contains(key)){
+                if(cChar != ':'){ Message._throw(3, "Expected Dock Value"); return; }
+                makeDockValue(text, key);
+            }
+            else { Message._throw(3, "Unknown Dock"); return; }
+        }
+        private void makeDockValue(string text, string key){
+            string value = "";
+            Position positionStart = pos.copy();
+            advance(text);
+            while(cChar == ' ') advance(text);
+            while(cChar != ',' && !end && cChar != ';')
+            {
+                value += cChar;
+                advance(text);    
+            }
+            advance(text);
+            if(cChar == ' ') advance(text);
+            if(value == "TRUE" || value == "FALSE"){ _dockValues[key] = readableToBool(value); }
+            else{ Message._throw(3, "Expected Value of \"TRUE\" or \"FALSE\""); return; }
+        }
+
+        internal void Dock(string text){
+            pos = new Position(text, -1, -1, 0);
+            advance(text);
+            cChar = text[pos.index];
+            pChar = text[pos.index];
+            if(cChar == 'D'){ dockCheck(text); }
+            else{ _hasDocks = false; return; }
+
+            while(cChar.ToString() != Environment.NewLine && !Message._errored && !end){
+                if(cChar == '"') makeKeyword(text);
+                else if (cChar == ' ') advance(text); 
+            }
+        }
     }
     
     internal class Lexer
@@ -234,7 +324,8 @@ namespace Shore
         internal void Lex(string text, bool disp = false, bool debug = false)
         {
             if(disp)Message._writeWithColor(ConsoleColor.DarkCyan, $"Your input was: {text}");
-            pos = new Position(text, -1, -1, 0);
+            if(Docks._hasDocks){ pos = new Position(text, Docks._dockEndIndex, Docks._dockEndIndex, 0); }
+            else{ pos = new Position(text, -1, -1, 0); }
             advance(text, debug);
             cChar = text[pos.index];
             pChar = text[pos.index];
@@ -451,7 +542,7 @@ namespace Shore
             }
         }
 
-        internal void Parse(List<string> toks, bool debug = false)
+        internal void Parse(List<string> toks, bool debug)
         {
             while (shouldParse())
             {
@@ -464,7 +555,8 @@ namespace Shore
         }
     };
     
-    internal class Interpreter{
+    internal class Interpreter
+    {
         /* NOTE: This is the best I can do for now.
             globals[node][0] = mod
             globals[node][1] = type
