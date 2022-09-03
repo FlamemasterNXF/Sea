@@ -9,7 +9,7 @@ namespace Sea
         public static void Main()
         {
             new ErrorConfig().ErrorSetup();
-            new Lexer().Lex("local string localTest = \"hat!!!!!!\" localTest global int16 globalTest");
+            new Lexer().Lex("local string localTest = \"hat!!!!!!\" localTest global int16 globalTest", true);
             new Parser().Parse(Lexer._tokens);
             new Interpreter().Interpret(Parser._nodes, true);
         }
@@ -76,7 +76,7 @@ namespace Sea
         {
             pChar = cChar;
             pos.advance(cChar);
-            if (pos.index < text.Length) { cChar = text[pos.index]; if(debug)Console.WriteLine(cChar); }
+            if (pos.index < text.Length) { cChar = text[pos.index]; if(debug)Console.WriteLine($"DEBUG(L): {cChar}"); }
             else shouldLex = false;
         }
 
@@ -101,7 +101,7 @@ namespace Sea
                     advance(text, debug);
                 }
             }
-            if (debug) Console.WriteLine($"Added {number}");
+            if (debug) Console.WriteLine($"DEBUG(L): Added {number}");
             _variables.Add(number);
             _numbers.Add(number);
             _tokens.Add(number);
@@ -116,8 +116,8 @@ namespace Sea
                 id += cChar;
                 advance(text, debug);
             }
-            if (debug) Console.WriteLine($"Added {id}");
-            if (id == "int" || id == "float") { makeNumberType(id, text, debug); if (debug) Console.WriteLine("shifted to numberType"); }
+            if (debug) Console.WriteLine($"DEBUG(L): Added {id}");
+            if (id == "int" || id == "float") { makeNumberType(id, text, debug); if(debug)Console.WriteLine("DEBUG(L): Shifted to numberType"); }
             else { _ids.Add(id); _tokens.Add(id); }
         }
         private void makeNumberType(string t, string text, bool debug)
@@ -143,7 +143,7 @@ namespace Sea
                 advance(text, debug);
             }
             advance(text, debug);
-            if (debug) Console.WriteLine($"Added {str}");
+            if (debug) Console.WriteLine($"DEBUG(L): Added {str}");
             _variables.Add(str);
             _strings.Add(str);
             _tokens.Add(str);
@@ -219,9 +219,9 @@ namespace Sea
             }
         }
 
-        internal void Lex(string text, bool debug = false)
+        internal void Lex(string text, bool disp = false, bool debug = false)
         {
-            Console.WriteLine($"Your input was: {text}");
+            if(disp)Message._writeWithColor(ConsoleColor.DarkCyan, $"Your input was: {text}");
             pos = new Position(text, -1, -1, 0);
             advance(text, debug);
             cChar = text[pos.index];
@@ -388,7 +388,7 @@ namespace Sea
             {
                 MakeValueNode(strings[0], strings[1], strings[2], strings[3], "TOP_LEVEL", all(strings));
                 simpleError("NULL_VALUE");
-                if (debug) Console.WriteLine($"Variable declared: {all(strings)}");
+                if (debug) Console.WriteLine($"DEBUG(P): Variable declared: {all(strings)}");
                 tokIdx = tokIdx-1;
                 return;
             }
@@ -397,7 +397,7 @@ namespace Sea
             {
                 strings.Add(toks[tokIdx]);
                 MakeValueNode(strings[0], strings[1], strings[2], strings[3], "TOP_LEVEL", all(strings), strings[5]);
-                if (debug) Console.WriteLine($"Variable declared: {all(strings)}");
+                if (debug) Console.WriteLine($"DEBUG(P): Variable declared: {all(strings)}");
             }
             else
             {
@@ -420,7 +420,7 @@ namespace Sea
                     advance();
                     if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM");; return; }
                     MakeEquationNode(num1, op, toks[tokIdx]);
-                    if(debug)Console.WriteLine($"Equation declared: ({num1} {op} {toks[tokIdx]})");
+                    if(debug)Console.WriteLine($"DEBUG(P): Equation declared: ({num1} {op} {toks[tokIdx]})");
                     advance();
                 }
                 return;
@@ -434,7 +434,7 @@ namespace Sea
                     advance();
                     if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM");; return; }
                     MakeEquationNode(num1, op, toks[tokIdx]);
-                    if(debug)Console.WriteLine($"Equation declared: {num1} {op} {toks[tokIdx]}");
+                    if(debug)Console.WriteLine($"DEBUG(P): Equation declared: {num1} {op} {toks[tokIdx]}");
                 
             }
         }
@@ -469,8 +469,8 @@ namespace Sea
             { 
                 varAccess.Add(node.id, node.aMod);
 
-                if(node.aMod == "global"){ globals.Add(node.id, new List<string>(){node.mod, node.type, node.value}); if(debug)Console.WriteLine($"Made Global Var {node.id} with Type {node.type}"); }
-                else{ locals.Add(node.id, new List<string>(){node.scope, node.mod, node.type, node.value}); if(debug)Console.WriteLine($"Made Local Var {node.id} with Scope {node.scope} and Type {node.type}"); }
+                if(node.aMod == "global"){ globals.Add(node.id, new List<string>(){node.mod, node.type, node.value}); if(debug)Console.WriteLine($"DEBUG(I): Made Global Var {node.id} with Type {node.type}"); }
+                else{ locals.Add(node.id, new List<string>(){node.scope, node.mod, node.type, node.value}); if(debug)Console.WriteLine($"DEBUG(I): Made Local Var {node.id} with Scope {node.scope} and Type {node.type}"); }
             }
             foreach (var node in nodes["accessNodes"]){
                 try
