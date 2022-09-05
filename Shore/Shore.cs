@@ -17,8 +17,8 @@ namespace Shore
 
             // INTERPRETER 
             new ErrorConfig().ErrorSetup();
-            new Docks().Dock(dev);
-            new Lexer().Lex(dev, Docks._dockValues["LEX_INPUT_RETURN"], Docks._dockValues["LEX_DEBUG"]);
+            new Docks().Dock(text);
+            new Lexer().Lex(text, Docks._dockValues["LEX_INPUT_RETURN"], Docks._dockValues["LEX_DEBUG"]);
             new Parser().Parse(Lexer._tokens, Docks._dockValues["PARSE_DEBUG"]);
             new Interpreter().Interpret(Parser._nodes, Docks._dockValues["INTERPRET_DEBUG"]);
 

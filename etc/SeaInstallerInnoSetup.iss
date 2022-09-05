@@ -6,7 +6,7 @@
 #define MyAppPublisher "FlamemasterNXF"
 #define MyAppURL "https://github.com/FlamemasterNXF/Sea"
 #define MyAppExeName "Shore.exe"
-#define MyAppAssocName MyAppName + " File"
+#define MyAppAssocName MyAppName + " Script"
 #define MyAppAssocExt ".sea"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
 
