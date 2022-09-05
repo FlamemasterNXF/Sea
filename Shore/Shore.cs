@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Data;
 namespace Shore
 {
     public class Program
@@ -12,11 +13,12 @@ namespace Shore
 
             // READING FILE
             string text = File.ReadAllText(args[0]).Replace(Environment.NewLine, " ");
+            string dev = "1+1+1";
 
             // INTERPRETER 
             new ErrorConfig().ErrorSetup();
-            new Docks().Dock(text);
-            new Lexer().Lex(text, Docks._dockValues["LEX_INPUT_RETURN"], Docks._dockValues["LEX_DEBUG"]);
+            new Docks().Dock(dev);
+            new Lexer().Lex(dev, Docks._dockValues["LEX_INPUT_RETURN"], Docks._dockValues["LEX_DEBUG"]);
             new Parser().Parse(Lexer._tokens, Docks._dockValues["PARSE_DEBUG"]);
             new Interpreter().Interpret(Parser._nodes, Docks._dockValues["INTERPRET_DEBUG"]);
 
@@ -44,6 +46,7 @@ namespace Shore
             if (severity == 3) { _writeWithColor(ConsoleColor.Red, $"ERROR: {message}"); _errored = true; };
         }
     }
+    
     internal class Position
     {
         public Position(string txt, int idx, int lnIdx, int ln)
@@ -68,6 +71,7 @@ namespace Shore
             }*/
         }
         internal Position copy(){ return new Position(text, index, lineIdx, line);}
+
     }
     
     internal class Docks
@@ -305,7 +309,12 @@ namespace Shore
                     if (cChar == '=') { _tokens.Add("!=="); advance(text, debug); }
                     else Message._throw(3, "Expected '==' after '!' ");
                 }
-                else Message._throw(3, "Expected '==' after '!' ");
+                else _tokens.Add("!");
+            }
+            if (type == '^')
+            {
+                advance(text, debug);
+                _tokens.Add("^");
             }
             if (type == '>')
             {
@@ -343,6 +352,7 @@ namespace Shore
                 else if (cChar == '%') makeOp('%', text, debug);
                 else if (cChar == '=') makeOp('=', text, debug);
                 else if (cChar == '!') makeOp('!', text, debug);
+                else if (cChar == '^') makeOp('^', text, debug);
                 else if (cChar == '>') makeOp('>', text, debug);
                 else if (cChar == '<') makeOp('<', text, debug);
                 else if (cChar == '(') { _tokens.Add("("); advance(text, debug); }
@@ -360,7 +370,7 @@ namespace Shore
     {
         internal static readonly Dictionary<string, dynamic> _nodes = new Dictionary<string, dynamic>(){
             {"valueNodes", new List<ValueNode>(){}},
-            {"equationNodes", new List<EquationNode>(){}},
+            {"equationNodes", new List<string>(){}},
             {"accessNodes", new List<string>(){}},
         };
         
@@ -369,7 +379,7 @@ namespace Shore
             {"mods", new List<string>() { "const", "simple", "unsigned" }},
             {"types", new List<string>() { "bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64" }},
             {"lManagers", new List<string>() { "break", "return", "continue" }},
-            {"ops", new List<string>() { "+", "-", "*", "/", "%" }},
+            {"ops", new List<string>() { "+", "-", "*", "/", "%", "!", "^" }},
             {"special", new List<string>() { "[", "]", "(", ")", "{", "}" }}
         };
 
@@ -383,20 +393,15 @@ namespace Shore
             internal string value{get; init;} = value;
             internal string special{get; init;} = special;
         }
-        private record EquationNode(string v1, string op, string v2){
-            internal string v1{get; init;} = v1;
-            internal string op{get; init;} = op;
-            internal string v2{get; init;} = v2;
-        }
         private int tokIdx = -1;
 
         private void MakeValueNode(string aMod, string mod, string type, string id, string scope, string all, string value = "null", string special = "null")
         {
             _nodes["valueNodes"].Add(new ValueNode(aMod, mod, type, id, scope, all, value, special));
         }
-        private void MakeEquationNode(string v1, string op, string v2)
+        private void MakeEquationNode(string equation)
         {
-            _nodes["equationNodes"].Add(new EquationNode(v1, op, v2));
+            _nodes["equationNodes"].Add(equation);
         }
         private void MakeAccessNode(string name){
             _nodes["accessNodes"].Add(name);
@@ -512,33 +517,34 @@ namespace Shore
         {
             if (toks[tokIdx] == "(")
             {
+                string equation = "(";
+                advance();
                 while (toks[tokIdx] != ")" && shouldParse())
                 {
-                    advance();
-                    if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM"); return; }
-                    string num1 = toks[tokIdx];
-                    advance();
-                    if (!tokens["ops"].Contains(toks[tokIdx])) { simpleError("EXPECTED_OP"); return; }
-                    string op = toks[tokIdx];
-                    advance();
-                    if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM");; return; }
-                    MakeEquationNode(num1, op, toks[tokIdx]);
-                    if(debug)Console.WriteLine($"DEBUG(P): Equation declared: ({num1} {op} {toks[tokIdx]})");
-                    advance();
+                    if(tokens["ops"].Contains(toks[tokIdx]) || Lexer._numbers.Contains(toks[tokIdx])){
+                        equation += toks[tokIdx];
+                        advance();
+                    }
+                    else{
+                        simpleError("EXPECTED_OP");
+                    }
                 }
+                equation += ")";
+                if(debug) Console.WriteLine(equation);
+                MakeEquationNode(equation);
                 return;
             }
-            if(Lexer.digits.Contains(toks[tokIdx]))
+            if(Lexer._numbers.Contains(toks[tokIdx]))
             {
-                    string num1 = toks[tokIdx];
+                string equation = "";
+                while (shouldParse() && (tokens["ops"].Contains(toks[tokIdx]) || Lexer._numbers.Contains(toks[tokIdx])))
+                {
+                    equation += toks[tokIdx];
                     advance();
-                    if (!tokens["ops"].Contains(toks[tokIdx])) { simpleError("EXPECTED_OP"); return; }
-                    string op = toks[tokIdx];
-                    advance();
-                    if (!Lexer._numbers.Contains(toks[tokIdx])) { simpleError("EXPECTED_NUM");; return; }
-                    MakeEquationNode(num1, op, toks[tokIdx]);
-                    if(debug)Console.WriteLine($"DEBUG(P): Equation declared: {num1} {op} {toks[tokIdx]}");
-                
+                }
+                if(debug) Console.WriteLine(equation);
+                MakeEquationNode(equation);
+                return;               
             }
         }
 
@@ -549,7 +555,7 @@ namespace Shore
                 advance();
                 if (shouldParse() && tokens["aMods"].Contains(toks[tokIdx])) { makeValue(toks, debug); }
                 else if (shouldParse() && (toks[tokIdx] == "(")) { makeEquation(toks, debug); }
-                else if (shouldParse() && Lexer.digits.Contains(toks[tokIdx])) { makeEquation(toks, debug); }
+                else if (shouldParse() && Lexer._numbers.Contains(toks[tokIdx])) { makeEquation(toks, debug); }
                 else if (shouldParse() && Lexer._ids.Contains(toks[tokIdx])) { MakeAccessNode(toks[tokIdx]); }
             }
         }
@@ -576,7 +582,7 @@ namespace Shore
                 if(node.aMod == "global"){ globals.Add(node.id, new List<string>(){node.mod, node.type, node.value}); if(debug)Console.WriteLine($"DEBUG(I): Made Global Var {node.id} with Type {node.type}"); }
                 else{ locals.Add(node.id, new List<string>(){node.scope, node.mod, node.type, node.value}); if(debug)Console.WriteLine($"DEBUG(I): Made Local Var {node.id} with Scope {node.scope} and Type {node.type}"); }
             }
-            foreach (var node in nodes["accessNodes"]){
+            foreach (string node in nodes["accessNodes"]){
                 try
                 {
                     if(varAccess[node] == "local"){
@@ -591,6 +597,16 @@ namespace Shore
                 catch (System.Exception)
                 {
                     Message._throw(3, $"{node} is undefined!");
+                }
+            }
+            foreach (string node in nodes["equationNodes"]){
+                try
+                {
+                    Console.WriteLine(Calculator.Calculate(node));
+                }
+                catch (System.Exception)
+                {
+                    Message._throw(3, $"Invalid Equation.");
                 }
             }
         }
