@@ -13,7 +13,7 @@ namespace Shore
 
             // READING FILE
             string text = File.ReadAllText(args[0]).Replace(Environment.NewLine, " ");
-            string dev = "1+1+1";
+            string dev = "1+-(1*3)+5*2+4!-2^2+(4+3(2*3))+5";
 
             // INTERPRETER 
             new ErrorConfig().ErrorSetup();
@@ -379,7 +379,7 @@ namespace Shore
             {"mods", new List<string>() { "const", "simple", "unsigned" }},
             {"types", new List<string>() { "bool", "char", "string", "byte", "int8", "int16", "int", "int32", "int64", "float32", "float64" }},
             {"lManagers", new List<string>() { "break", "return", "continue" }},
-            {"ops", new List<string>() { "+", "-", "*", "/", "%", "!", "^" }},
+            {"ops", new List<string>() { "+", "-", "*", "/", "%", "!", "^", "(", ")" }},
             {"special", new List<string>() { "[", "]", "(", ")", "{", "}" }}
         };
 
@@ -515,37 +515,15 @@ namespace Shore
         }
         private void makeEquation(List<string> toks, bool debug)
         {
-            if (toks[tokIdx] == "(")
+            string equation = "";
+            while (shouldParse() && (tokens["ops"].Contains(toks[tokIdx]) || Lexer._numbers.Contains(toks[tokIdx])))
             {
-                string equation = "(";
+                equation += toks[tokIdx];
                 advance();
-                while (toks[tokIdx] != ")" && shouldParse())
-                {
-                    if(tokens["ops"].Contains(toks[tokIdx]) || Lexer._numbers.Contains(toks[tokIdx])){
-                        equation += toks[tokIdx];
-                        advance();
-                    }
-                    else{
-                        simpleError("EXPECTED_OP");
-                    }
-                }
-                equation += ")";
-                if(debug) Console.WriteLine(equation);
-                MakeEquationNode(equation);
-                return;
             }
-            if(Lexer._numbers.Contains(toks[tokIdx]))
-            {
-                string equation = "";
-                while (shouldParse() && (tokens["ops"].Contains(toks[tokIdx]) || Lexer._numbers.Contains(toks[tokIdx])))
-                {
-                    equation += toks[tokIdx];
-                    advance();
-                }
-                if(debug) Console.WriteLine(equation);
-                MakeEquationNode(equation);
-                return;               
-            }
+            if(debug) Console.WriteLine(equation);
+            MakeEquationNode(equation);
+            return;               
         }
 
         internal void Parse(List<string> toks, bool debug)
@@ -554,8 +532,7 @@ namespace Shore
             {
                 advance();
                 if (shouldParse() && tokens["aMods"].Contains(toks[tokIdx])) { makeValue(toks, debug); }
-                else if (shouldParse() && (toks[tokIdx] == "(")) { makeEquation(toks, debug); }
-                else if (shouldParse() && Lexer._numbers.Contains(toks[tokIdx])) { makeEquation(toks, debug); }
+                else if (shouldParse() && ((toks[tokIdx] == "(") || Lexer._numbers.Contains(toks[tokIdx]))) { makeEquation(toks, debug); }
                 else if (shouldParse() && Lexer._ids.Contains(toks[tokIdx])) { MakeAccessNode(toks[tokIdx]); }
             }
         }
