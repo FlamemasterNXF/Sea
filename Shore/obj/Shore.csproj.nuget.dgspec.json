@@ -1,25 +1,28 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\flame\\Documents\\GitHub\\Sea\\Shore\\Shore.csproj": {}
+    "E:\\coding projects\\C#\\Sea\\Shore\\Shore.csproj": {}
   },
   "projects": {
-    "C:\\Users\\flame\\Documents\\GitHub\\Sea\\Shore\\Shore.csproj": {
+    "E:\\coding projects\\C#\\Sea\\Shore\\Shore.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\flame\\Documents\\GitHub\\Sea\\Shore\\Shore.csproj",
+        "projectUniqueName": "E:\\coding projects\\C#\\Sea\\Shore\\Shore.csproj",
         "projectName": "Shore",
-        "projectPath": "C:\\Users\\flame\\Documents\\GitHub\\Sea\\Shore\\Shore.csproj",
-        "packagesPath": "C:\\Users\\flame\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\flame\\Documents\\GitHub\\Sea\\Shore\\obj\\",
+        "projectPath": "E:\\coding projects\\C#\\Sea\\Shore\\Shore.csproj",
+        "packagesPath": "C:\\Users\\pizza\\.nuget\\packages\\",
+        "outputPath": "E:\\coding projects\\C#\\Sea\\Shore\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\flame\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\pizza\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -49,8 +52,7 @@
             "net47",
             "net471",
             "net472",
-            "net48",
-            "net481"
+            "net48"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -59,7 +61,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }

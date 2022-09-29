@@ -31,6 +31,8 @@ public static class Interpreter
             try
             {
                 var line = split[i];
+                if (line.StartsWith("global") || line.StartsWith("local")) line = "def " + line;
+                
                 var index = line.IndexOf(" ", StringComparison.Ordinal);
                 var token = line[..index];
                 line = line[(index + 1)..];

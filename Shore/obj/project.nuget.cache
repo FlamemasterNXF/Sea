@@ -1,21 +1,21 @@
 {
   "version": 2,
-  "dgSpecHash": "q6UhJvH+x40uLZk54+le57mvVcS6DSUQUJ3W6Rfst5g90c98JQNLwJwwi6/tokCSd+HBZGUrLiQzxIqWHz/2Yw==",
+  "dgSpecHash": "9alOgwhOVjt4dpoSJRtB/igkN+uLyV5CA0T3fvsAlkJi5Yz9DCMH4Yc7FCYEGP7025M+se5IjbkNKYT+VFqiOw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\flame\\Documents\\GitHub\\Sea\\Shore\\Shore.csproj",
+  "projectFilePath": "E:\\coding projects\\C#\\Sea\\Shore\\Shore.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\flame\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.3\\microsoft.codeanalysis.analyzers.3.3.3.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\microsoft.codeanalysis.common\\4.4.0-2.final\\microsoft.codeanalysis.common.4.4.0-2.final.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\microsoft.codeanalysis.csharp\\4.4.0-2.final\\microsoft.codeanalysis.csharp.4.4.0-2.final.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\microsoft.codeanalysis.csharp.scripting\\4.4.0-2.final\\microsoft.codeanalysis.csharp.scripting.4.4.0-2.final.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\microsoft.codeanalysis.scripting.common\\4.4.0-2.final\\microsoft.codeanalysis.scripting.common.4.4.0-2.final.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\system.reflection.metadata\\5.0.0\\system.reflection.metadata.5.0.0.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\system.text.encoding.codepages\\6.0.0\\system.text.encoding.codepages.6.0.0.nupkg.sha512",
-    "C:\\Users\\flame\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512"
+    "C:\\Users\\pizza\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.3\\microsoft.codeanalysis.analyzers.3.3.3.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\microsoft.codeanalysis.common\\4.4.0-2.final\\microsoft.codeanalysis.common.4.4.0-2.final.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\microsoft.codeanalysis.csharp\\4.4.0-2.final\\microsoft.codeanalysis.csharp.4.4.0-2.final.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\microsoft.codeanalysis.csharp.scripting\\4.4.0-2.final\\microsoft.codeanalysis.csharp.scripting.4.4.0-2.final.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\microsoft.codeanalysis.scripting.common\\4.4.0-2.final\\microsoft.codeanalysis.scripting.common.4.4.0-2.final.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\system.reflection.metadata\\5.0.0\\system.reflection.metadata.5.0.0.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\system.text.encoding.codepages\\6.0.0\\system.text.encoding.codepages.6.0.0.nupkg.sha512",
+    "C:\\Users\\pizza\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512"
   ],
   "logs": []
 }
