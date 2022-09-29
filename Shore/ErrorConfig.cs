@@ -1,5 +1,5 @@
-using System.Collections.Specialized;
-namespace Shore{
+/*
+ * namespace Shore{
     public class ErrorConfig
     {
         // Edit this Dictionary to change what certain Flags do!
@@ -64,3 +64,4 @@ namespace Shore{
         }
     };
 }
+*/
