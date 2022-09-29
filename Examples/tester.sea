@@ -1,4 +1,2 @@
-local float64 exampleVar = 96
-local float32 exampleVarDos = 9696
-exampleVar
-exampleVarDos
+def global bool myBool = false
+print bool
