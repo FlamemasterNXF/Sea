@@ -6,6 +6,7 @@ namespace Shore;
 public static class Interpreter
 {
     public static Dictionary<string, MethodInfo> tokenFunctions = new();
+    public static List<string> errors = new(); 
     public static void Init()
     {
         var types = Assembly.GetExecutingAssembly().GetTypes();
@@ -27,14 +28,20 @@ public static class Interpreter
         StringBuilder sb = new();
         for (int i = 0; i < split.Length; i++)
         {
-            var line = split[i];
-            var index = line.IndexOf(" ", StringComparison.Ordinal);
-            var token = line[..index];
-            line = line[(index + 1)..];
+            try
+            {
+                var line = split[i];
+                var index = line.IndexOf(" ", StringComparison.Ordinal);
+                var token = line[..index];
+                line = line[(index + 1)..];
 
-            sb.Append((string) tokenFunctions[token].Invoke(null, new object[] { line })!);
+                sb.Append((string) tokenFunctions[token].Invoke(null, new object[] { line })!);
+            }
+            catch (Exception e)
+            {
+                errors.Add($"{e.Message} on line ${i}");
+            }
         }
-
         return sb.ToString();
     }
     

@@ -12,22 +12,25 @@ namespace Shore
         {
             var sw = new Stopwatch();
             sw.Start();
-            
+
             Interpreter.Init();
 
-            string path = File.Exists($"{Directory.GetCurrentDirectory()}/Base.sea") ? $"{Directory.GetCurrentDirectory()}/Base.sea" : "bin/Debug/net6.0/Base.sea";
+            string path = File.Exists($"{Directory.GetCurrentDirectory()}/Base.sea")
+                ? $"{Directory.GetCurrentDirectory()}/Base.sea"
+                : "bin/Debug/net6.0/Base.sea";
             if (args.Length == 0) args = new string[] { $"{path}" };
 
             // READING FILE
             string text = File.ReadAllText(args[0]).Replace("\r", "");
-            string dev = @"print Math.Pow(54,54)";
-            var code = Interpreter.Interpret(text);
+            string dev = @"def global bool lol = 100";
+            var code = Interpreter.Interpret(dev);
             var script = CSharpScript.Create(code, ScriptOptions.Default.WithImports("System", "System.Math"));
 
             string Repeat(string repeater, int amount)
             {
                 return string.Join("", Enumerable.Repeat(repeater, amount));
             }
+
             var i = 0;
             var running = true;
 
@@ -36,7 +39,7 @@ namespace Shore
                 script.Compile();
                 running = false;
             });
-            
+
             while (running)
             {
                 i++;
@@ -50,11 +53,12 @@ namespace Shore
             Console.SetCursorPosition(0, 0);
             Console.WriteLine("                                                   ");
             Console.SetCursorPosition(0, 0);
-            
+
             sw.Stop();
             Console.WriteLine($"Compiled Successfully in: [{sw.Elapsed}]!");
 
-            script.RunAsync().GetAwaiter().GetResult();
+            try { script.RunAsync().GetAwaiter().GetResult(); }
+            catch (Exception e) { Console.WriteLine($"{e.Message} at Line x"); }
             
             // CONSOLE WINDOW CONTROL
             Console.WriteLine("Press C to close this window :)");
