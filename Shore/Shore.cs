@@ -15,21 +15,16 @@ namespace Shore
 
             Interpreter.Init();
 
-            string path = File.Exists($"{Directory.GetCurrentDirectory()}/Base.sea")
+            var path = File.Exists($"{Directory.GetCurrentDirectory()}/Base.sea")
                 ? $"{Directory.GetCurrentDirectory()}/Base.sea"
                 : "bin/Debug/net6.0/Base.sea";
             if (args.Length == 0) args = new string[] { $"{path}" };
 
             // READING FILE
-            string text = File.ReadAllText(args[0]).Replace("\r", "");
-            string dev = @"def global bool lol = 100";
+            var text = File.ReadAllText(args[0]).Replace("\r", "");
+            var dev = @"def global bool lol = 100";
             var code = Interpreter.Interpret(dev);
             var script = CSharpScript.Create(code, ScriptOptions.Default.WithImports("System", "System.Math"));
-
-            string Repeat(string repeater, int amount)
-            {
-                return string.Join("", Enumerable.Repeat(repeater, amount));
-            }
 
             var i = 0;
             var running = true;
@@ -45,8 +40,7 @@ namespace Shore
                 i++;
                 Task.Delay(150).GetAwaiter().GetResult();
                 Console.SetCursorPosition(0, 0);
-                Console.WriteLine(
-                    $"Compiling Please Wait [{Repeat(".", i)}{Repeat(" ", 3 - i)}]      ");
+                Console.WriteLine($"Compiling Please Wait [{".".Repeat(i)}{" ".Repeat(3 - i)}]      ");
                 i %= 3;
             }
 
@@ -58,8 +52,13 @@ namespace Shore
             Console.WriteLine($"Compiled Successfully in: [{sw.Elapsed}]!");
 
             try { script.RunAsync().GetAwaiter().GetResult(); }
-            catch (Exception e) { Console.WriteLine($"{e.Message} at Line x"); }
-            
+            catch (Exception e)
+            {
+                var msg = e.Message;
+                Console.WriteLine(
+                    $"[{msg[(msg.IndexOf(':', msg.IndexOf(':') + 1) + 2)..]}] AT LINE [{msg[1..msg.IndexOf(',')]}]");
+            }
+
             // CONSOLE WINDOW CONTROL
             Console.WriteLine("Press C to close this window :)");
             try { while (Console.ReadKey(true).Key != ConsoleKey.C) Console.Read(); }
@@ -67,4 +66,3 @@ namespace Shore
         }
     }
 }
-
