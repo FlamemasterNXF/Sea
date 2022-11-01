@@ -5,10 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc93cbbe-17e1-4d72-b29a-bd18888bd3f9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Evaluator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Nodes/BinaryExpressionNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Nodes/ExpressionNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Nodes/Node.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Nodes/NodeTree.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Nodes/NumberExpressionNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Nodes/ParenthesisExpressionNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Nodes/Token.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Lexer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Parser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/TokType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ErrorConfig.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/ref/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/ref/Shore.dll" afterDir="false" />
@@ -76,7 +89,7 @@
       <workItem from="1665193729271" duration="316000" />
       <workItem from="1666219582532" duration="1350000" />
       <workItem from="1667329498587" duration="255000" />
-      <workItem from="1667329772342" duration="14213000" />
+      <workItem from="1667329772342" duration="15928000" />
     </task>
     <servers />
   </component>
