@@ -18,7 +18,7 @@ namespace Shore.CodeAnalysis
 
         private int EvaluateExpression(ExpressionNode node)
         {
-            if (node is NumberExpressionNode n) return (int) n.NumberToken.Value;
+            if (node is NumberExpressionNode n) return (int) n.LiteralToken.Value;
             
             if (node is BinaryExpressionNode b)
             {

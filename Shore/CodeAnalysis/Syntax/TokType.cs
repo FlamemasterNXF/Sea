@@ -12,7 +12,7 @@ namespace Shore.CodeAnalysis.Syntax
         OpenParenToken,
         UnknownToken,
         EndOfFileToken,
-        NumberExpression,
+        LiteralExpression,
         BinaryExpression,
         ParenthesisExpression
     }
