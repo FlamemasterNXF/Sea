@@ -1,6 +1,5 @@
-using System.Collections.Specialized;
 namespace Shore{
-    public class ErrorConfig
+    /*public class ErrorConfig
     {
         // Edit this Dictionary to change what certain Flags do!
         private readonly Dictionary<string, string> EDIT_ME_HUMANS = new Dictionary<string, string>()
@@ -63,4 +62,5 @@ namespace Shore{
             } 
         }
     };
+    */
 }
