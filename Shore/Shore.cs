@@ -7,23 +7,43 @@ namespace Shore
     {
         public static void Main(string[] args)
         {
-            Console.Write("> ");
-            var line = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(line)) return;
+            bool showTree = false;
 
-            var parser = new Parser(line);
-            var tree = parser.Parse();
-
-            var color = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            LogNode(tree.Root);
-            Console.ForegroundColor = color;
-
-            if (tree.Diagnostics.Any())
+            while (true)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                foreach (var diagnostic in parser.Diagnostics) Console.WriteLine(diagnostic);
-                Console.ForegroundColor = color;
+                Console.Write("> ");
+                var line = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(line)) return;
+
+                if (line == "#SHOWTREE")
+                {
+                    showTree = !showTree;
+                    Console.WriteLine(showTree ? "Showing Node Trees" : "Hiding Node Trees");
+                    continue;
+                }
+
+                var tree = NodeTree.Parse(line);
+                var color = Console.ForegroundColor;
+
+                if (showTree)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    LogNode(tree.Root);
+                    Console.ForegroundColor = color;
+                }
+
+                if (tree.Diagnostics.Any())
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    foreach (var diagnostic in tree.Diagnostics) Console.WriteLine(diagnostic);
+                    Console.ForegroundColor = color;
+                }
+                else
+                {
+                    var e = new Evaluator(tree.Root);
+                    var result = e.Evaluate();
+                    Console.WriteLine(result);
+                }   
             }
 
             // CONSOLE WINDOW CONTROL
@@ -70,7 +90,8 @@ namespace Shore
         UnknownToken,
         EndOfFileToken,
         NumberExpression,
-        BinaryExpression
+        BinaryExpression,
+        ParenthesisExpression
     }
     
     class Token : Node
@@ -128,7 +149,8 @@ namespace Shore
 
                 var length = _position - start;
                 var text = _text.Substring(start, length);
-                int.TryParse(text, out var value);
+                if(!int.TryParse(text, out var value)) _diagnostics.Add($"ERROR: '{text}' is not an Int32 value.");
+                
                 return new Token(TokType.NumberToken, start, text, value);
             }
 
@@ -206,6 +228,28 @@ namespace Shore
         }
     }
 
+    sealed class ParenthesisExpressionNode : ExpressionNode
+    {
+        public Token OpenParen { get; }
+        public ExpressionNode Expression { get; }
+        public Token CloseParen { get; }
+
+        public ParenthesisExpressionNode(Token openParen, ExpressionNode expression, Token closeParen)
+        {
+            OpenParen = openParen;
+            Expression = expression;
+            CloseParen = closeParen;
+        }
+
+        public override TokType Type => TokType.ParenthesisExpression;
+        public override IEnumerable<Node> GetChildren()
+        {
+            yield return OpenParen;
+            yield return Expression;
+            yield return CloseParen;
+        }
+    }
+
     sealed class NodeTree
     {
         public IReadOnlyList<string> Diagnostics { get; }
@@ -217,6 +261,12 @@ namespace Shore
             Diagnostics = diagnostics.ToArray();
             Root = root;
             EndOfFileToken = endOfFileToken;
+        }
+
+        public static NodeTree Parse(string text)
+        {
+            var parser = new Parser(text);
+            return parser.Parse();
         }
     }
         
@@ -234,8 +284,7 @@ namespace Shore
             var lexer = new Lexer(text);
             Token token;
 
-            do 
-            {
+            do {
                 token = lexer.NextToken();
                 if (token.Type != TokType.WhitespaceToken && token.Type != TokType.UnknownToken) tokens.Add(token);
             } while (token.Type != TokType.EndOfFileToken);
@@ -272,15 +321,37 @@ namespace Shore
 
         private ExpressionNode ParsePrimaryExpression()
         {
+            if (Current.Type == TokType.OpenParenToken)
+            {
+                var left = NextToken();
+                var expression = ParseExpression();
+                var right = Match(TokType.CloseParenToken);
+                return new ParenthesisExpressionNode(left, expression, right);
+            }
+            
             var numberToken = Match(TokType.NumberToken);
             return new NumberExpressionNode(numberToken);
         }
 
-        private ExpressionNode ParseExpression()
+        private ExpressionNode ParseTerm()
+        {
+            var left = ParseFactor();
+
+            while (Current.Type is TokType.PlusToken or TokType.DashToken)
+            {
+                var operatorToken = NextToken();
+                var right = ParseFactor();
+                left = new BinaryExpressionNode(left, operatorToken, right);
+            }
+
+            return left;
+        }
+        
+        private ExpressionNode ParseFactor()
         {
             var left = ParsePrimaryExpression();
 
-            while (Current.Type is TokType.PlusToken or TokType.DashToken)
+            while (Current.Type is TokType.StarToken or TokType.SlashToken)
             {
                 var operatorToken = NextToken();
                 var right = ParsePrimaryExpression();
@@ -289,12 +360,52 @@ namespace Shore
 
             return left;
         }
+
+        private ExpressionNode ParseExpression()
+        {
+            return ParseTerm();
+        }
         
         public NodeTree Parse()
         {
-            var expression = ParseExpression();
+            var expression = ParseTerm();
             var eof = Match(TokType.EndOfFileToken);
             return new NodeTree(_diagnostics, expression, eof);
+        }
+    }
+
+    class Evaluator
+    {
+        private readonly ExpressionNode _root;
+        public Evaluator(ExpressionNode root)
+        {
+            _root = root;
+        }
+
+        public int Evaluate()
+        {
+            return EvaluateExpression(_root);
+        }
+
+        private int EvaluateExpression(ExpressionNode node)
+        {
+            if (node is NumberExpressionNode n) return (int) n.NumberToken.Value;
+            
+            if (node is BinaryExpressionNode b)
+            {
+                var left = EvaluateExpression(b.Left);
+                var right = EvaluateExpression(b.Right);
+
+                if (b.OperatorToken.Type == TokType.PlusToken) return left + right;
+                if (b.OperatorToken.Type == TokType.DashToken) return left - right; 
+                if (b.OperatorToken.Type == TokType.StarToken) return left * right;
+                if (b.OperatorToken.Type == TokType.SlashToken) return left / right;
+                throw new Exception($"Unexpected Binary Operator '{b.OperatorToken.Type}'");
+            }
+
+            if (node is ParenthesisExpressionNode p) return EvaluateExpression(p.Expression);
+            
+            throw new Exception($"Unexpected Node '{node.Type}'");
         }
     }
 }
