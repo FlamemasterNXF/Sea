@@ -27,40 +27,40 @@ namespace Shore.CodeAnalysis.Syntax
         
         public IEnumerable<string> Diagnostics => _diagnostics;
 
-        private Token Peek(int offset)
+        private Token PeekToken(int offset)
         {
             var index = _position + offset;
             return index >= _tokens.Length ? _tokens[^1] : _tokens[index];
         }
         
-        private Token Current => Peek(0);
+        private Token CurrentToken => PeekToken(0);
 
         private Token NextToken()
         {
-            var current = Current;
+            var current = CurrentToken;
             _position++;
             return current;
         }
         
-        private Token Match(TokType type)
+        private Token MatchToken(TokType type)
         {
-            if (Current.Type == type) return NextToken();
+            if (CurrentToken.Type == type) return NextToken();
             
-            _diagnostics.Add($"ERROR: Unexpected Token <{Current.Type}>, {type} was expected.");
-            return new Token(type, Current.Position, null, null);
+            _diagnostics.Add($"ERROR: Unexpected Token <{CurrentToken.Type}>, {type} was expected.");
+            return new Token(type, CurrentToken.Position, null, null);
         }
 
         private ExpressionNode ParsePrimaryExpression()
         {
-            if (Current.Type == TokType.OpenParenToken)
+            if (CurrentToken.Type == TokType.OpenParenToken)
             {
                 var left = NextToken();
                 var expression = ParseExpression();
-                var right = Match(TokType.CloseParenToken);
+                var right = MatchToken(TokType.CloseParenToken);
                 return new ParenthesisExpressionNode(left, expression, right);
             }
             
-            var numberToken = Match(TokType.NumberToken);
+            var numberToken = MatchToken(TokType.NumberToken);
             return new NumberExpressionNode(numberToken);
         }
 
@@ -68,7 +68,7 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var left = ParseFactor();
 
-            while (Current.Type is TokType.PlusToken or TokType.DashToken)
+            while (CurrentToken.Type is TokType.PlusToken or TokType.DashToken)
             {
                 var operatorToken = NextToken();
                 var right = ParseFactor();
@@ -82,7 +82,7 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var left = ParsePrimaryExpression();
 
-            while (Current.Type is TokType.StarToken or TokType.SlashToken)
+            while (CurrentToken.Type is TokType.StarToken or TokType.SlashToken)
             {
                 var operatorToken = NextToken();
                 var right = ParsePrimaryExpression();
@@ -99,8 +99,8 @@ namespace Shore.CodeAnalysis.Syntax
         
         public NodeTree Parse()
         {
-            var expression = ParseTerm();
-            var eof = Match(TokType.EndOfFileToken);
+            var expression = ParseExpression();
+            var eof = MatchToken(TokType.EndOfFileToken);
             return new NodeTree(_diagnostics, expression, eof);
         }
     }
