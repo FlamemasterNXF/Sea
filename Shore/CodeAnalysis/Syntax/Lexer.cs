@@ -2,7 +2,7 @@ using Shore.CodeAnalysis.Nodes;
 
 namespace Shore.CodeAnalysis.Syntax
 {
-    public class Lexer
+    internal class Lexer
     {
         private readonly string _text;
         private int _position;

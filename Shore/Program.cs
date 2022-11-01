@@ -3,9 +3,9 @@ using Shore.CodeAnalysis.Nodes;
 
 namespace Shore
 {
-    public static class Program
+    internal static class Program
     {
-        public static void Main(string[] args)
+        private static void Main(string[] args)
         {
             bool showTree = false;
 
@@ -23,20 +23,19 @@ namespace Shore
                 }
 
                 var tree = NodeTree.Parse(line);
-                var color = Console.ForegroundColor;
 
                 if (showTree)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     LogNode(tree.Root);
-                    Console.ForegroundColor = color;
+                    Console.ResetColor();
                 }
 
                 if (tree.Diagnostics.Any())
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     foreach (var diagnostic in tree.Diagnostics) Console.WriteLine(diagnostic);
-                    Console.ForegroundColor = color;
+                    Console.ResetColor();
                 }
                 else
                 {

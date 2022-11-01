@@ -3,7 +3,7 @@ using Shore.CodeAnalysis.Syntax;
 
 namespace Shore.CodeAnalysis
 {
-    class Evaluator
+    public sealed class Evaluator
     {
         private readonly ExpressionNode _root;
         public Evaluator(ExpressionNode root)

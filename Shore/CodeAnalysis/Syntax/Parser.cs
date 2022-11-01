@@ -2,7 +2,7 @@ using Shore.CodeAnalysis.Nodes;
 
 namespace Shore.CodeAnalysis.Syntax
 {
-    public class Parser
+    internal sealed class Parser
     {
         private readonly Token[] _tokens;
 

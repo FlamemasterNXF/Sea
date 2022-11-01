@@ -2,7 +2,7 @@ using Shore.CodeAnalysis.Syntax;
 
 namespace Shore.CodeAnalysis.Nodes
 {
-    public class Token : Node
+    public sealed class Token : Node
     {
         public override TokType Type { get; }
 
