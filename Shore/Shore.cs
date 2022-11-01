@@ -12,9 +12,19 @@ namespace Shore
             if (string.IsNullOrWhiteSpace(line)) return;
 
             var parser = new Parser(line);
-            var expression = parser.Parse();
-            
-            LogNode(expression);
+            var tree = parser.Parse();
+
+            var color = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            LogNode(tree.Root);
+            Console.ForegroundColor = color;
+
+            if (tree.Diagnostics.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                foreach (var diagnostic in parser.Diagnostics) Console.WriteLine(diagnostic);
+                Console.ForegroundColor = color;
+            }
 
             // CONSOLE WINDOW CONTROL
             //Console.WriteLine("Press C to close this window :)");
@@ -89,11 +99,14 @@ namespace Shore
     {
         private readonly string _text;
         private int _position;
+        private List<string> _diagnostics = new List<string>();
 
         public Lexer(string text)
         {
             _text = text;
         }
+
+        public IEnumerable<string> Diagnostics => _diagnostics;
 
         private char Current => _position >= _text.Length ? '\0' : _text[_position];
 
@@ -137,7 +150,8 @@ namespace Shore
             if (Current == '/') return new Token(TokType.SlashToken, _position++, "/", null);
             if (Current == '(') return new Token(TokType.OpenParenToken, _position++, "(", null);
             if (Current == ')') return new Token(TokType.CloseParenToken, _position++, ")", null);
-
+            
+            _diagnostics.Add($"ERROR: Unknown Character: '{Current}'.");
             return new Token(TokType.UnknownToken, _position++, _text.Substring(_position - 1, 1), null);
         }
     }
@@ -191,10 +205,26 @@ namespace Shore
             yield return Right;
         }
     }
-    
+
+    sealed class NodeTree
+    {
+        public IReadOnlyList<string> Diagnostics { get; }
+        public ExpressionNode Root { get; }
+        public Token EndOfFileToken { get; }
+
+        public NodeTree(IEnumerable<string> diagnostics, ExpressionNode root, Token endOfFileToken)
+        {
+            Diagnostics = diagnostics.ToArray();
+            Root = root;
+            EndOfFileToken = endOfFileToken;
+        }
+    }
+        
     class Parser
     {
         private readonly Token[] _tokens;
+
+        private List<string> _diagnostics = new List<string>();
         private int _position;
 
         public Parser(string text)
@@ -211,7 +241,10 @@ namespace Shore
             } while (token.Type != TokType.EndOfFileToken);
 
             _tokens = tokens.ToArray();
+            _diagnostics.AddRange(lexer.Diagnostics);
         }
+        
+        public IEnumerable<string> Diagnostics => _diagnostics;
 
         private Token Peek(int offset)
         {
@@ -232,6 +265,8 @@ namespace Shore
         private Token Match(TokType type)
         {
             if (Current.Type == type) return NextToken();
+            
+            _diagnostics.Add($"ERROR: Unexpected Token <{Current.Type}>, {type} was expected.");
             return new Token(type, Current.Position, null, null);
         }
 
@@ -240,8 +275,8 @@ namespace Shore
             var numberToken = Match(TokType.NumberToken);
             return new NumberExpressionNode(numberToken);
         }
-        
-        public ExpressionNode Parse()
+
+        private ExpressionNode ParseExpression()
         {
             var left = ParsePrimaryExpression();
 
@@ -253,6 +288,13 @@ namespace Shore
             }
 
             return left;
+        }
+        
+        public NodeTree Parse()
+        {
+            var expression = ParseExpression();
+            var eof = Match(TokType.EndOfFileToken);
+            return new NodeTree(_diagnostics, expression, eof);
         }
     }
 }
