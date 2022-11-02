@@ -1,4 +1,5 @@
 ﻿using Shore.CodeAnalysis;
+using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore
@@ -22,27 +23,31 @@ namespace Shore
                     continue;
                 }
 
-                var tree = NodeTree.Parse(line);
+                var nodeTree = NodeTree.Parse(line);
+                var binder = new Binder();
+                var boundTree = binder.BindExpression(nodeTree.Root);
+
+                IReadOnlyList<string> diagnostics = nodeTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
 
                 if (showTree)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    LogNode(tree.Root);
+                    LogNode(nodeTree.Root);
                     Console.ResetColor();
                 }
 
-                if (tree.Diagnostics.Any())
+                if (!diagnostics.Any())
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    foreach (var diagnostic in tree.Diagnostics) Console.WriteLine(diagnostic);
-                    Console.ResetColor();
+                    var e = new Evaluator(boundTree);
+                    var result = e.Evaluate();
+                    Console.WriteLine(result);
                 }
                 else
                 {
-                    var e = new Evaluator(tree.Root);
-                    var result = e.Evaluate();
-                    Console.WriteLine(result);
-                }   
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    foreach (var diagnostic in nodeTree.Diagnostics) Console.WriteLine(diagnostic);
+                    Console.ResetColor();
+                }
             }
 
             // CONSOLE WINDOW CONTROL

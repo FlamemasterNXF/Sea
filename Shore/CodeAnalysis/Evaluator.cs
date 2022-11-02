@@ -1,12 +1,13 @@
+using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Syntax;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore.CodeAnalysis
 {
-    public sealed class Evaluator
+    internal sealed class Evaluator
     {
-        private readonly ExpressionNode _root;
-        public Evaluator(ExpressionNode root)
+        private readonly BoundExpression _root;
+        public Evaluator(BoundExpression root)
         {
             _root = root;
         }
@@ -16,38 +17,36 @@ namespace Shore.CodeAnalysis
             return EvaluateExpression(_root);
         }
 
-        private int EvaluateExpression(ExpressionNode node)
+        private int EvaluateExpression(BoundExpression node)
         {
-            if (node is LiteralExpressionNode n) return (int) n.LiteralToken.Value;
+            if (node is BoundLiteralExpression n) return (int) n.Value;
 
-            if (node is UnaryExpressionNode u)
+            if (node is BoundUnaryExpression u)
             {
                 var operand = EvaluateExpression(u.Operand);
 
-                return u.OperatorToken.Type switch
+                return u.OperatorKind switch
                 {
-                    TokType.PlusToken => operand,
-                    TokType.DashToken => -operand,
-                    _ => throw new Exception($"Unexpected Unary Operator '{u.OperatorToken.Type}'")
+                    BoundUnaryOperatorKind.Identity => operand,
+                    BoundUnaryOperatorKind.Negation => -operand,
+                    _ => throw new Exception($"Unexpected Unary Operator '{u.OperatorKind}'")
                 };
             }
             
-            if (node is BinaryExpressionNode b)
+            if (node is BoundBinaryExpression b)
             {
                 var left = EvaluateExpression(b.Left);
                 var right = EvaluateExpression(b.Right);
 
-                return b.OperatorToken.Type switch
+                return b.OperatorKind switch
                 {
-                    TokType.PlusToken => left + right,
-                    TokType.DashToken => left - right,
-                    TokType.StarToken => left * right,
-                    TokType.SlashToken => left / right,
-                    _ => throw new Exception($"Unexpected Binary Operator '{b.OperatorToken.Type}'")
+                    BoundBinaryOperatorKind.Addition => left + right,
+                    BoundBinaryOperatorKind.Subtraction => left - right,
+                    BoundBinaryOperatorKind.Multiplication => left * right,
+                    BoundBinaryOperatorKind.Division => left / right,
+                    _ => throw new Exception($"Unexpected Binary Operator '{b.OperatorKind}'")
                 };
             }
-
-            if (node is ParenthesisExpressionNode p) return EvaluateExpression(p.Expression);
             
             throw new Exception($"Unexpected Node '{node.Type}'");
         }
