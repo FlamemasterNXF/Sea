@@ -50,6 +50,39 @@ namespace Shore.CodeAnalysis.Syntax
             return new Token(type, CurrentToken.Position, null, null);
         }
 
+        private ExpressionNode ParseExpression(int parentPrecedence = 0)
+        {
+            var left = ParsePrimaryExpression();
+
+            while (true)
+            {
+                var precedence = GetBinaryOperatorPrecedence(CurrentToken.Type);
+                if (precedence == 0 || precedence <= parentPrecedence) break;
+
+                var operatorToken = NextToken();
+                var right = ParseExpression(precedence);
+                left = new BinaryExpressionNode(left, operatorToken, right);
+            }
+
+            return left;
+        }
+
+        private static int GetBinaryOperatorPrecedence(TokType type)
+        {
+            switch (type)
+            {
+                case TokType.StarToken:
+                case TokType.SlashToken: 
+                    return 2;
+                
+                case TokType.PlusToken:
+                case TokType.DashToken:
+                    return 1;
+
+                default: return 0;
+            }
+        }
+
         private ExpressionNode ParsePrimaryExpression()
         {
             if (CurrentToken.Type == TokType.OpenParenToken)
@@ -64,39 +97,6 @@ namespace Shore.CodeAnalysis.Syntax
             return new NumberExpressionNode(numberToken);
         }
 
-        private ExpressionNode ParseTerm()
-        {
-            var left = ParseFactor();
-
-            while (CurrentToken.Type is TokType.PlusToken or TokType.DashToken)
-            {
-                var operatorToken = NextToken();
-                var right = ParseFactor();
-                left = new BinaryExpressionNode(left, operatorToken, right);
-            }
-
-            return left;
-        }
-        
-        private ExpressionNode ParseFactor()
-        {
-            var left = ParsePrimaryExpression();
-
-            while (CurrentToken.Type is TokType.StarToken or TokType.SlashToken)
-            {
-                var operatorToken = NextToken();
-                var right = ParsePrimaryExpression();
-                left = new BinaryExpressionNode(left, operatorToken, right);
-            }
-
-            return left;
-        }
-
-        private ExpressionNode ParseExpression()
-        {
-            return ParseTerm();
-        }
-        
         public NodeTree Parse()
         {
             var expression = ParseExpression();
