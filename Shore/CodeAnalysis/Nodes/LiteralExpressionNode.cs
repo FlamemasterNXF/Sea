@@ -2,11 +2,11 @@ using Shore.CodeAnalysis.Syntax;
 
 namespace Shore.CodeAnalysis.Nodes
 {
-    public sealed class NumberExpressionNode : ExpressionNode
+    public sealed class LiteralExpressionNode : ExpressionNode
     {
         public Token LiteralToken { get; }
 
-        public NumberExpressionNode(Token literalToken)
+        public LiteralExpressionNode(Token literalToken)
         {
             LiteralToken = literalToken;
         }

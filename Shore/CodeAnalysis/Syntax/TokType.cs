@@ -14,6 +14,7 @@ namespace Shore.CodeAnalysis.Syntax
         EndOfFileToken,
         LiteralExpression,
         BinaryExpression,
-        ParenthesisExpression
+        ParenthesisExpression,
+        UnaryExpression
     }
 }

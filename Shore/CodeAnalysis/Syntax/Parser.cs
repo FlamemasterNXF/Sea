@@ -46,17 +46,28 @@ namespace Shore.CodeAnalysis.Syntax
         {
             if (CurrentToken.Type == type) return NextToken();
             
-            _diagnostics.Add($"ERROR: Unexpected Token <{CurrentToken.Type}>, {type} was expected.");
+            _diagnostics.Add($"ERROR: Unexpected Token {CurrentToken.Type}, {type} was expected.");
             return new Token(type, CurrentToken.Position, null, null);
         }
 
         private ExpressionNode ParseExpression(int parentPrecedence = 0)
         {
-            var left = ParsePrimaryExpression();
+            ExpressionNode left;
+            var unaryOperatorPrecedence = CurrentToken.Type.GetUnaryOperatorPrecedence();
+            if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
+            {
+                var operatorToken = NextToken();
+                var operand = ParseExpression(unaryOperatorPrecedence);
+                left = new UnaryExpressionNode(operatorToken, operand);
+            }
+            else
+            {
+                left = ParsePrimaryExpression();
+            }
 
             while (true)
             {
-                var precedence = GetBinaryOperatorPrecedence(CurrentToken.Type);
+                var precedence = CurrentToken.Type.GetBinaryOperatorPrecedence();
                 if (precedence == 0 || precedence <= parentPrecedence) break;
 
                 var operatorToken = NextToken();
@@ -65,22 +76,6 @@ namespace Shore.CodeAnalysis.Syntax
             }
 
             return left;
-        }
-
-        private static int GetBinaryOperatorPrecedence(TokType type)
-        {
-            switch (type)
-            {
-                case TokType.StarToken:
-                case TokType.SlashToken: 
-                    return 2;
-                
-                case TokType.PlusToken:
-                case TokType.DashToken:
-                    return 1;
-
-                default: return 0;
-            }
         }
 
         private ExpressionNode ParsePrimaryExpression()
@@ -94,7 +89,7 @@ namespace Shore.CodeAnalysis.Syntax
             }
             
             var numberToken = MatchToken(TokType.NumberToken);
-            return new NumberExpressionNode(numberToken);
+            return new LiteralExpressionNode(numberToken);
         }
 
         public NodeTree Parse()

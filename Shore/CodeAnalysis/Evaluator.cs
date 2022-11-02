@@ -18,7 +18,19 @@ namespace Shore.CodeAnalysis
 
         private int EvaluateExpression(ExpressionNode node)
         {
-            if (node is NumberExpressionNode n) return (int) n.LiteralToken.Value;
+            if (node is LiteralExpressionNode n) return (int) n.LiteralToken.Value;
+
+            if (node is UnaryExpressionNode u)
+            {
+                var operand = EvaluateExpression(u.Operand);
+
+                return u.OperatorToken.Type switch
+                {
+                    TokType.PlusToken => operand,
+                    TokType.DashToken => -operand,
+                    _ => throw new Exception($"Unexpected Unary Operator '{u.OperatorToken.Type}'")
+                };
+            }
             
             if (node is BinaryExpressionNode b)
             {
