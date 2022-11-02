@@ -1,6 +1,4 @@
-using Shore.CodeAnalysis.Syntax;
-
-namespace Shore.CodeAnalysis.Nodes
+namespace Shore.CodeAnalysis.Syntax.Nodes
 {
     public sealed class NodeTree
     {

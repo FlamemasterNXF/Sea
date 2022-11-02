@@ -1,5 +1,5 @@
 ﻿using Shore.CodeAnalysis;
-using Shore.CodeAnalysis.Nodes;
+using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore
 {

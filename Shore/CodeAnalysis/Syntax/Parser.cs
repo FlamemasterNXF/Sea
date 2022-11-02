@@ -1,4 +1,4 @@
-using Shore.CodeAnalysis.Nodes;
+using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore.CodeAnalysis.Syntax
 {
@@ -65,7 +65,7 @@ namespace Shore.CodeAnalysis.Syntax
                 left = ParsePrimaryExpression();
             }
 
-            while (true)
+            while (true) 
             {
                 var precedence = CurrentToken.Type.GetBinaryOperatorPrecedence();
                 if (precedence == 0 || precedence <= parentPrecedence) break;
