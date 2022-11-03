@@ -7,6 +7,8 @@ namespace Shore.CodeAnalysis.Binding
         Multiplication,
         Division,
         LogicalOr,
-        LogicalAnd
+        LogicalAnd,
+        LogicalNotEquals,
+        LogicalEquals
     }
 }

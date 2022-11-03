@@ -22,7 +22,7 @@ namespace Shore.CodeAnalysis.Binding
             ResultType = resultType;
         }
         
-        private static BoundUnaryOperator[] _operators =
+        private static readonly BoundUnaryOperator[] Operators =
         {
             new BoundUnaryOperator(TokType.PlusToken, BoundUnaryOperatorKind.Identity, typeof(int)),
             new BoundUnaryOperator(TokType.DashToken, BoundUnaryOperatorKind.Negation, typeof(int)),
@@ -32,7 +32,7 @@ namespace Shore.CodeAnalysis.Binding
 
         public static BoundUnaryOperator? Bind(TokType tokType, Type operandType)
         {
-            foreach (var op in _operators)
+            foreach (var op in Operators)
             {
                 if (op.TokType == tokType && op.OperandType == operandType) return op;
             }

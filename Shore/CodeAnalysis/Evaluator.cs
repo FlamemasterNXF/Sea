@@ -47,6 +47,8 @@ namespace Shore.CodeAnalysis
                     BoundBinaryOperatorKind.Division => (int) left / (int) right,
                     BoundBinaryOperatorKind.LogicalAnd => (bool) left && (bool) right,
                     BoundBinaryOperatorKind.LogicalOr => (bool) left || (bool) right,
+                    BoundBinaryOperatorKind.LogicalEquals => Equals(left, right),
+                    BoundBinaryOperatorKind.LogicalNotEquals => !Equals(left, right),
                     _ => throw new Exception($"Unexpected Binary Operator '{b.Op.Kind}'")
                 };
             }

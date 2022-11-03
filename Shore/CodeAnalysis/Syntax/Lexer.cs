@@ -87,12 +87,16 @@ namespace Shore.CodeAnalysis.Syntax
                 case ')':
                     return new Token(TokType.CloseParenToken, _position++, ")", null);
                 case '!':
+                    if(Lookahead == '=') return new Token(TokType.BangEqualsToken, _position+=2, "!=", null);
                     return new Token(TokType.BangToken, _position++, "!", null);
                 case '&':
                     if(Lookahead == '&') return new Token(TokType.DoubleAmpersandToken, _position+=2, "&&", null);
                     break;
                 case '|':
                     if(Lookahead == '|') return new Token(TokType.DoublePipeToken, _position+=2, "||", null);
+                    break;
+                case '=':
+                    if(Lookahead == '=') return new Token(TokType.DoubleEqualsToken, _position+=2, "==", null);
                     break;
             }
             

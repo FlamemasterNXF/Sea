@@ -6,9 +6,9 @@ namespace Shore.CodeAnalysis.Syntax
         {
             return type switch
             {
-                TokType.PlusToken => 5,
-                TokType.DashToken => 5,
-                TokType.BangToken => 5,
+                TokType.PlusToken => 6,
+                TokType.DashToken => 6,
+                TokType.BangToken => 6,
                 
                 _ => 0
             };
@@ -18,11 +18,14 @@ namespace Shore.CodeAnalysis.Syntax
         {
             return type switch
             {
-                TokType.StarToken => 4,
-                TokType.SlashToken => 4,
+                TokType.StarToken => 5,
+                TokType.SlashToken => 5,
                 
-                TokType.PlusToken => 3,
-                TokType.DashToken => 3,
+                TokType.PlusToken => 4,
+                TokType.DashToken => 4,
+                
+                TokType.DoubleEqualsToken => 3,
+                TokType.BangEqualsToken => 3,
                 
                 TokType.DoubleAmpersandToken => 2,
                 TokType.DoublePipeToken => 1,

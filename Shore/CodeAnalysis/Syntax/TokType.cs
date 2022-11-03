@@ -21,6 +21,8 @@ namespace Shore.CodeAnalysis.Syntax
         TrueKeyword,
         BangToken,
         DoubleAmpersandToken,
-        DoublePipeToken
+        DoublePipeToken,
+        DoubleEqualsToken,
+        BangEqualsToken
     }
 }
