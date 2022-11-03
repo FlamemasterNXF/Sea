@@ -29,82 +29,30 @@ namespace Shore.CodeAnalysis.Binding
         private BoundExpression BindUnaryExpression(UnaryExpressionNode node)
         {
             var boundOperand = BindExpression(node.Operand);
-            var boundOperatorKind = BindUnaryOperatorKind(node.OperatorToken.Type, boundOperand.Type);
+            var boundOperator = BoundUnaryOperator.Bind(node.OperatorToken.Type, boundOperand.Type);
             
-            if (boundOperatorKind is null)
+            if (boundOperator is null)
             {
                 _diagnostics.Add($"Unary Operator '{node.OperatorToken.Text}' is not defined for Type {boundOperand.Type}.");
                 return boundOperand;
             }
             
-            return new BoundUnaryExpression(boundOperatorKind.Value, boundOperand);
+            return new BoundUnaryExpression(boundOperator, boundOperand);
         }
 
         private BoundExpression BindBinaryExpression(BinaryExpressionNode node)
         {
             var boundLeft = BindExpression(node.Left);
             var boundRight = BindExpression(node.Right);
-            var boundOperatorKind = BindBinaryOperatorKind(node.OperatorToken.Type, boundLeft.Type, boundRight.Type);
+            var boundOperator = BoundBinaryOperator.Bind(node.OperatorToken.Type, boundLeft.Type, boundRight.Type);
             
-            if (boundOperatorKind is null)
+            if (boundOperator is null)
             {
                 _diagnostics.Add($"Binary Operator '{node.OperatorToken.Text}' is not defined for Types {boundLeft.Type} and {boundRight.Type}.");
                 return boundLeft;
             }
 
-            return new BoundBinaryExpression(boundLeft, boundOperatorKind.Value, boundRight);
-        }
-        
-        private BoundUnaryOperatorKind? BindUnaryOperatorKind(TokType kind, Type operandType)
-        {
-            if (operandType == typeof(int))
-            {
-                return kind switch
-                {
-                    TokType.PlusToken => BoundUnaryOperatorKind.Identity,
-                    TokType.DashToken => BoundUnaryOperatorKind.Negation,
-                    _ => throw new Exception($"Unexpected Unary Operator '{kind}'")
-                };
-            }
-
-            if (operandType == typeof(bool))
-            {
-                return kind switch
-                {
-                    TokType.BangToken => BoundUnaryOperatorKind.LogicalNegation,
-                    _ => throw new Exception($"Unexpected Unary Operator '{kind}'")
-
-                };
-            }
-
-            return null;
-        }
-        
-        private BoundBinaryOperatorKind? BindBinaryOperatorKind(TokType kind, Type leftType, Type rightType)
-        {
-            if (leftType == typeof(int) && rightType == typeof(int))
-            {
-                return kind switch
-                {
-                    TokType.PlusToken => BoundBinaryOperatorKind.Addition,
-                    TokType.DashToken => BoundBinaryOperatorKind.Subtraction,
-                    TokType.StarToken => BoundBinaryOperatorKind.Multiplication,
-                    TokType.SlashToken => BoundBinaryOperatorKind.Division,
-                    _ => throw new Exception($"Unexpected Binary Operator '{kind}'")
-                };
-            }
-            
-            if (leftType == typeof(bool) && rightType == typeof(bool))
-            {
-                return kind switch
-                {
-                    TokType.DoubleAmpersandToken => BoundBinaryOperatorKind.LogicalAnd,
-                    TokType.DoublePipeToken => BoundBinaryOperatorKind.LogicalOr,
-                    _ => throw new Exception($"Unexpected Binary Operator '{kind}'")
-                };
-            }
-                
-            return null;
+            return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
         }
     }
 }
