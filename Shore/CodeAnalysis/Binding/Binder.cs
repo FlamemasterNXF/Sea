@@ -57,28 +57,54 @@ namespace Shore.CodeAnalysis.Binding
         
         private BoundUnaryOperatorKind? BindUnaryOperatorKind(TokType kind, Type operandType)
         {
-            if (operandType != typeof(int)) return null;
-            
-            return kind switch
+            if (operandType == typeof(int))
             {
-                TokType.PlusToken => BoundUnaryOperatorKind.Identity,
-                TokType.DashToken => BoundUnaryOperatorKind.Negation,
-                _ => throw new Exception($"Unexpected Unary Operator '{kind}'")
-            };
+                return kind switch
+                {
+                    TokType.PlusToken => BoundUnaryOperatorKind.Identity,
+                    TokType.DashToken => BoundUnaryOperatorKind.Negation,
+                    _ => throw new Exception($"Unexpected Unary Operator '{kind}'")
+                };
+            }
+
+            if (operandType == typeof(bool))
+            {
+                return kind switch
+                {
+                    TokType.BangToken => BoundUnaryOperatorKind.LogicalNegation,
+                    _ => throw new Exception($"Unexpected Unary Operator '{kind}'")
+
+                };
+            }
+
+            return null;
         }
         
         private BoundBinaryOperatorKind? BindBinaryOperatorKind(TokType kind, Type leftType, Type rightType)
         {
-            if (leftType != typeof(int) || rightType != typeof(int)) return null;
-            
-            return kind switch
+            if (leftType == typeof(int) && rightType == typeof(int))
             {
-                TokType.PlusToken => BoundBinaryOperatorKind.Addition,
-                TokType.DashToken => BoundBinaryOperatorKind.Subtraction,
-                TokType.StarToken => BoundBinaryOperatorKind.Multiplication,
-                TokType.SlashToken => BoundBinaryOperatorKind.Division,
-                _ => throw new Exception($"Unexpected Binary Operator '{kind}'")
-            };
+                return kind switch
+                {
+                    TokType.PlusToken => BoundBinaryOperatorKind.Addition,
+                    TokType.DashToken => BoundBinaryOperatorKind.Subtraction,
+                    TokType.StarToken => BoundBinaryOperatorKind.Multiplication,
+                    TokType.SlashToken => BoundBinaryOperatorKind.Division,
+                    _ => throw new Exception($"Unexpected Binary Operator '{kind}'")
+                };
+            }
+            
+            if (leftType == typeof(bool) && rightType == typeof(bool))
+            {
+                return kind switch
+                {
+                    TokType.DoubleAmpersandToken => BoundBinaryOperatorKind.LogicalAnd,
+                    TokType.DoublePipeToken => BoundBinaryOperatorKind.LogicalOr,
+                    _ => throw new Exception($"Unexpected Binary Operator '{kind}'")
+                };
+            }
+                
+            return null;
         }
     }
 }

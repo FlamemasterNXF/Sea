@@ -15,7 +15,14 @@ namespace Shore.CodeAnalysis.Syntax
 
         public IEnumerable<string> Diagnostics => _diagnostics;
 
-        private char Current => _position >= _text.Length ? '\0' : _text[_position];
+        private char Current => PeekToken(0);
+        private char Lookahead => PeekToken(1);
+
+        private char PeekToken(int offset)
+        {
+            var index = _position + offset;
+            return index >= _text.Length ? '\0' : _text[index];
+        }
 
         private void Next()
         {
@@ -79,10 +86,18 @@ namespace Shore.CodeAnalysis.Syntax
                     return new Token(TokType.OpenParenToken, _position++, "(", null);
                 case ')':
                     return new Token(TokType.CloseParenToken, _position++, ")", null);
-                default:
-                    _diagnostics.Add($"ERROR: Unknown Character: '{Current}'.");
-                    return new Token(TokType.UnknownToken, _position++, _text.Substring(_position - 1, 1), null);
+                case '!':
+                    return new Token(TokType.BangToken, _position++, "!", null);
+                case '&':
+                    if(Lookahead == '&') return new Token(TokType.DoubleAmpersandToken, _position+=2, "&&", null);
+                    break;
+                case '|':
+                    if(Lookahead == '|') return new Token(TokType.DoublePipeToken, _position+=2, "||", null);
+                    break;
             }
+            
+            _diagnostics.Add($"ERROR: Unknown Character: '{Current}'.");
+            return new Token(TokType.UnknownToken, _position++, _text.Substring(_position - 1, 1), null);
         }
     }
 }

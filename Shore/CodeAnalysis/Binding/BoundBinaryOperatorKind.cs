@@ -5,6 +5,8 @@ namespace Shore.CodeAnalysis.Binding
         Addition, 
         Subtraction,
         Multiplication,
-        Division
+        Division,
+        LogicalOr,
+        LogicalAnd
     }
 }

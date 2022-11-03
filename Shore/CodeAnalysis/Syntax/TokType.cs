@@ -18,6 +18,9 @@ namespace Shore.CodeAnalysis.Syntax
         UnaryExpression,
         IdentifierToken,
         FalseKeyword,
-        TrueKeyword
+        TrueKeyword,
+        BangToken,
+        DoubleAmpersandToken,
+        DoublePipeToken
     }
 }
