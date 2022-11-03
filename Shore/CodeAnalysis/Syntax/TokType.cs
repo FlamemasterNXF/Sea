@@ -15,6 +15,9 @@ namespace Shore.CodeAnalysis.Syntax
         LiteralExpression,
         BinaryExpression,
         ParenthesisExpression,
-        UnaryExpression
+        UnaryExpression,
+        IdentifierToken,
+        FalseKeyword,
+        TrueKeyword
     }
 }

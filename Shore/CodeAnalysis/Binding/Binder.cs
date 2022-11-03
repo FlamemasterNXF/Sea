@@ -3,85 +3,6 @@ using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore.CodeAnalysis.Binding
 {
-    internal enum BoundNodeKind
-    {
-        UnaryExpression,
-        LiteralExpression,
-        BinaryExpression
-    }
-    
-    internal abstract class BoundNode
-    {
-        public abstract BoundNodeKind Kind { get; }
-    }
-
-    internal abstract class BoundExpression : BoundNode
-    {
-        public abstract Type Type { get; }
-    }
-
-    internal sealed class BoundLiteralExpression : BoundExpression
-    {
-        public object Value { get; }
-
-        public BoundLiteralExpression(object value)
-        {
-            Value = value;
-        }
-
-        public override Type Type => Value.GetType();
-
-        public override BoundNodeKind Kind => BoundNodeKind.LiteralExpression;
-    }
-    
-    internal enum BoundUnaryOperatorKind
-    {
-        Identity, 
-        Negation
-    }
-    
-    internal sealed class BoundUnaryExpression : BoundExpression
-    {
-        public BoundUnaryOperatorKind OperatorKind { get; }
-        public BoundExpression Operand { get; }
-
-        public BoundUnaryExpression(BoundUnaryOperatorKind operatorKind, BoundExpression operand)
-        {
-            OperatorKind = operatorKind;
-            Operand = operand;
-        }
-
-        public override Type Type => Operand.Type;
-        
-        public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
-    }
-    
-    internal enum BoundBinaryOperatorKind
-    {
-        Addition, 
-        Subtraction,
-        Multiplication,
-        Division
-    }
-
-    internal sealed class BoundBinaryExpression : BoundExpression
-    {
-        public BoundExpression Left { get; }
-        public BoundBinaryOperatorKind OperatorKind { get; }
-        public BoundExpression Right { get; }
-
-        public BoundBinaryExpression(BoundExpression left, BoundBinaryOperatorKind operatorKind, BoundExpression right)
-        {
-            Left = left;
-            OperatorKind = operatorKind;
-            Right = right;
-        }
-
-        public override Type Type => Left.Type;
-
-        public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
-    }
-
     internal sealed class Binder
     {
         private List<string> _diagnostics = new List<string>();
@@ -101,7 +22,7 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
         {
-            var value = node.LiteralToken.Value as int? ?? 0;
+            var value = node.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 
@@ -127,7 +48,7 @@ namespace Shore.CodeAnalysis.Binding
             
             if (boundOperatorKind is null)
             {
-                _diagnostics.Add($"Unary Operator '{node.OperatorToken.Text}' is not defined for Types {boundLeft.Type} and {boundRight.Type}.");
+                _diagnostics.Add($"Binary Operator '{node.OperatorToken.Text}' is not defined for Types {boundLeft.Type} and {boundRight.Type}.");
                 return boundLeft;
             }
 
@@ -148,7 +69,7 @@ namespace Shore.CodeAnalysis.Binding
         
         private BoundBinaryOperatorKind? BindBinaryOperatorKind(TokType kind, Type leftType, Type rightType)
         {
-            if (leftType != typeof(int) || leftType != rightType) return null;
+            if (leftType != typeof(int) || rightType != typeof(int)) return null;
             
             return kind switch
             {

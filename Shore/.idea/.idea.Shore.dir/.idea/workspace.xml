@@ -5,10 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc93cbbe-17e1-4d72-b29a-bd18888bd3f9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/Binder.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundBinaryExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundBinaryOperatorKind.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundLiteralExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundNodeKind.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundUnaryExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundUnaryOperatorKind.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Binding/Binder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/Binder.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CodeAnalysis/Evaluator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Evaluator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/Lexer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Lexer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/Nodes/LiteralExpressionNode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Nodes/LiteralExpressionNode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Parser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/SyntaxFacts.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/SyntaxFacts.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/TokType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/TokType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/ref/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/ref/Shore.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/refint/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/refint/Shore.dll" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +93,7 @@
       <workItem from="1666219582532" duration="1350000" />
       <workItem from="1667329498587" duration="255000" />
       <workItem from="1667329772342" duration="19772000" />
-      <workItem from="1667421783041" duration="8226000" />
+      <workItem from="1667421783041" duration="12336000" />
     </task>
     <servers />
   </component>

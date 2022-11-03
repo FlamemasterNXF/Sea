@@ -80,16 +80,28 @@ namespace Shore.CodeAnalysis.Syntax
 
         private ExpressionNode ParsePrimaryExpression()
         {
-            if (CurrentToken.Type == TokType.OpenParenToken)
+            switch (CurrentToken.Type)
             {
-                var left = NextToken();
-                var expression = ParseExpression();
-                var right = MatchToken(TokType.CloseParenToken);
-                return new ParenthesisExpressionNode(left, expression, right);
+                case TokType.OpenParenToken:
+                {
+                    var left = NextToken();
+                    var expression = ParseExpression();
+                    var right = MatchToken(TokType.CloseParenToken);
+                    return new ParenthesisExpressionNode(left, expression, right);
+                }
+                case TokType.TrueKeyword:
+                case TokType.FalseKeyword:
+                {
+                    var keywordToken = NextToken();
+                    var value = keywordToken.Type is TokType.TrueKeyword;
+                    return new LiteralExpressionNode(keywordToken, value);
+                }
+                default:
+                {
+                    var numberToken = MatchToken(TokType.NumberToken);
+                    return new LiteralExpressionNode(numberToken);
+                }
             }
-            
-            var numberToken = MatchToken(TokType.NumberToken);
-            return new LiteralExpressionNode(numberToken);
         }
 
         public NodeTree Parse()

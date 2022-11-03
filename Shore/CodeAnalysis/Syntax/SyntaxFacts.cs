@@ -11,6 +11,7 @@ namespace Shore.CodeAnalysis.Syntax
                 _ => 0
             };
         }
+        
         public static int GetBinaryOperatorPrecedence(this TokType type)
         {
             return type switch
@@ -20,6 +21,16 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.PlusToken => 1,
                 TokType.DashToken => 1,
                 _ => 0
+            };
+        }
+
+        public static TokType GetKeywordType(this string text)
+        {
+            return text switch
+            {
+                "true" => TokType.TrueKeyword,
+                "false" => TokType.FalseKeyword,
+                _ => TokType.IdentifierToken
             };
         }
     }
