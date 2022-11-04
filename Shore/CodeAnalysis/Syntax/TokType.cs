@@ -23,6 +23,9 @@ namespace Shore.CodeAnalysis.Syntax
         DoubleAmpersandToken,
         DoublePipeToken,
         DoubleEqualsToken,
-        BangEqualsToken
+        BangEqualsToken,
+        NameExpression,
+        AssignmentExpression,
+        EqualsToken
     }
 }

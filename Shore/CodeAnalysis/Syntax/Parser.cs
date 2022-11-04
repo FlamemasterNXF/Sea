@@ -49,15 +49,33 @@ namespace Shore.CodeAnalysis.Syntax
             _diagnostics.ReportUnexpectedToken(CurrentToken.Span, CurrentToken.Type, type);
             return new Token(type, CurrentToken.Position, null, null);
         }
+        
+        private ExpressionNode ParseExpression()
+        {
+            return ParseAssignmentExpression();
+        }
+        
+        private ExpressionNode ParseAssignmentExpression()
+        {
+            if (CurrentToken.Type == TokType.IdentifierToken && PeekToken(1).Type == TokType.EqualsToken)
+            {
+                var identifierToken = NextToken();
+                var operatorToken = NextToken();
+                var right = ParseAssignmentExpression();
+                return new AssignmentExpressionNode(identifierToken, operatorToken, right);
+            }
 
-        private ExpressionNode ParseExpression(int parentPrecedence = 0)
+            return ParseBinaryExpression();
+        }
+        
+        private ExpressionNode ParseBinaryExpression(int parentPrecedence = 0)
         {
             ExpressionNode left;
             var unaryOperatorPrecedence = CurrentToken.Type.GetUnaryOperatorPrecedence();
             if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
             {
                 var operatorToken = NextToken();
-                var operand = ParseExpression(unaryOperatorPrecedence);
+                var operand = ParseBinaryExpression(unaryOperatorPrecedence);
                 left = new UnaryExpressionNode(operatorToken, operand);
             }
             else
@@ -71,7 +89,7 @@ namespace Shore.CodeAnalysis.Syntax
                 if (precedence == 0 || precedence <= parentPrecedence) break;
 
                 var operatorToken = NextToken();
-                var right = ParseExpression(precedence);
+                var right = ParseBinaryExpression(precedence);
                 left = new BinaryExpressionNode(left, operatorToken, right);
             }
 
@@ -89,6 +107,7 @@ namespace Shore.CodeAnalysis.Syntax
                     var right = MatchToken(TokType.CloseParenToken);
                     return new ParenthesisExpressionNode(left, expression, right);
                 }
+                
                 case TokType.TrueKeyword:
                 case TokType.FalseKeyword:
                 {
@@ -96,6 +115,13 @@ namespace Shore.CodeAnalysis.Syntax
                     var value = keywordToken.Type is TokType.TrueKeyword;
                     return new LiteralExpressionNode(keywordToken, value);
                 }
+                
+                case TokType.IdentifierToken:
+                {
+                    var identifierToken = NextToken();
+                    return new NameExpressionNode(identifierToken);
+                }
+                
                 default:
                 {
                     var numberToken = MatchToken(TokType.NumberToken);

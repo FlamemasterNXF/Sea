@@ -10,6 +10,7 @@ namespace Shore
         private static void Main(string[] args)
         {
             bool showTree = false;
+            var variables = new Dictionary<VariableSymbol, object>();
 
             while (true)
             {
@@ -26,7 +27,7 @@ namespace Shore
 
                 var nodeTree = NodeTree.Parse(line);
                 var compilation = new Compilation(nodeTree);
-                var result = compilation.Evaluate();
+                var result = compilation.Evaluate(variables);
 
                 var diagnostics = result.Diagnostics;
 

@@ -5,21 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc93cbbe-17e1-4d72-b29a-bd18888bd3f9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Compilation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Diagnostic.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CodeAnalysis/DiagnosticBag.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CodeAnalysis/EvaluationResult.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CodeAnalysis/TextSpan.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundAssignmentExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundVariableExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Nodes/AssignmentExpressionNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Nodes/NameExpressionNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CodeAnalysis/VariableSymbol.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CodeAnalysis/Binding/Binder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/Binder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundNodeKind.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Binding/BoundNodeKind.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Compilation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Compilation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/DiagnosticBag.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/DiagnosticBag.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CodeAnalysis/Evaluator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Evaluator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/Lexer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Lexer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/Nodes/NodeTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Nodes/NodeTree.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/Nodes/Token.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Nodes/Token.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/Parser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/misc/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeAnalysis/Syntax/TokType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CodeAnalysis/Syntax/TokType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Debug/net6.0/Shore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/misc/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net6.0/Shore.pdb" afterDir="false" />
@@ -30,6 +32,9 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e7e231682be8652744726acc6de35323daa68061429db55e0c251114902f60/String.Manipulation.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -91,7 +96,7 @@
       <workItem from="1667329772342" duration="19772000" />
       <workItem from="1667421783041" duration="12968000" />
       <workItem from="1667492483747" duration="8002000" />
-      <workItem from="1667578990731" duration="7840000" />
+      <workItem from="1667578990731" duration="13803000" />
     </task>
     <servers />
   </component>

@@ -117,6 +117,7 @@ namespace Shore.CodeAnalysis.Syntax
                         _position+=2;
                         return new Token(TokType.DoubleEqualsToken, pos, "==", null);
                     }
+                    return new Token(TokType.EqualsToken, _position++, "=", null);
                     break;
             }
             

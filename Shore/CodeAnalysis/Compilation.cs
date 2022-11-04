@@ -12,15 +12,15 @@ namespace Shore.CodeAnalysis
             NodeTree = nodeTree;
         }
 
-        public EvaluationResult Evaluate()
+        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
-            var binder = new Binder();
+            var binder = new Binder(variables);
             var boundTree = binder.BindExpression(NodeTree.Root);
 
             var diagnostics = NodeTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
             if (diagnostics.Any()) return new EvaluationResult(diagnostics, null);
 
-            var evaluator = new Evaluator(boundTree);
+            var evaluator = new Evaluator(boundTree, variables);
             var value = evaluator.Evaluate();
             return new EvaluationResult(Array.Empty<Diagnostic>(), value);
         }

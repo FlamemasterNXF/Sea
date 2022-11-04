@@ -4,6 +4,8 @@ namespace Shore.CodeAnalysis.Binding
     {
         UnaryExpression,
         LiteralExpression,
-        BinaryExpression
+        BinaryExpression,
+        VariableExpression,
+        AssignmentExpression
     }
 }

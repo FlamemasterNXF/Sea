@@ -56,5 +56,11 @@ namespace Shore.CodeAnalysis
             var message = $"Binary Operator '{operatorText}' is not defined for Types {sLeftType} and {sRightType}.";
             ReportError(span, message);
         }
+
+        public void ReportUndefinedName(TextSpan span, string name)
+        {
+            var message = $"'{name}' is not defined.";
+            ReportError(span, message);
+        }
     }
 }
