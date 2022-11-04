@@ -16,6 +16,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.LiteralExpression => BindLiteralExpression((LiteralExpressionNode)node),
                 TokType.UnaryExpression => BindUnaryExpression((UnaryExpressionNode)node),
                 TokType.BinaryExpression => BindBinaryExpression((BinaryExpressionNode)node),
+                TokType.ParenthesisExpression => BindExpression(((ParenthesisExpressionNode)node).Expression),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
         }
