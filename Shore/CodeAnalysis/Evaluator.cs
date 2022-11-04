@@ -1,6 +1,4 @@
 using Shore.CodeAnalysis.Binding;
-using Shore.CodeAnalysis.Syntax;
-using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore.CodeAnalysis
 {

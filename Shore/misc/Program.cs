@@ -1,4 +1,5 @@
-﻿using Shore.CodeAnalysis;
+﻿using System.ComponentModel.DataAnnotations;
+using Shore.CodeAnalysis;
 using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
@@ -24,10 +25,10 @@ namespace Shore
                 }
 
                 var nodeTree = NodeTree.Parse(line);
-                var binder = new Binder();
-                var boundTree = binder.BindExpression(nodeTree.Root);
+                var compilation = new Compilation(nodeTree);
+                var result = compilation.Evaluate();
 
-                IReadOnlyList<string> diagnostics = nodeTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+                var diagnostics = result.Diagnostics;
 
                 if (showTree)
                 {
@@ -36,17 +37,32 @@ namespace Shore
                     Console.ResetColor();
                 }
 
-                if (!diagnostics.Any())
-                {
-                    var e = new Evaluator(boundTree);
-                    var result = e.Evaluate();
-                    Console.WriteLine(result);
-                }
+                if (!diagnostics.Any()) Console.WriteLine(result.Value);
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    foreach (var diagnostic in diagnostics) Console.WriteLine(diagnostic);
-                    Console.ResetColor();
+                    foreach (var diagnostic in diagnostics)
+                    {
+                        Console.WriteLine();
+
+                        Console.ForegroundColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
+                        Console.WriteLine(diagnostic);
+                        Console.ResetColor();
+                        
+                        var prefix = line.Substring(0, diagnostic.Span.Start);
+                        var message = line.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
+                        var suffix = line.Substring(diagnostic.Span.End);
+                        
+                        Console.Write("    ");
+                        Console.Write(prefix);
+
+                        Console.ForegroundColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
+                        Console.Write(message);
+                        Console.ResetColor();
+                        
+                        Console.Write(suffix);
+                        Console.WriteLine();
+                    }
+                    Console.WriteLine();
                 }
             }
 
@@ -56,7 +72,7 @@ namespace Shore
             //catch (Exception){ Console.WriteLine($"Console Window not found!"); }
         }
 
-        static void LogNode(Node node, string indent = "", bool last = false)
+        private static void LogNode(Node node, string indent = "", bool last = false)
         {
             var marker = last ? "└──" : "├──";
 

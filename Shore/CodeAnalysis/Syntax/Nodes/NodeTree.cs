@@ -2,11 +2,11 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
 {
     public sealed class NodeTree
     {
-        public IReadOnlyList<string> Diagnostics { get; }
+        public IReadOnlyList<Diagnostic> Diagnostics { get; }
         public ExpressionNode Root { get; }
         public Token EndOfFileToken { get; }
 
-        public NodeTree(IEnumerable<string> diagnostics, ExpressionNode root, Token endOfFileToken)
+        public NodeTree(IEnumerable<Diagnostic> diagnostics, ExpressionNode root, Token endOfFileToken)
         {
             Diagnostics = diagnostics.ToArray();
             Root = root;

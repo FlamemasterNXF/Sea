@@ -6,7 +6,7 @@ namespace Shore.CodeAnalysis.Syntax
     {
         private readonly Token[] _tokens;
 
-        private readonly List<string> _diagnostics = new List<string>();
+        private DiagnosticBag _diagnostics = new DiagnosticBag();
         private int _position;
 
         public Parser(string text)
@@ -25,7 +25,7 @@ namespace Shore.CodeAnalysis.Syntax
             _diagnostics.AddRange(lexer.Diagnostics);
         }
         
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
 
         private Token PeekToken(int offset)
         {
@@ -46,7 +46,7 @@ namespace Shore.CodeAnalysis.Syntax
         {
             if (CurrentToken.Type == type) return NextToken();
             
-            _diagnostics.Add($"ERROR: Unexpected Token {CurrentToken.Type}, {type} was expected.");
+            _diagnostics.ReportUnexpectedToken(CurrentToken.Span, CurrentToken.Type, type);
             return new Token(type, CurrentToken.Position, null, null);
         }
 

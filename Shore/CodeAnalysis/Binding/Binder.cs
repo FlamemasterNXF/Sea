@@ -5,9 +5,9 @@ namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class Binder
     {
-        private List<string> _diagnostics = new List<string>();
+        private DiagnosticBag _diagnostics = new DiagnosticBag();
 
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
 
         public BoundExpression BindExpression(ExpressionNode node)
         {
@@ -34,7 +34,7 @@ namespace Shore.CodeAnalysis.Binding
             
             if (boundOperator is null)
             {
-                _diagnostics.Add($"Unary Operator '{node.OperatorToken.Text}' is not defined for Type {boundOperand.Type}.");
+                _diagnostics.ReportUndefinedUnaryOperator(node.OperatorToken.Span, node.OperatorToken.Text, boundOperand.Type);
                 return boundOperand;
             }
             
@@ -49,7 +49,7 @@ namespace Shore.CodeAnalysis.Binding
             
             if (boundOperator is null)
             {
-                _diagnostics.Add($"Binary Operator '{node.OperatorToken.Text}' is not defined for Types {boundLeft.Type} and {boundRight.Type}.");
+                _diagnostics.ReportUndefinedBinaryOperator(node.OperatorToken.Span, node.OperatorToken.Text, boundLeft.Type, boundRight.Type);
                 return boundLeft;
             }
 

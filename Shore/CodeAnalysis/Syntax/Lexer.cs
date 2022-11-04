@@ -6,14 +6,14 @@ namespace Shore.CodeAnalysis.Syntax
     {
         private readonly string _text;
         private int _position;
-        private readonly List<string> _diagnostics = new List<string>();
+        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
 
         public Lexer(string text)
         {
             _text = text;
         }
 
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
 
         private char Current => PeekToken(0);
         private char Lookahead => PeekToken(1);
@@ -32,7 +32,7 @@ namespace Shore.CodeAnalysis.Syntax
         {
             if (_position >= _text.Length)
                 return new Token(TokType.EndOfFileToken, _position, "\0", null);
-
+            
             if (char.IsDigit(Current))
             {
                 var start = _position;
@@ -42,7 +42,7 @@ namespace Shore.CodeAnalysis.Syntax
 
                 var length = _position - start;
                 var text = _text.Substring(start, length);
-                if(!int.TryParse(text, out var value)) _diagnostics.Add($"ERROR: '{text}' is not an Int32 value.");
+                if(!int.TryParse(text, out var value)) _diagnostics.ReportInvalidNumber(new TextSpan(start, length), text, typeof(int));
                 
                 return new Token(TokType.NumberToken, start, text, value);
             }
@@ -87,20 +87,40 @@ namespace Shore.CodeAnalysis.Syntax
                 case ')':
                     return new Token(TokType.CloseParenToken, _position++, ")", null);
                 case '!':
-                    if(Lookahead == '=') return new Token(TokType.BangEqualsToken, _position+=2, "!=", null);
+                    if(Lookahead == '=')
+                    {
+                        var pos = _position;
+                        _position+=2;
+                        return new Token(TokType.BangEqualsToken, pos, "!=", null);
+                    }
                     return new Token(TokType.BangToken, _position++, "!", null);
                 case '&':
-                    if(Lookahead == '&') return new Token(TokType.DoubleAmpersandToken, _position+=2, "&&", null);
+                    if(Lookahead == '&')
+                    {
+                        var pos = _position;
+                        _position+=2;
+                        return new Token(TokType.DoubleAmpersandToken, pos, "&&", null);
+                    }
                     break;
                 case '|':
-                    if(Lookahead == '|') return new Token(TokType.DoublePipeToken, _position+=2, "||", null);
+                    if(Lookahead == '|')
+                    {
+                        var pos = _position;
+                        _position+=2;
+                        return new Token(TokType.DoublePipeToken, pos, "||", null);
+                    }
                     break;
                 case '=':
-                    if(Lookahead == '=') return new Token(TokType.DoubleEqualsToken, _position+=2, "==", null);
+                    if(Lookahead == '=')
+                    {
+                        var pos = _position;
+                        _position+=2;
+                        return new Token(TokType.DoubleEqualsToken, pos, "==", null);
+                    }
                     break;
             }
             
-            _diagnostics.Add($"ERROR: Unknown Character: '{Current}'.");
+            _diagnostics.ReportUnknownCharacter(new TextSpan(_position, 1), Current);
             return new Token(TokType.UnknownToken, _position++, _text.Substring(_position - 1, 1), null);
         }
     }
