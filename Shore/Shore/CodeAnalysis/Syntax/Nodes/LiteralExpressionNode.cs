@@ -17,9 +17,5 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         }
 
         public override TokType Type => TokType.LiteralExpression;
-        public override IEnumerable<Node> GetChildren()
-        {
-            yield return LiteralToken;
-        }
     }
 }

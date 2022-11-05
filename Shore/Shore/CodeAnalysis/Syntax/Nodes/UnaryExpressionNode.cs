@@ -12,10 +12,5 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         }
 
         public override TokType Type => TokType.UnaryExpression;
-        public override IEnumerable<Node> GetChildren()
-        {
-            yield return OperatorToken;
-            yield return Operand;
-        }
     }
 }

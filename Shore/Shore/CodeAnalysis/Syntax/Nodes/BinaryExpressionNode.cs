@@ -14,11 +14,5 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         }
 
         public override TokType Type => TokType.BinaryExpression;
-        public override IEnumerable<Node> GetChildren()
-        {
-            yield return Left;
-            yield return OperatorToken;
-            yield return Right;
-        }
     }
 }

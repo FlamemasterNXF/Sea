@@ -14,11 +14,5 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         }
 
         public override TokType Type => TokType.ParenthesisExpression;
-        public override IEnumerable<Node> GetChildren()
-        {
-            yield return OpenParen;
-            yield return Expression;
-            yield return CloseParen;
-        }
     }
 }

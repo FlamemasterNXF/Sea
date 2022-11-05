@@ -14,11 +14,5 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         }
 
         public override TokType Type => TokType.AssignmentExpression;
-        public override IEnumerable<Node> GetChildren()
-        {
-            yield return IdentifierToken;
-            yield return EqualsToken;
-            yield return Expression;
-        }
     }
 }
