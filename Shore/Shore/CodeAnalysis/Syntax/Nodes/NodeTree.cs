@@ -1,14 +1,16 @@
+using System.Collections.Immutable;
+
 namespace Shore.CodeAnalysis.Syntax.Nodes
 {
     public sealed class NodeTree
     {
-        public IReadOnlyList<Diagnostic> Diagnostics { get; }
+        public ImmutableArray<Diagnostic> Diagnostics { get; }
         public ExpressionNode Root { get; }
         public Token EndOfFileToken { get; }
 
-        public NodeTree(IEnumerable<Diagnostic> diagnostics, ExpressionNode root, Token endOfFileToken)
+        public NodeTree(ImmutableArray<Diagnostic> diagnostics, ExpressionNode root, Token endOfFileToken)
         {
-            Diagnostics = diagnostics.ToArray();
+            Diagnostics = diagnostics;
             Root = root;
             EndOfFileToken = endOfFileToken;
         }

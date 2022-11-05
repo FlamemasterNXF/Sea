@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
@@ -17,12 +18,12 @@ namespace Shore.CodeAnalysis
             var binder = new Binder(variables);
             var boundTree = binder.BindExpression(NodeTree.Root);
 
-            var diagnostics = NodeTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+            var diagnostics = NodeTree.Diagnostics.Concat(binder.Diagnostics).ToImmutableArray();
             if (diagnostics.Any()) return new EvaluationResult(diagnostics, null);
 
             var evaluator = new Evaluator(boundTree, variables);
             var value = evaluator.Evaluate();
-            return new EvaluationResult(Array.Empty<Diagnostic>(), value);
+            return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }
     }
 }
