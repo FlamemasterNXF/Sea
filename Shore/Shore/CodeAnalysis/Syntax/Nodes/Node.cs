@@ -42,10 +42,15 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         }
         private static void LogNode(TextWriter writer, Node node, string indent = "", bool last = false)
         {
+            var isToConsole = writer == Console.Out;
             var marker = last ? "└──" : "├──";
 
+            if (isToConsole) Console.ForegroundColor = ConsoleColor.DarkGray;
+            
             writer.Write(indent);
             writer.Write(marker);
+
+            if (isToConsole) Console.ForegroundColor = node is Token ? ConsoleColor.Blue : ConsoleColor.Cyan;
             writer.Write(node.Type);
 
             if (node is Token t && t.Value is not null)
@@ -54,6 +59,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
                 writer.Write(t.Value);   
             }
             
+            if (isToConsole) Console.ResetColor();
+
             writer.WriteLine();
             indent += last ? "    " : "│   ";
 
