@@ -25,7 +25,7 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
 
             while (true)
             {
-                var token = lexer.NextToken();
+                var token = lexer.Lex();
                 if (token.Type is TokType.EndOfFileToken) break;
                 yield return token;
             }

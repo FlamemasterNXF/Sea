@@ -17,7 +17,7 @@ namespace Shore.CodeAnalysis.Syntax
             Token token;
 
             do {
-                token = lexer.NextToken();
+                token = lexer.Lex();
                 if (token.Type != TokType.WhitespaceToken && token.Type != TokType.UnknownToken) tokens.Add(token);
             } while (token.Type != TokType.EndOfFileToken);
 
