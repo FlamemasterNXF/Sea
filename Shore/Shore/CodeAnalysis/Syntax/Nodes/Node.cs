@@ -6,6 +6,16 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
     {
         public abstract TokType Type { get; }
 
+        public virtual TextSpan Span
+        {
+            get
+            {
+                var first = GetChildren().First().Span;
+                var last = GetChildren().Last().Span;
+                return TextSpan.FromBounds(first.Start, last.End);
+            }
+        }
+        
         public IEnumerable<Node> GetChildren()
         {
             var properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
