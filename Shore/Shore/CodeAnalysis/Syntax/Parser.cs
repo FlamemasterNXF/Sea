@@ -1,15 +1,17 @@
 using System.Collections.Immutable;
 using Shore.CodeAnalysis.Syntax.Nodes;
+using Shore.Text;
 
 namespace Shore.CodeAnalysis.Syntax
 {
     internal sealed class Parser
     {
         private DiagnosticBag _diagnostics = new DiagnosticBag();
+        private readonly SourceText _text;
         private readonly ImmutableArray<Token> _tokens;
         private int _position;
 
-        public Parser(string text)
+        public Parser(SourceText text)
         {
             var tokens = new List<Token>();
 
@@ -21,6 +23,7 @@ namespace Shore.CodeAnalysis.Syntax
                 if (token.Type != TokType.WhitespaceToken && token.Type != TokType.UnknownToken) tokens.Add(token);
             } while (token.Type != TokType.EndOfFileToken);
 
+            _text = text;
             _tokens = tokens.ToImmutableArray();
             _diagnostics.AddRange(lexer.Diagnostics);
         }
@@ -100,7 +103,7 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var expression = ParseExpression();
             var eof = MatchToken(TokType.EndOfFileToken);
-            return new NodeTree(_diagnostics.ToImmutableArray(), expression, eof);
+            return new NodeTree(_text, _diagnostics.ToImmutableArray(), expression, eof);
         }
         
         private ExpressionNode ParsePrimaryExpression()

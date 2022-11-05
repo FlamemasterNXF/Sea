@@ -1,15 +1,18 @@
 using System.Collections.Immutable;
+using Shore.Text;
 
 namespace Shore.CodeAnalysis.Syntax.Nodes
 {
     public sealed class NodeTree
     {
+        public SourceText Text { get; }
         public ImmutableArray<Diagnostic> Diagnostics { get; }
         public ExpressionNode Root { get; }
         public Token EndOfFileToken { get; }
 
-        public NodeTree(ImmutableArray<Diagnostic> diagnostics, ExpressionNode root, Token endOfFileToken)
+        public NodeTree(SourceText text, ImmutableArray<Diagnostic> diagnostics, ExpressionNode root, Token endOfFileToken)
         {
+            Text = text;
             Diagnostics = diagnostics;
             Root = root;
             EndOfFileToken = endOfFileToken;
@@ -17,11 +20,23 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
 
         public static NodeTree Parse(string text)
         {
+            var sourceText = SourceText.From(text);
+            return Parse(sourceText);
+        }
+
+        private static NodeTree Parse(SourceText text)
+        {
             var parser = new Parser(text);
             return parser.Parse();
         }
 
         public static IEnumerable<Token> ParseTokens(string text)
+        {
+            var sourceText = SourceText.From(text);
+            return ParseTokens(sourceText);
+        }
+
+        private static IEnumerable<Token> ParseTokens(SourceText text)
         {
             var lexer = new Lexer(text);
 

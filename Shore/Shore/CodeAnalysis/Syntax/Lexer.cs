@@ -6,14 +6,14 @@ namespace Shore.CodeAnalysis.Syntax
     internal class Lexer
     {
         private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
-        private readonly string _text;
+        private readonly SourceText _text;
         
         private int _position;
         private int _start;
         private TokType _type;
         private object? _value;
 
-        public Lexer(string text)
+        public Lexer(SourceText text)
         {
             _text = text;
         }
@@ -114,7 +114,7 @@ namespace Shore.CodeAnalysis.Syntax
             }
 
             var length = _position - _start;
-            var text = SyntaxFacts.GetText(_type) ?? _text.Substring(_start, length);
+            var text = SyntaxFacts.GetText(_type) ?? _text.ToString(_start, length);
             return new Token(_type, _start, text, _value);
         }
 
@@ -128,8 +128,8 @@ namespace Shore.CodeAnalysis.Syntax
         {
             while (char.IsDigit(Current)) _position++;
             var length = _position - _start;
-            var text = _text.Substring(_start, length);
-            if (!int.TryParse(text, out var value)) _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), _text, typeof(int));
+            var text = _text.ToString(_start, length);
+            if (!int.TryParse(text, out var value)) _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, typeof(int));
             _value = value;
             _type = TokType.NumberToken;
         }
@@ -138,7 +138,7 @@ namespace Shore.CodeAnalysis.Syntax
         {
             while (char.IsLetter(Current)) _position++;
             var length = _position - _start;
-            var text = _text.Substring(_start, length);
+            var text = _text.ToString(_start, length);
             _type = text.GetKeywordType();
         }
     }
