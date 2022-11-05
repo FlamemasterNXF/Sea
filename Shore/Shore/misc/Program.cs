@@ -1,5 +1,7 @@
-﻿using Shore.CodeAnalysis;
+﻿using System.Text;
+using Shore.CodeAnalysis;
 using Shore.CodeAnalysis.Syntax.Nodes;
+using Shore.Text;
 
 namespace Shore.misc
 {
@@ -9,21 +11,34 @@ namespace Shore.misc
         {
             bool showTree = false;
             var variables = new Dictionary<VariableSymbol, object>();
+            var textBuilder = new StringBuilder();
 
             while (true)
             {
-                Console.Write("> ");
-                var line = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(line)) return;
+                if(textBuilder.Length == 0) Console.Write("> ");
+                else Console.Write("| ");
 
-                if (line == "#SHOWTREE")
+                var input = Console.ReadLine();
+                var isBlank = string.IsNullOrWhiteSpace(input);
+
+                if (textBuilder.Length == 0)
                 {
-                    showTree = !showTree;
-                    Console.WriteLine(showTree ? "Showing Node Trees" : "Hiding Node Trees");
-                    continue;
+                    if (isBlank) break;
+                    
+                    if (input == "#SHOWTREE")
+                    {
+                        showTree = !showTree;
+                        Console.WriteLine(showTree ? "Showing Node Trees" : "Hiding Node Trees");
+                        continue;
+                    }
                 }
 
-                var nodeTree = NodeTree.Parse(line);
+                textBuilder.AppendLine(input);
+                var text = textBuilder.ToString();
+                var nodeTree = NodeTree.Parse(text);
+
+                if(!isBlank && nodeTree.Diagnostics.Any()) continue;
+
                 var compilation = new Compilation(nodeTree);
                 var result = compilation.Evaluate(variables);
 
@@ -39,13 +54,12 @@ namespace Shore.misc
                 if (!diagnostics.Any()) Console.WriteLine(result.Value);
                 else
                 {
-                    var text = nodeTree.Text;
-                    
                     foreach (var diagnostic in diagnostics)
                     {
-                        var lineIndex = text.GetLineIndex(diagnostic.Span.Start);
+                        var lineIndex = nodeTree.Text.GetLineIndex(diagnostic.Span.Start);
+                        var line = nodeTree.Text.Lines[lineIndex];
                         var lineNumber = lineIndex + 1;
-                        var character = diagnostic.Span.Start - text.Lines[lineIndex].Start + 1;
+                        var character = diagnostic.Span.Start - line.Start + 1;
                         
                         Console.WriteLine();
 
@@ -53,11 +67,13 @@ namespace Shore.misc
                         Console.Write($"({lineNumber}, {character}): ");
                         Console.WriteLine(diagnostic);
                         Console.ResetColor();
-                        
-                        var prefix = line.Substring(0, diagnostic.Span.Start);
-                        var message = line.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
-                        var suffix = line.Substring(diagnostic.Span.End);
-                        
+
+                        var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
+                        var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
+                        var prefix = nodeTree.Text.ToString(prefixSpan);
+                        var message = nodeTree.Text.ToString(diagnostic.Span);
+                        var suffix = nodeTree.Text.ToString(suffixSpan);
+
                         Console.Write("    ");
                         Console.Write(prefix);
 
@@ -70,6 +86,8 @@ namespace Shore.misc
                     }
                     Console.WriteLine();
                 }
+
+                textBuilder.Clear();
             }
 
             // CONSOLE WINDOW CONTROL
