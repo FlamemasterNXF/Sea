@@ -6,6 +6,20 @@ namespace Shore.Tests.CodeAnalysis.Syntax
 {
     public class LexerTest
     {
+        [Fact]
+        public void Lexer_Tests_AllTokens()
+        {
+            var tokenTypes = Enum.GetValues(typeof(TokType)).Cast<TokType>()
+                .Where(t => t.ToString().EndsWith("Keyword") || t.ToString().EndsWith("Token"));
+            var testedTokenTypes = GetTokens().Concat(GetSeparators()).Select(t => t.type);
+            var untestedTokenTypes = new SortedSet<TokType>(tokenTypes);
+            untestedTokenTypes.Remove(TokType.UnknownToken);
+            untestedTokenTypes.Remove(TokType.EndOfFileToken);
+            untestedTokenTypes.ExceptWith(testedTokenTypes);
+            
+            Assert.Empty(untestedTokenTypes);
+        } 
+            
         [Theory]
         [MemberData(nameof(GetTokensData))]
         public void Lexer_Lexes_Token(TokType type, string text)
