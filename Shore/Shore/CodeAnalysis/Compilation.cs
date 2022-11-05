@@ -16,7 +16,7 @@ namespace Shore.CodeAnalysis
         public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
             var binder = new Binder(variables);
-            var boundTree = binder.BindExpression(NodeTree.Root);
+            var boundTree = binder.BindExpression(NodeTree.Root.Expression);
 
             var diagnostics = NodeTree.Diagnostics.Concat(binder.Diagnostics).ToImmutableArray();
             if (diagnostics.Any()) return new EvaluationResult(diagnostics, null);

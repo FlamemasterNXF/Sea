@@ -7,15 +7,17 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
     {
         public SourceText Text { get; }
         public ImmutableArray<Diagnostic> Diagnostics { get; }
-        public ExpressionNode Root { get; }
-        public Token EndOfFileToken { get; }
+        public CompilationUnitNode Root { get; }
 
-        public NodeTree(SourceText text, ImmutableArray<Diagnostic> diagnostics, ExpressionNode root, Token endOfFileToken)
+        private NodeTree(SourceText text)
         {
+            var parser = new Parser(text);
+            var root = parser.ParseCompilationUnit();
+            var diagnostics = parser.Diagnostics.ToImmutableArray();
+            
             Text = text;
             Diagnostics = diagnostics;
             Root = root;
-            EndOfFileToken = endOfFileToken;
         }
 
         public static NodeTree Parse(string text)
@@ -24,11 +26,7 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
             return Parse(sourceText);
         }
 
-        private static NodeTree Parse(SourceText text)
-        {
-            var parser = new Parser(text);
-            return parser.Parse();
-        }
+        private static NodeTree Parse(SourceText text) => new NodeTree(text);
 
         public static IEnumerable<Token> ParseTokens(string text)
         {

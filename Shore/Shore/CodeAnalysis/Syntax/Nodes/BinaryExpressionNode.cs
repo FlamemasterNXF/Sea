@@ -1,5 +1,17 @@
 namespace Shore.CodeAnalysis.Syntax.Nodes
 {
+    public sealed class CompilationUnitNode : Node
+    {
+        public ExpressionNode Expression { get; }
+        public Token EndOfFileToken { get; }
+        public override TokType Type => TokType.CompilationUnit;
+
+        public CompilationUnitNode(ExpressionNode expression, Token endOfFileToken)
+        {
+            Expression = expression;
+            EndOfFileToken = endOfFileToken;
+        }
+    }
     public sealed class BinaryExpressionNode : ExpressionNode
     {
         public ExpressionNode Left { get; }

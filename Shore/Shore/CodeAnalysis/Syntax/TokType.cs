@@ -31,5 +31,6 @@ namespace Shore.CodeAnalysis.Syntax
         UnaryExpression,
         NameExpression,
         AssignmentExpression,
+        CompilationUnit
     }
 }

@@ -99,11 +99,11 @@ namespace Shore.CodeAnalysis.Syntax
             return left;
         }
 
-        public NodeTree Parse()
+        public CompilationUnitNode ParseCompilationUnit()
         {
             var expression = ParseExpression();
             var eof = MatchToken(TokType.EndOfFileToken);
-            return new NodeTree(_text, _diagnostics.ToImmutableArray(), expression, eof);
+            return new CompilationUnitNode(expression, eof);
         }
         
         private ExpressionNode ParsePrimaryExpression()

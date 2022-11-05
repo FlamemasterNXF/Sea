@@ -15,7 +15,7 @@ namespace Shore.Tests.CodeAnalysis.Syntax
             var op1Text = SyntaxFacts.GetText(op1);
             var op2Text = SyntaxFacts.GetText(op2);
             var text = $"a {op1Text} b {op2Text} c";
-            var expression = NodeTree.Parse(text).Root;
+            var expression = ParseExpression(text);
 
             if (op1Precedence >= op2Precedence)
             {
@@ -56,7 +56,7 @@ namespace Shore.Tests.CodeAnalysis.Syntax
             var unaryText = SyntaxFacts.GetText(unaryType);
             var binaryText = SyntaxFacts.GetText(binaryType);
             var text = $"{unaryText} a {binaryText} b";
-            var expression = NodeTree.Parse(text).Root;
+            var expression = ParseExpression(text);
 
             if (unaryPrecedence >= binaryPrecedence)
             {
@@ -83,8 +83,15 @@ namespace Shore.Tests.CodeAnalysis.Syntax
                 e.AssertToken(TokType.IdentifierToken, "b");
             }
         }
-        
 
+
+        private static ExpressionNode ParseExpression(string text)
+        {
+            var nodeTree = NodeTree.Parse(text);
+            var root = nodeTree.Root;
+            return root.Expression;
+        }
+        
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()
         {
             return from op1 in SyntaxFacts.GetBinaryOperatorTypes() from op2 in SyntaxFacts.GetBinaryOperatorTypes() select new object[] { op1, op2 };

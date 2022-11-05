@@ -6,7 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="6647fa5a-2700-43d0-bf2c-0aec1a45daff" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/Node.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/Node.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/Syntax/ParserTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/Syntax/ParserTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Compilation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Compilation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/BinaryExpressionNode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/BinaryExpressionNode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/NodeTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/NodeTree.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Parser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/TokType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/TokType.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +69,7 @@
       <updated>1667595329257</updated>
       <workItem from="1667595333258" duration="197000" />
       <workItem from="1667595806156" duration="1051000" />
-      <workItem from="1667667010797" duration="17367000" />
+      <workItem from="1667667010797" duration="18752000" />
     </task>
     <servers />
   </component>
