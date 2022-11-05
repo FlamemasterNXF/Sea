@@ -44,6 +44,22 @@ namespace Shore.CodeAnalysis.Syntax
             };
         }
 
+        public static IEnumerable<TokType> GetUnaryOperatorTypes()
+        {
+            var types = (TokType[])Enum.GetValues(typeof(TokType));
+            foreach (var type in types)
+                if (GetUnaryOperatorPrecedence(type) > 0)
+                    yield return type;
+        }
+        
+        public static IEnumerable<TokType> GetBinaryOperatorTypes()
+        {
+            var types = (TokType[])Enum.GetValues(typeof(TokType));
+            foreach (var type in types)
+                if (GetBinaryOperatorPrecedence(type) > 0)
+                    yield return type;
+        }
+
         public static string? GetText(TokType type)
         {
             return type switch
@@ -57,10 +73,11 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.DoubleAmpersandToken => "&&",
                 TokType.DoublePipeToken => "||",
                 TokType.DoubleEqualsToken => "==",
+                TokType.BangEqualsToken => "!=",
                 TokType.OpenParenToken => "(",
                 TokType.CloseParenToken => ")",
-                TokType.TrueKeyword => "true",
                 TokType.FalseKeyword => "false",
+                TokType.TrueKeyword => "true",
                 _ => null
             };
         }
