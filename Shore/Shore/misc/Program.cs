@@ -34,7 +34,7 @@ namespace Shore
                 if (showTree)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    LogNode(nodeTree.Root);
+                    nodeTree.Root.WriteTo(Console.Out);
                     Console.ResetColor();
                 }
 
@@ -71,30 +71,6 @@ namespace Shore
             //Console.WriteLine("Press C to close this window :)");
             //try{ while(Console.ReadKey(true).Key != ConsoleKey.C){ Console.Read(); } }
             //catch (Exception){ Console.WriteLine($"Console Window not found!"); }
-        }
-
-        private static void LogNode(Node node, string indent = "", bool last = false)
-        {
-            var marker = last ? "└──" : "├──";
-
-            Console.Write(indent);
-            Console.Write(marker);
-            Console.Write(node.Type);
-
-            if (node is Token t && t.Value is not null)
-            {
-                Console.Write(" ");
-                Console.Write(t.Value);   
-            }
-            
-            Console.WriteLine();
-            indent += last ? "    " : "│   ";
-
-            var lastChild = node.GetChildren().LastOrDefault();
-            foreach (var child in node.GetChildren())
-            {
-                LogNode(child, indent, child == lastChild);
-            }
         }
     }
 }

@@ -34,5 +34,40 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
                 }
             }
         }
+
+        public void WriteTo(TextWriter writer)
+        {
+            LogNode(writer, this);
+        }
+        private static void LogNode(TextWriter writer, Node node, string indent = "", bool last = false)
+        {
+            var marker = last ? "└──" : "├──";
+
+            writer.Write(indent);
+            writer.Write(marker);
+            writer.Write(node.Type);
+
+            if (node is Token t && t.Value is not null)
+            {
+                writer.Write(" ");
+                writer.Write(t.Value);   
+            }
+            
+            writer.WriteLine();
+            indent += last ? "    " : "│   ";
+
+            var lastChild = node.GetChildren().LastOrDefault();
+            foreach (var child in node.GetChildren())
+            {
+                LogNode(writer, child, indent, child == lastChild);
+            }
+        }
+
+        public override string ToString()
+        {
+            using var writer = new StringWriter();
+            WriteTo(writer);
+            return writer.ToString();
+        }
     }
 }
