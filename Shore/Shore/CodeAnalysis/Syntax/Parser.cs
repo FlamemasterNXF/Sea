@@ -4,9 +4,8 @@ namespace Shore.CodeAnalysis.Syntax
 {
     internal sealed class Parser
     {
-        private readonly Token[] _tokens;
-
         private DiagnosticBag _diagnostics = new DiagnosticBag();
+        private readonly Token[] _tokens;
         private int _position;
 
         public Parser(string text)
@@ -96,45 +95,51 @@ namespace Shore.CodeAnalysis.Syntax
             return left;
         }
 
-        private ExpressionNode ParsePrimaryExpression()
-        {
-            switch (CurrentToken.Type)
-            {
-                case TokType.OpenParenToken:
-                {
-                    var left = NextToken();
-                    var expression = ParseExpression();
-                    var right = MatchToken(TokType.CloseParenToken);
-                    return new ParenthesisExpressionNode(left, expression, right);
-                }
-                
-                case TokType.TrueKeyword:
-                case TokType.FalseKeyword:
-                {
-                    var keywordToken = NextToken();
-                    var value = keywordToken.Type is TokType.TrueKeyword;
-                    return new LiteralExpressionNode(keywordToken, value);
-                }
-                
-                case TokType.IdentifierToken:
-                {
-                    var identifierToken = NextToken();
-                    return new NameExpressionNode(identifierToken);
-                }
-                
-                default:
-                {
-                    var numberToken = MatchToken(TokType.NumberToken);
-                    return new LiteralExpressionNode(numberToken);
-                }
-            }
-        }
-
         public NodeTree Parse()
         {
             var expression = ParseExpression();
             var eof = MatchToken(TokType.EndOfFileToken);
             return new NodeTree(_diagnostics, expression, eof);
+        }
+        
+        private ExpressionNode ParsePrimaryExpression()
+        {
+            return CurrentToken.Type switch
+            {
+                TokType.OpenParenToken => ParseParenthesisExpression(),
+                TokType.TrueKeyword => ParseBooleanLiteral(),
+                TokType.FalseKeyword => ParseBooleanLiteral(),
+                TokType.NumberToken => ParseNumberLiteral(),
+                TokType.IdentifierToken => ParseNameExpression(),
+                _ => ParseNameExpression()
+            };
+        }
+
+        private ExpressionNode ParseParenthesisExpression()
+        {
+            var left = MatchToken(TokType.OpenParenToken);
+            var expression = ParseExpression();
+            var right = MatchToken(TokType.CloseParenToken);
+            return new ParenthesisExpressionNode(left, expression, right);
+        }
+
+        private ExpressionNode ParseBooleanLiteral()
+        {
+            var isTrue = CurrentToken.Type == TokType.TrueKeyword;
+            var keywordToken = isTrue ? MatchToken(TokType.TrueKeyword) : MatchToken(TokType.FalseKeyword);
+            return new LiteralExpressionNode(keywordToken, isTrue);
+        }
+
+        private ExpressionNode ParseNumberLiteral()
+        {
+            var numberToken = MatchToken(TokType.NumberToken);
+            return new LiteralExpressionNode(numberToken);
+        }
+
+        private ExpressionNode ParseNameExpression()
+        {
+            var identifierToken = MatchToken(TokType.IdentifierToken);
+            return new NameExpressionNode(identifierToken);
         }
     }
 }
