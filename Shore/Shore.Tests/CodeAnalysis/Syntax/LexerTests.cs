@@ -77,27 +77,17 @@ namespace Shore.Tests.CodeAnalysis.Syntax
 
         private static IEnumerable<(TokType type, string text)> GetTokens()
         {
-            return new[]
+            var fixedTokens = Enum.GetValues(typeof(TokType)).Cast<TokType>()
+                .Select(t => (type: t, text: SyntaxFacts.GetText(t))).Where(t => t.text != null);
+            var dynamicTokens = new[]
             {
                 (TokType.NumberToken, "1"),
                 (TokType.NumberToken, "123"),
                 (TokType.IdentifierToken, "a"),
                 (TokType.IdentifierToken, "abc"),
-                (TokType.FalseKeyword, "false"),
-                (TokType.TrueKeyword, "true"),
-                (TokType.DashToken, "-"),
-                (TokType.StarToken, "*"),
-                (TokType.SlashToken, "/"),
-                (TokType.PlusToken, "+"),
-                (TokType.CloseParenToken, ")"),
-                (TokType.OpenParenToken, "("),
-                (TokType.EqualsToken, "="),
-                (TokType.BangToken, "!"),
-                (TokType.DoubleAmpersandToken, "&&"),
-                (TokType.DoublePipeToken, "||"),
-                (TokType.DoubleEqualsToken, "=="),
-                (TokType.BangEqualsToken, "!=")
             };
+
+            return fixedTokens.Concat(dynamicTokens);
         }
 
         private static IEnumerable<(TokType type, string text)> GetSeparators()
