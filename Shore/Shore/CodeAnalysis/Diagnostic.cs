@@ -1,3 +1,5 @@
+using Shore.Text;
+
 namespace Shore.CodeAnalysis
 {
     public sealed class Diagnostic

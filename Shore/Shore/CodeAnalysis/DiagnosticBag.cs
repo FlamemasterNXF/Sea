@@ -1,5 +1,6 @@
 using System.Collections;
 using Shore.CodeAnalysis.Syntax;
+using Shore.Text;
 
 namespace Shore.CodeAnalysis
 {

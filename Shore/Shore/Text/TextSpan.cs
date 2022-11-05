@@ -1,4 +1,4 @@
-namespace Shore.CodeAnalysis
+namespace Shore.Text
 {
     public readonly struct TextSpan
     {

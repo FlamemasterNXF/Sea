@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Shore.CodeAnalysis;
-using Shore.CodeAnalysis.Binding;
+﻿using Shore.CodeAnalysis;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
-namespace Shore
+namespace Shore.misc
 {
     internal static class Program
     {

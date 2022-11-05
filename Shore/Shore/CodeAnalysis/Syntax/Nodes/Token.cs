@@ -1,3 +1,5 @@
+using Shore.Text;
+
 namespace Shore.CodeAnalysis.Syntax.Nodes
 {
     public sealed class Token : Node
