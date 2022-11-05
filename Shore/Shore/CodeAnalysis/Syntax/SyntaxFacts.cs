@@ -1,6 +1,6 @@
 namespace Shore.CodeAnalysis.Syntax
 {
-    internal static class SyntaxFacts
+    public static class SyntaxFacts
     {
         public static int GetUnaryOperatorPrecedence(this TokType type)
         {
@@ -41,6 +41,27 @@ namespace Shore.CodeAnalysis.Syntax
                 "true" => TokType.TrueKeyword,
                 "false" => TokType.FalseKeyword,
                 _ => TokType.IdentifierToken
+            };
+        }
+
+        public static string? GetText(TokType type)
+        {
+            return type switch
+            {
+                TokType.PlusToken => "+",
+                TokType.DashToken => "-",
+                TokType.StarToken => "*",
+                TokType.SlashToken => "/",
+                TokType.BangToken => "!",
+                TokType.EqualsToken => "=",
+                TokType.DoubleAmpersandToken => "&&",
+                TokType.DoublePipeToken => "||",
+                TokType.DoubleEqualsToken => "==",
+                TokType.OpenParenToken => "(",
+                TokType.CloseParenToken => ")",
+                TokType.TrueKeyword => "true",
+                TokType.FalseKeyword => "false",
+                _ => null
             };
         }
     }
