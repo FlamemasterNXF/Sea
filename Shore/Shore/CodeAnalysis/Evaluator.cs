@@ -94,6 +94,10 @@ namespace Shore.CodeAnalysis
                         BoundBinaryOperatorKind.LogicalOr => (bool) left || (bool) right,
                         BoundBinaryOperatorKind.LogicalEquals => Equals(left, right),
                         BoundBinaryOperatorKind.LogicalNotEquals => !Equals(left, right),
+                        BoundBinaryOperatorKind.GreaterThan => (int)left > (int)right,
+                        BoundBinaryOperatorKind.GreaterThanOrEqual => (int)left >= (int)right,
+                        BoundBinaryOperatorKind.LessThan => (int)left < (int)right,
+                        BoundBinaryOperatorKind.LessThanOrEqual => (int)left <= (int)right,
                         _ => throw new Exception($"Unexpected Binary Operator '{b.Op.Kind}'")
                     };
                 }

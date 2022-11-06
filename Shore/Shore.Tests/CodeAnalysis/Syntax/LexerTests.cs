@@ -130,16 +130,25 @@ namespace Shore.Tests.CodeAnalysis.Syntax
                     return true;
             }
 
-            return type1 switch
+            switch (type1)
             {
-                TokType.IdentifierToken when twoIsKeyword => true,
-                TokType.NumberToken when type2 == TokType.NumberToken => true,
-                TokType.BangToken when type2 == TokType.EqualsToken => true,
-                TokType.BangToken when type2 == TokType.DoubleEqualsToken => true,
-                TokType.EqualsToken when type2 == TokType.EqualsToken => true,
-                TokType.EqualsToken when type2 == TokType.DoubleEqualsToken => true,
-                _ => false
-            };
+                case TokType.GreaterThanToken when type2 == TokType.EqualsToken:
+                case TokType.GreaterThanToken when type2 == TokType.DoubleEqualsToken:
+                case TokType.LessThanToken when type2 == TokType.EqualsToken:
+                case TokType.LessThanToken when type2 == TokType.DoubleEqualsToken:
+                    return true;
+                default:
+                    return type1 switch
+                    {
+                        TokType.IdentifierToken when twoIsKeyword => true,
+                        TokType.NumberToken when type2 == TokType.NumberToken => true,
+                        TokType.BangToken when type2 == TokType.EqualsToken => true,
+                        TokType.BangToken when type2 == TokType.DoubleEqualsToken => true,
+                        TokType.EqualsToken when type2 == TokType.EqualsToken => true,
+                        TokType.EqualsToken when type2 == TokType.DoubleEqualsToken => true,
+                        _ => false
+                    };
+            }
         }
 
         private static IEnumerable<(TokType type1, string text1, TokType type2, string text2)> GetTokenPairs()

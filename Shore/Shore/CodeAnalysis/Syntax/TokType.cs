@@ -38,6 +38,10 @@ namespace Shore.CodeAnalysis.Syntax
         OpenBraceToken,
         VariableDeclarationStatement,
         LetKeyword,
-        ReadOnlyKeyword
+        ReadOnlyKeyword,
+        GreaterThanOrEqualToken,
+        GreaterThanToken,
+        LessThanOrEqualToken,
+        LessThanToken
     }
 }

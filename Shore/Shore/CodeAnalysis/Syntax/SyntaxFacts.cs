@@ -26,6 +26,10 @@ namespace Shore.CodeAnalysis.Syntax
                 
                 TokType.DoubleEqualsToken => 3,
                 TokType.BangEqualsToken => 3,
+                TokType.GreaterThanToken => 3,
+                TokType.GreaterThanOrEqualToken => 3,
+                TokType.LessThanToken => 3,
+                TokType.LessThanOrEqualToken => 3,
                 
                 TokType.DoubleAmpersandToken => 2,
                 TokType.DoublePipeToken => 1,
@@ -72,6 +76,10 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.SlashToken => "/",
                 TokType.BangToken => "!",
                 TokType.EqualsToken => "=",
+                TokType.GreaterThanToken => ">",
+                TokType.GreaterThanOrEqualToken => ">=",
+                TokType.LessThanToken => "<",
+                TokType.LessThanOrEqualToken => "<=",
                 TokType.DoubleAmpersandToken => "&&",
                 TokType.DoublePipeToken => "||",
                 TokType.DoubleEqualsToken => "==",

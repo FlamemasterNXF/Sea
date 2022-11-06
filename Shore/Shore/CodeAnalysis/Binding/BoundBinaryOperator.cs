@@ -27,19 +27,21 @@ namespace Shore.CodeAnalysis.Binding
         
         private static readonly BoundBinaryOperator[] Operators =
         {
-            //INTEGER TYPES
-            new BoundBinaryOperator(TokType.PlusToken, BoundBinaryOperatorKind.Addition, typeof(int)),
-            new BoundBinaryOperator(TokType.DashToken, BoundBinaryOperatorKind.Subtraction, typeof(int)),
-            new BoundBinaryOperator(TokType.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int)),
-            new BoundBinaryOperator(TokType.SlashToken, BoundBinaryOperatorKind.Division, typeof(int)),
-            new BoundBinaryOperator(TokType.DoubleEqualsToken, BoundBinaryOperatorKind.LogicalEquals, typeof(int), typeof(bool)),
-            new BoundBinaryOperator(TokType.BangEqualsToken, BoundBinaryOperatorKind.LogicalNotEquals, typeof(int), typeof(bool)),
+            new (TokType.PlusToken, BoundBinaryOperatorKind.Addition, typeof(int)),
+            new (TokType.DashToken, BoundBinaryOperatorKind.Subtraction, typeof(int)),
+            new (TokType.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int)),
+            new (TokType.SlashToken, BoundBinaryOperatorKind.Division, typeof(int)),
+            new (TokType.DoubleEqualsToken, BoundBinaryOperatorKind.LogicalEquals, typeof(int), typeof(bool)),
+            new (TokType.BangEqualsToken, BoundBinaryOperatorKind.LogicalNotEquals, typeof(int), typeof(bool)),
+            new (TokType.GreaterThanToken, BoundBinaryOperatorKind.GreaterThan, typeof(int), typeof(bool)),
+            new (TokType.GreaterThanOrEqualToken, BoundBinaryOperatorKind.GreaterThanOrEqual, typeof(int), typeof(bool)),
+            new (TokType.LessThanToken, BoundBinaryOperatorKind.LessThan, typeof(int), typeof(bool)),
+            new (TokType.LessThanOrEqualToken, BoundBinaryOperatorKind.LessThanOrEqual, typeof(int), typeof(bool)),
             
-            //BOOLEAN TYPES
-            new BoundBinaryOperator(TokType.DoubleAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),
-            new BoundBinaryOperator(TokType.DoublePipeToken, BoundBinaryOperatorKind.LogicalOr, typeof(bool)),
-            new BoundBinaryOperator(TokType.DoubleEqualsToken, BoundBinaryOperatorKind.LogicalEquals, typeof(bool)),
-            new BoundBinaryOperator(TokType.BangEqualsToken, BoundBinaryOperatorKind.LogicalNotEquals, typeof(bool)),
+            new (TokType.DoubleAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),
+            new (TokType.DoublePipeToken, BoundBinaryOperatorKind.LogicalOr, typeof(bool)),
+            new (TokType.DoubleEqualsToken, BoundBinaryOperatorKind.LogicalEquals, typeof(bool)),
+            new (TokType.BangEqualsToken, BoundBinaryOperatorKind.LogicalNotEquals, typeof(bool)),
         };
 
         public static BoundBinaryOperator? Bind(TokType tokType, Type leftType, Type rightType)

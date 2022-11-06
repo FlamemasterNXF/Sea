@@ -9,6 +9,10 @@ namespace Shore.CodeAnalysis.Binding
         LogicalOr,
         LogicalAnd,
         LogicalNotEquals,
-        LogicalEquals
+        LogicalEquals,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual
     }
 }

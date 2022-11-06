@@ -104,6 +104,24 @@ namespace Shore.CodeAnalysis.Syntax
                         _type = TokType.DoublePipeToken;
                     }
                     break;
+                case '<':
+                    _position++;
+                    if (Current != '=') _type = TokType.LessThanToken;
+                    else
+                    {
+                        _type = TokType.LessThanOrEqualToken;
+                        _position++;
+                    }
+                    break;
+                case '>':
+                    _position++;
+                    if (Current != '=') _type = TokType.GreaterThanToken;
+                    else
+                    {
+                        _type = TokType.GreaterThanOrEqualToken;
+                        _position++;
+                    }
+                    break;
                 case '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9':
                     ReadNumberToken();
                     break;
