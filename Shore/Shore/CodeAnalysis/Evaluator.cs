@@ -30,6 +30,9 @@ namespace Shore.CodeAnalysis
                 case BoundNodeKind.VariableDeclaration:
                     EvaluateVariableDeclaration((BoundVariableDeclaration)node);
                     break;
+                case BoundNodeKind.IfStatement:
+                    EvaluateIfStatement((BoundIfStatement)node);
+                    break;
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement((BoundExpressionStatement)node);
                     break;
@@ -48,6 +51,13 @@ namespace Shore.CodeAnalysis
             var value = EvaluateExpression(node.Initializer);
             _variables[node.Variable] = value;
             _lastValue = value;
+        }
+
+        private void EvaluateIfStatement(BoundIfStatement node)
+        {
+            var condition = (bool)EvaluateExpression(node.Condition);
+            if (condition) EvaluateStatement(node.ThenStatement);
+            else if (node.ElseStatement is not null) EvaluateStatement(node.ElseStatement);
         }
 
         private void EvaluateExpressionStatement(BoundExpressionStatement node) =>

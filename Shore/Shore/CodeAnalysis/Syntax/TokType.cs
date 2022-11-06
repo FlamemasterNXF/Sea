@@ -42,6 +42,10 @@ namespace Shore.CodeAnalysis.Syntax
         GreaterThanOrEqualToken,
         GreaterThanToken,
         LessThanOrEqualToken,
-        LessThanToken
+        LessThanToken,
+        IfStatement,
+        ElseStatement,
+        ElseKeyword,
+        IfKeyword
     }
 }

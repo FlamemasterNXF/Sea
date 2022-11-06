@@ -58,6 +58,7 @@ namespace Shore.CodeAnalysis.Binding
             {
                 TokType.BlockStatement => BindBlockStatement((BlockStatementNode)node),
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
+                TokType.IfStatement => BindIfStatement((IfStatementNode)node),
                 TokType.ExpressionStatement => BindExpressionStatement((ExpressionStatementNode)node),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
@@ -91,13 +92,28 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundVariableDeclaration(variable, initializer);
         }
 
+        private BoundStatement BindIfStatement(IfStatementNode node)
+        {
+            var condition = BindExpression(node.Condition, typeof(bool));
+            var thenStatement = BindStatement(node.ThenStatement);
+            var elseStatement = node.ElseNode == null ? null : BindStatement(node.ElseNode.ElseStatement);
+            return new BoundIfStatement(condition, thenStatement, elseStatement);
+        }
+
         private BoundStatement BindExpressionStatement(ExpressionStatementNode node)
         {
             var expression = BindExpression(node.Expression);
             return new BoundExpressionStatement(expression);
         }
+
+        private BoundExpression BindExpression(ExpressionNode node, Type targetType)
+        {
+            var result = BindExpression(node);
+            if (result.Type != targetType) _diagnostics.ReportCannotConvert(node.Span, result.Type, targetType);
+            return result;
+        }
         
-        public BoundExpression BindExpression(ExpressionNode node)
+        private BoundExpression BindExpression(ExpressionNode node)
         {
             return node.Type switch
             {

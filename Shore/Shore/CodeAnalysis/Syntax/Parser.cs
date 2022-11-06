@@ -113,6 +113,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.OpenBraceToken => ParseBlockStatement(),
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
                 TokType.LetKeyword => ParseVariableDeclaration(),
+                TokType.IfKeyword => ParseIfStatement(),
                 _=> ParseExpressionStatement()
             };
         }
@@ -141,6 +142,24 @@ namespace Shore.CodeAnalysis.Syntax
             var equals = MatchToken(TokType.EqualsToken);
             var initializer = ParseExpression();
             return new VariableDeclarationNode(keyword, identifier, equals, initializer);
+        }
+
+        private StatementNode ParseIfStatement()
+        {
+            var keyword = MatchToken(TokType.IfKeyword);
+            var condition = ParseExpression();
+            var statement = ParseStatement();
+            var elseClause = ParseElseStatement();
+            return new IfStatementNode(keyword, condition, statement, elseClause);
+        }
+
+        private ElseNode ParseElseStatement()
+        {
+            if (CurrentToken.Type != TokType.ElseKeyword) return null;
+
+            var keyword = NextToken();
+            var statement = ParseStatement();
+            return new ElseNode(keyword, statement);
         }
 
         private ExpressionStatementNode ParseExpressionStatement()

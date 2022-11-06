@@ -46,6 +46,8 @@ namespace Shore.CodeAnalysis.Syntax
                 "false" => TokType.FalseKeyword,
                 "let" => TokType.LetKeyword,
                 "readonly" => TokType.ReadOnlyKeyword,
+                "if" => TokType.IfKeyword,
+                "else" => TokType.ElseKeyword,
                 _ => TokType.IdentifierToken
             };
         }
@@ -92,6 +94,8 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.TrueKeyword => "true",
                 TokType.LetKeyword => "let",
                 TokType.ReadOnlyKeyword => "readonly",
+                TokType.IfKeyword => "if",
+                TokType.ElseKeyword => "else",
                 _ => null
             };
         }
