@@ -12,6 +12,7 @@ namespace Shore.misc
             bool showTree = false;
             var variables = new Dictionary<VariableSymbol, object>();
             var textBuilder = new StringBuilder();
+            Compilation? previous = null;
 
             while (true)
             {
@@ -31,6 +32,12 @@ namespace Shore.misc
                         Console.WriteLine(showTree ? "Showing Node Trees" : "Hiding Node Trees");
                         continue;
                     }
+                    else if (input == "#RESET")
+                    {
+                        previous = null;
+                        variables.Clear();
+                        continue;
+                    }
                 }
 
                 textBuilder.AppendLine(input);
@@ -39,7 +46,7 @@ namespace Shore.misc
 
                 if(!isBlank && nodeTree.Diagnostics.Any()) continue;
 
-                var compilation = new Compilation(nodeTree);
+                var compilation = previous is null ? new Compilation(nodeTree) : previous.ContinueWith(nodeTree);
                 var result = compilation.Evaluate(variables);
 
                 var diagnostics = result.Diagnostics;
@@ -49,6 +56,7 @@ namespace Shore.misc
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     nodeTree.Root.WriteTo(Console.Out);
                     Console.ResetColor();
+                    previous = compilation;
                 }
 
                 if (!diagnostics.Any()) Console.WriteLine(result.Value);

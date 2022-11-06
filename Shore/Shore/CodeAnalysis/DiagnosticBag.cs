@@ -63,5 +63,11 @@ namespace Shore.CodeAnalysis
             var message = $"'{name}' is not defined.";
             ReportError(span, message);
         }
+
+        public void ReportCannotConvert(TextSpan span, Type fromType, Type toType)
+        {
+            var message = $"Cannot Convert Type '{fromType}' to Type '{toType}'.";
+            ReportError(span, message);
+        }
     }
 }

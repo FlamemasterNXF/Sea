@@ -6,22 +6,44 @@ namespace Shore.CodeAnalysis
 {
     public sealed class Compilation
     {
+        private BoundGlobalScope? _globalScope;
+        public Compilation? Previous { get; }
         public NodeTree NodeTree { get; }
 
         public Compilation(NodeTree nodeTree)
+            : this(null, nodeTree)
         {
             NodeTree = nodeTree;
         }
 
+        private Compilation(Compilation? previous, NodeTree nodeTree)
+        {
+            Previous = previous;
+            NodeTree = nodeTree;
+        }
+
+        internal BoundGlobalScope GlobalScope
+        {
+            get
+            {
+                if (_globalScope == null)
+                {
+                    var globalScope = Binder.BindGlobalScope(Previous?.GlobalScope, NodeTree.Root);
+                    Interlocked.CompareExchange(ref _globalScope, globalScope, null);
+                }
+
+                return _globalScope;
+            }
+        }
+
+        public Compilation ContinueWith(NodeTree nodeTree) => new Compilation(this, nodeTree);
+
         public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
-            var binder = new Binder(variables);
-            var boundTree = binder.BindExpression(NodeTree.Root.Expression);
-
-            var diagnostics = NodeTree.Diagnostics.Concat(binder.Diagnostics).ToImmutableArray();
+            var diagnostics = NodeTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToImmutableArray();
             if (diagnostics.Any()) return new EvaluationResult(diagnostics, null);
 
-            var evaluator = new Evaluator(boundTree, variables);
+            var evaluator = new Evaluator(GlobalScope.Expression, variables);
             var value = evaluator.Evaluate();
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }
