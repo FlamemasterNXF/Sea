@@ -48,6 +48,9 @@ namespace Shore.CodeAnalysis.Syntax
         ElseKeyword,
         IfKeyword,
         WhileStatement,
-        WhileKeyword
+        WhileKeyword,
+        ForStatement,
+        ForKeyword,
+        UntilKeyword
     }
 }

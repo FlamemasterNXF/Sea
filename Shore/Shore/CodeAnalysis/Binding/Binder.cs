@@ -60,6 +60,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
                 TokType.IfStatement => BindIfStatement((IfStatementNode)node),
                 TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
+                TokType.ForStatement => BindForStatement((ForStatementNode)node),
                 TokType.ExpressionStatement => BindExpressionStatement((ExpressionStatementNode)node),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
@@ -106,6 +107,22 @@ namespace Shore.CodeAnalysis.Binding
             var condition = BindExpression(node.Condition, typeof(bool));
             var body = BindStatement(node.Body);
             return new BoundWhileStatement(condition, body);
+        }
+
+        private BoundStatement BindForStatement(ForStatementNode node)
+        {
+            var lowerBound = BindExpression(node.LowerBound, typeof(int));
+            var upperBound = BindExpression(node.UpperBound, typeof(int));
+
+            _scope = new BoundScope(_scope);
+
+            var name = node.Identifier.Text;
+            var variable = new VariableSymbol(name, true, typeof(int));
+            if (!_scope.TryDeclare(variable)) _diagnostics.ReportVariableReDeclaration(node.Identifier.Span, name);
+            var body = BindStatement(node.Body);
+
+            _scope = _scope.Parent;
+            return new BoundForStatement(variable, lowerBound, upperBound, body);
         }
         
         private BoundStatement BindExpressionStatement(ExpressionStatementNode node)

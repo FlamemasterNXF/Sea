@@ -11,6 +11,7 @@ namespace Shore.CodeAnalysis.Binding
         BlockStatement,
         VariableDeclaration,
         IfStatement,
-        WhileStatement
+        WhileStatement,
+        ForStatement
     }
 }

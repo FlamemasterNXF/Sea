@@ -115,6 +115,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.LetKeyword => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
+                TokType.ForKeyword => ParseForStatement(),
                 _=> ParseExpressionStatement()
             };
         }
@@ -169,6 +170,18 @@ namespace Shore.CodeAnalysis.Syntax
             var condition = ParseExpression();
             var body = ParseStatement();
             return new WhileStatementNode(keyword, condition, body);
+        }
+
+        private StatementNode ParseForStatement()
+        {
+            var keyword = MatchToken(TokType.ForKeyword);
+            var identifier = MatchToken(TokType.IdentifierToken);
+            var equalsToken = MatchToken(TokType.EqualsToken);
+            var lowerBound = ParseExpression();
+            var untilKeyword = MatchToken(TokType.UntilKeyword);
+            var upperBound = ParseExpression();
+            var body = ParseStatement();
+            return new ForStatementNode(keyword, identifier, equalsToken, lowerBound, untilKeyword, upperBound, body);
         }
 
         private ExpressionStatementNode ParseExpressionStatement()

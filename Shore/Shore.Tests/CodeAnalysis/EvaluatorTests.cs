@@ -46,9 +46,46 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("{ let a = 0 if a == 0 a = 10 else a = 5 a }", 10)]
         [InlineData("{ let a = 0 if a == 4 a = 10 else a = 5 a }", 5)]
         [InlineData("{ let i = 10 let result = 0 while i > 0 { result = result + i i = i -1 } result }", 55)]
+        [InlineData("{ let result = 0 for i = 1 until 10 { result = result + i } result }", 55)]
         public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
         {
             AssertValue(text, expectedValue);
+        }
+        
+        [Fact]
+        public void Evaluator_For_Statement_Reports_CannotConvert_LowerBound()
+        {
+            var text = @"
+                {
+                    let result = 0
+                    for i = [false] until 10
+                        result = result + i
+                }
+            ";
+
+            var diagnostics = @"
+                Cannot Convert Type 'Boolean' to Type 'Int32'.
+            ";
+            
+            AssertDiagnostics(text, diagnostics);
+        }
+        
+        [Fact]
+        public void Evaluator_For_Statement_Reports_CannotConvert_UpperBound()
+        {
+            var text = @"
+                {
+                    let result = 0
+                    for i = 1 until [true]
+                        result = result + i
+                }
+            ";
+
+            var diagnostics = @"
+                Cannot Convert Type 'Boolean' to Type 'Int32'.
+            ";
+            
+            AssertDiagnostics(text, diagnostics);
         }
         
         [Fact]
