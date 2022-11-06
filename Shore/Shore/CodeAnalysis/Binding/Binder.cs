@@ -155,6 +155,13 @@ namespace Shore.CodeAnalysis.Binding
         private BoundExpression BindNameExpression(NameExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
+
+            if (string.IsNullOrEmpty(name))
+            {
+                // This ensures that 'Token Fabrication' does not cause an Error.
+                // An Error has already been thrown, so we just return an expression of 0.
+                return new BoundLiteralExpression(0);
+            }
             
             if (!_scope.TryLookup(name, out var variable))
             {

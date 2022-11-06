@@ -51,6 +51,34 @@ namespace Shore.Tests.CodeAnalysis
         {
             AssertValue(text, expectedValue);
         }
+
+        [Fact]
+        public void Evaluator_No_InfiniteLoop()
+        {
+            var text = @"
+                {
+                [)][]
+            ";
+
+            var diagnostics = @"
+                Unexpected Token CloseParenToken, IdentifierToken was expected.
+                Unexpected Token EndOfFileToken, CloseBraceToken was expected.
+            ";
+            
+            AssertDiagnostics(text, diagnostics);
+        }
+        
+        [Fact]
+        public void Evaluator_NameExpression_Reports_NoError_ForTokenFabrication()
+        {
+            var text = @"[]";
+
+            var diagnostics = @"
+                Unexpected Token EndOfFileToken, IdentifierToken was expected.
+            ";
+            
+            AssertDiagnostics(text, diagnostics);
+        }
         
         [Fact]
         public void Evaluator_For_Statement_Reports_CannotConvert_LowerBound()

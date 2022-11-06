@@ -127,8 +127,14 @@ namespace Shore.CodeAnalysis.Syntax
 
             while (CurrentToken.Type != TokType.EndOfFileToken && CurrentToken.Type != TokType.CloseBraceToken)
             {
+                var startToken = CurrentToken;
+                
                 var statement = ParseStatement();
                 statements.Add(statement);
+
+                // If no Tokens are consumed this is used to avoid an infinite loop.
+                // No Error reporting is needed because the failed expression already reports one.
+                if (CurrentToken == startToken) NextToken();
             }
 
             var closeBraceToken = MatchToken(TokType.CloseBraceToken);
