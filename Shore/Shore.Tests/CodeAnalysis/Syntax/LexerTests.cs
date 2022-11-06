@@ -132,22 +132,31 @@ namespace Shore.Tests.CodeAnalysis.Syntax
 
             switch (type1)
             {
+                case TokType.LeftShiftToken when type2 == TokType.LessThanToken:
+                case TokType.RightShiftToken when type2 == TokType.GreaterThanToken:
+                case TokType.LessThanToken when type2 == TokType.LeftShiftToken:
+                case TokType.GreaterThanToken when type2 == TokType.RightShiftToken:
+                case TokType.GreaterThanToken when type2 == TokType.GreaterThanToken:
+                case TokType.GreaterThanToken when type2 == TokType.GreaterThanOrEqualToken:
+                case TokType.LessThanToken when type2 == TokType.LessThanOrEqualToken:
+                case TokType.LessThanToken when type2 == TokType.LessThanToken:
+                case TokType.AmpersandToken when type2 == TokType.AmpersandToken:
+                case TokType.AmpersandToken when type2 == TokType.DoubleAmpersandToken:
+                case TokType.PipeToken when type2 == TokType.PipeToken:
+                case TokType.PipeToken when type2 == TokType.DoublePipeToken:
                 case TokType.GreaterThanToken when type2 == TokType.EqualsToken:
                 case TokType.GreaterThanToken when type2 == TokType.DoubleEqualsToken:
                 case TokType.LessThanToken when type2 == TokType.EqualsToken:
                 case TokType.LessThanToken when type2 == TokType.DoubleEqualsToken:
+                case TokType.IdentifierToken when twoIsKeyword:
+                case TokType.NumberToken when type2 == TokType.NumberToken:
+                case TokType.BangToken when type2 == TokType.EqualsToken:
+                case TokType.BangToken when type2 == TokType.DoubleEqualsToken:
+                case TokType.EqualsToken when type2 == TokType.EqualsToken:
+                case TokType.EqualsToken when type2 == TokType.DoubleEqualsToken: 
                     return true;
                 default:
-                    return type1 switch
-                    {
-                        TokType.IdentifierToken when twoIsKeyword => true,
-                        TokType.NumberToken when type2 == TokType.NumberToken => true,
-                        TokType.BangToken when type2 == TokType.EqualsToken => true,
-                        TokType.BangToken when type2 == TokType.DoubleEqualsToken => true,
-                        TokType.EqualsToken when type2 == TokType.EqualsToken => true,
-                        TokType.EqualsToken when type2 == TokType.DoubleEqualsToken => true,
-                        _ => false
-                    };
+                    return false;
             }
         }
 

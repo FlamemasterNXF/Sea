@@ -51,6 +51,12 @@ namespace Shore.CodeAnalysis.Syntax
         WhileKeyword,
         ForStatement,
         ForKeyword,
-        UntilKeyword
+        UntilKeyword,
+        RightShiftToken,
+        LeftShiftToken,
+        PipeToken,
+        AmpersandToken,
+        CaratToken,
+        TildeToken
     }
 }

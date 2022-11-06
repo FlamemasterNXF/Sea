@@ -72,6 +72,14 @@ namespace Shore.CodeAnalysis.Syntax
                     _type = TokType.CloseBraceToken;
                     _position++;
                     break; 
+                case '~':
+                    _type = TokType.TildeToken;
+                    _position++;
+                    break;
+                case '^':
+                    _type = TokType.CaratToken;
+                    _position++;
+                    break;
                 case '!':
                     _position++;
                     if (Current != '=') _type = TokType.BangToken;
@@ -91,35 +99,55 @@ namespace Shore.CodeAnalysis.Syntax
                     }
                     break;
                 case '&':
-                    if(Lookahead == '&')
+                    _position++;
+                    if (Current != '&') _type = TokType.AmpersandToken;
+                    else
                     {
-                        _position += 2;
                         _type = TokType.DoubleAmpersandToken;
+                        _position++;
                     }
                     break;
                 case '|':
-                    if(Lookahead == '|')
+                    _position++;
+                    if (Current != '|') _type = TokType.PipeToken;
+                    else
                     {
-                        _position += 2;
                         _type = TokType.DoublePipeToken;
+                        _position++;
                     }
                     break;
                 case '<':
                     _position++;
-                    if (Current != '=') _type = TokType.LessThanToken;
-                    else
+                    switch (Current)
                     {
-                        _type = TokType.LessThanOrEqualToken;
-                        _position++;
+                        case '=':
+                            _type = TokType.LessThanOrEqualToken;
+                            _position++;
+                            break;
+                        case '<': 
+                            _type = TokType.LeftShiftToken;
+                            _position++;
+                            break;
+                        default:
+                            _type = TokType.LessThanToken;
+                            break;
                     }
                     break;
                 case '>':
                     _position++;
-                    if (Current != '=') _type = TokType.GreaterThanToken;
-                    else
+                    switch (Current)
                     {
-                        _type = TokType.GreaterThanOrEqualToken;
-                        _position++;
+                        case '=':
+                            _type = TokType.GreaterThanOrEqualToken;
+                            _position++;
+                            break;
+                        case '>': 
+                            _type = TokType.RightShiftToken;
+                            _position++;
+                            break;
+                        default:
+                            _type = TokType.GreaterThanToken;
+                            break;
                     }
                     break;
                 case '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9':

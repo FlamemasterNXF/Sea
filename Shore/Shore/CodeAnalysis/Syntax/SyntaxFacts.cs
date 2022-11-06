@@ -6,9 +6,10 @@ namespace Shore.CodeAnalysis.Syntax
         {
             return type switch
             {
-                TokType.PlusToken => 6,
-                TokType.DashToken => 6,
-                TokType.BangToken => 6,
+                TokType.PlusToken => 7,
+                TokType.DashToken => 7,
+                TokType.BangToken => 7,
+                TokType.TildeToken => 7,
                 
                 _ => 0
             };
@@ -18,21 +19,27 @@ namespace Shore.CodeAnalysis.Syntax
         {
             return type switch
             {
-                TokType.StarToken => 5,
-                TokType.SlashToken => 5,
+                TokType.StarToken => 6,
+                TokType.SlashToken => 6,
                 
-                TokType.PlusToken => 4,
-                TokType.DashToken => 4,
+                TokType.PlusToken => 5,
+                TokType.DashToken => 5,
                 
-                TokType.DoubleEqualsToken => 3,
-                TokType.BangEqualsToken => 3,
-                TokType.GreaterThanToken => 3,
-                TokType.GreaterThanOrEqualToken => 3,
-                TokType.LessThanToken => 3,
-                TokType.LessThanOrEqualToken => 3,
+                TokType.DoubleEqualsToken => 4,
+                TokType.BangEqualsToken => 4,
+                TokType.GreaterThanToken => 4,
+                TokType.GreaterThanOrEqualToken => 4,
+                TokType.LessThanToken => 4,
+                TokType.LessThanOrEqualToken => 4,
                 
+                TokType.LeftShiftToken => 3,
+                TokType.RightShiftToken => 3,
+                
+                TokType.AmpersandToken => 2,
                 TokType.DoubleAmpersandToken => 2,
+                TokType.PipeToken => 1,
                 TokType.DoublePipeToken => 1,
+                TokType.CaratToken => 1,
                 
                 _ => 0
             };
@@ -81,11 +88,17 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.SlashToken => "/",
                 TokType.BangToken => "!",
                 TokType.EqualsToken => "=",
+                TokType.TildeToken => "~",
+                TokType.CaratToken => "^",
                 TokType.GreaterThanToken => ">",
                 TokType.GreaterThanOrEqualToken => ">=",
+                TokType.RightShiftToken => ">>",
                 TokType.LessThanToken => "<",
                 TokType.LessThanOrEqualToken => "<=",
+                TokType.LeftShiftToken => "<<",
+                TokType.AmpersandToken => "&",
                 TokType.DoubleAmpersandToken => "&&",
+                TokType.PipeToken => "|",
                 TokType.DoublePipeToken => "||",
                 TokType.DoubleEqualsToken => "==",
                 TokType.BangEqualsToken => "!=",

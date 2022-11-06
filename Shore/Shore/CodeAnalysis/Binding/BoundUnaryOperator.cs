@@ -24,10 +24,11 @@ namespace Shore.CodeAnalysis.Binding
         
         private static readonly BoundUnaryOperator[] Operators =
         {
-            new BoundUnaryOperator(TokType.PlusToken, BoundUnaryOperatorKind.Identity, typeof(int)),
-            new BoundUnaryOperator(TokType.DashToken, BoundUnaryOperatorKind.Negation, typeof(int)),
+            new (TokType.PlusToken, BoundUnaryOperatorKind.Identity, typeof(int)),
+            new (TokType.DashToken, BoundUnaryOperatorKind.Negation, typeof(int)),
+            new (TokType.TildeToken, BoundUnaryOperatorKind.OnesComplement, typeof(int)),
             
-            new BoundUnaryOperator(TokType.BangToken, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
+            new (TokType.BangToken, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
         };
 
         public static BoundUnaryOperator? Bind(TokType tokType, Type operandType)

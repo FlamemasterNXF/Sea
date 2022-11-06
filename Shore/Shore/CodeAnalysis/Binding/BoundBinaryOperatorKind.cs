@@ -13,6 +13,11 @@ namespace Shore.CodeAnalysis.Binding
         GreaterThan,
         GreaterThanOrEqual,
         LessThan,
-        LessThanOrEqual
+        LessThanOrEqual,
+        BitwiseXor,
+        BitwiseAnd,
+        BitwiseOr,
+        BitwiseRightShift,
+        BitwiseLeftShift
     }
 }

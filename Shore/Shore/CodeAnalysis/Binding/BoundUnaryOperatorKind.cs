@@ -4,6 +4,7 @@ namespace Shore.CodeAnalysis.Binding
     {
         Identity, 
         Negation,
-        LogicalNegation
+        LogicalNegation,
+        OnesComplement
     }
 }
