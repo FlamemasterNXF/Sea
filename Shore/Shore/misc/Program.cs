@@ -10,6 +10,7 @@ namespace Shore.misc
         private static void Main(string[] args)
         {
             bool showTree = false;
+            bool showBoundTree = false;
             var variables = new Dictionary<VariableSymbol, object>();
             var textBuilder = new StringBuilder();
             Compilation? previous = null;
@@ -26,13 +27,21 @@ namespace Shore.misc
                 {
                     if (isBlank) break;
                     
-                    if (input == "#SHOWTREE")
+                    if (input == "#showTree")
                     {
                         showTree = !showTree;
                         Console.WriteLine(showTree ? "Showing Node Trees" : "Hiding Node Trees");
                         continue;
                     }
-                    else if (input == "#RESET")
+                    
+                    if (input == "#showBoundTree")
+                    {
+                        showBoundTree = !showBoundTree;
+                        Console.WriteLine(showBoundTree ? "Showing Bound Trees" : "Hiding Bound Trees");
+                        continue;
+                    } 
+                    
+                    if (input == "#reset")
                     {
                         previous = null;
                         variables.Clear();
@@ -53,13 +62,13 @@ namespace Shore.misc
 
                 if (showTree)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     nodeTree.Root.WriteTo(Console.Out);
-                    Console.ResetColor();
-                    previous = compilation;
+                    //previous = compilation;
                 }
+                
+                if (showBoundTree) compilation.EmitTree(Console.Out);
 
-                if (!diagnostics.Any()) Console.WriteLine(result.Value);
+                    if (!diagnostics.Any()) Console.WriteLine(result.Value);
                 else
                 {
                     foreach (var diagnostic in diagnostics)
