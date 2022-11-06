@@ -31,6 +31,13 @@ namespace Shore.CodeAnalysis.Syntax
         UnaryExpression,
         NameExpression,
         AssignmentExpression,
-        CompilationUnit
+        CompilationUnit,
+        ExpressionStatement,
+        BlockStatement,
+        CloseBraceToken,
+        OpenBraceToken,
+        VariableDeclarationStatement,
+        LetKeyword,
+        ReadOnlyKeyword
     }
 }

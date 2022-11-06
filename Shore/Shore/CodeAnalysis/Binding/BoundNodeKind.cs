@@ -6,6 +6,9 @@ namespace Shore.CodeAnalysis.Binding
         LiteralExpression,
         BinaryExpression,
         VariableExpression,
-        AssignmentExpression
+        AssignmentExpression,
+        ExpressionStatement,
+        BlockStatement,
+        VariableDeclaration
     }
 }

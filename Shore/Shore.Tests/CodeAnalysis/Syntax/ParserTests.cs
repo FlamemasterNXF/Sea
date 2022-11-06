@@ -89,7 +89,8 @@ namespace Shore.Tests.CodeAnalysis.Syntax
         {
             var nodeTree = NodeTree.Parse(text);
             var root = nodeTree.Root;
-            return root.Expression;
+            var statement = root.Statement;
+            return Assert.IsType<ExpressionStatementNode>(statement).Expression;
         }
         
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()

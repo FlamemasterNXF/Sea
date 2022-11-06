@@ -63,7 +63,15 @@ namespace Shore.CodeAnalysis.Syntax
                 case ')':
                     _type = TokType.CloseParenToken;
                     _position++;
+                    break;    
+                case '{':
+                    _type = TokType.OpenBraceToken;
+                    _position++;
                     break;              
+                case '}':
+                    _type = TokType.CloseBraceToken;
+                    _position++;
+                    break; 
                 case '!':
                     _position++;
                     if (Current != '=') _type = TokType.BangToken;

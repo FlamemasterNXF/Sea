@@ -40,6 +40,8 @@ namespace Shore.CodeAnalysis.Syntax
             {
                 "true" => TokType.TrueKeyword,
                 "false" => TokType.FalseKeyword,
+                "let" => TokType.LetKeyword,
+                "readonly" => TokType.ReadOnlyKeyword,
                 _ => TokType.IdentifierToken
             };
         }
@@ -76,8 +78,12 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.BangEqualsToken => "!=",
                 TokType.OpenParenToken => "(",
                 TokType.CloseParenToken => ")",
+                TokType.OpenBraceToken => "{",
+                TokType.CloseBraceToken => "}",
                 TokType.FalseKeyword => "false",
                 TokType.TrueKeyword => "true",
+                TokType.LetKeyword => "let",
+                TokType.ReadOnlyKeyword => "readonly",
                 _ => null
             };
         }

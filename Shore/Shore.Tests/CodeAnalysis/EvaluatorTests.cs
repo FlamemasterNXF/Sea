@@ -30,7 +30,8 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("true", true)]
         [InlineData("!true", false)]
         [InlineData("!false", true)]
-        [InlineData("(a = 10) * a", 100)]
+        [InlineData("let a = 10", 10)]
+        [InlineData("{ let b = 0 (b = 10) * b}", 100)]
         public void EvaluatorTests_RoundTrips(string text, object expectedValue)
         {
             var nodeTree = NodeTree.Parse(text);

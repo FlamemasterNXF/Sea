@@ -101,9 +101,52 @@ namespace Shore.CodeAnalysis.Syntax
 
         public CompilationUnitNode ParseCompilationUnit()
         {
-            var expression = ParseExpression();
+            var statement = ParseStatement();
             var eof = MatchToken(TokType.EndOfFileToken);
-            return new CompilationUnitNode(expression, eof);
+            return new CompilationUnitNode(statement, eof);
+        }
+
+        private StatementNode ParseStatement()
+        {
+            return CurrentToken.Type switch
+            {
+                TokType.OpenBraceToken => ParseBlockStatement(),
+                TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
+                TokType.LetKeyword => ParseVariableDeclaration(),
+                _=> ParseExpressionStatement()
+            };
+        }
+
+        private BlockStatementNode ParseBlockStatement()
+        {
+            var statements = ImmutableArray.CreateBuilder<StatementNode>();
+            var openBraceToken = MatchToken(TokType.OpenBraceToken);
+
+            while (CurrentToken.Type != TokType.EndOfFileToken && CurrentToken.Type != TokType.CloseBraceToken)
+            {
+                var statement = ParseStatement();
+                statements.Add(statement);
+            }
+
+            var closeBraceToken = MatchToken(TokType.CloseBraceToken);
+
+            return new BlockStatementNode(openBraceToken, statements.ToImmutable(), closeBraceToken);
+        }
+
+        private StatementNode ParseVariableDeclaration()
+        {
+            var expected = CurrentToken.Type == TokType.LetKeyword ? TokType.LetKeyword : TokType.ReadOnlyKeyword;
+            var keyword = MatchToken(expected);
+            var identifier = MatchToken(TokType.IdentifierToken);
+            var equals = MatchToken(TokType.EqualsToken);
+            var initializer = ParseExpression();
+            return new VariableDeclarationNode(keyword, identifier, equals, initializer);
+        }
+
+        private ExpressionStatementNode ParseExpressionStatement()
+        {
+            var expression = ParseExpression();
+            return new ExpressionStatementNode(expression);
         }
         
         private ExpressionNode ParsePrimaryExpression()

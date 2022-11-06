@@ -69,5 +69,17 @@ namespace Shore.CodeAnalysis
             var message = $"Cannot Convert Type '{fromType}' to Type '{toType}'.";
             ReportError(span, message);
         }
+
+        public void ReportVariableReDeclaration(TextSpan span, string name)
+        {
+            var message = $"Variable '{name}' has already been declared in this Scope!";
+            ReportError(span, message);
+        }
+
+        public void ReportCannotAssign(TextSpan span, string name)
+        {
+            var message = $"Variable '{name}' is Read-Only and cannot be re-assigned.";
+            ReportError(span, message);
+        }
     }
 }

@@ -6,7 +6,7 @@ namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class Binder
     {
-        private readonly BoundScope _scope;
+        private BoundScope _scope;
         private DiagnosticBag _diagnostics = new DiagnosticBag();
 
         public Binder(BoundScope parent)
@@ -36,12 +36,12 @@ namespace Shore.CodeAnalysis.Binding
 
             return parent;
         }
-        
+
         public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitNode node)
         {
             var parentScope = CreateParentScope(previous);
             var binder = new Binder(parentScope);
-            var expression = binder.BindExpression(node.Expression);
+            var expression = binder.BindStatement(node.Statement);
             var variables = binder._scope.GetDeclaredVariables();
             var diagnostics = binder.Diagnostics.ToImmutableArray();
 
@@ -52,6 +52,51 @@ namespace Shore.CodeAnalysis.Binding
         
         public DiagnosticBag Diagnostics => _diagnostics;
 
+        private BoundStatement BindStatement(StatementNode node)
+        {
+            return node.Type switch
+            {
+                TokType.BlockStatement => BindBlockStatement((BlockStatementNode)node),
+                TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
+                TokType.ExpressionStatement => BindExpressionStatement((ExpressionStatementNode)node),
+                _ => throw new Exception($"Unexpected Node {node.Type}")
+            };
+        }
+
+        private BoundStatement BindBlockStatement(BlockStatementNode node)
+        {
+            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+            _scope = new BoundScope(_scope);
+
+            foreach (var statementNode in node.Statements)
+            {
+                var statement = BindStatement(statementNode);
+                statements.Add(statement);
+            }
+
+            _scope = _scope.Parent;
+
+            return new BoundBlockStatement(statements.ToImmutable());
+        }
+
+        private BoundStatement BindVariableDeclaration(VariableDeclarationNode node)
+        {
+            var name = node.Identifier.Text;
+            var isReadOnly = node.Keyword.Type == TokType.ReadOnlyKeyword;
+            var initializer = BindExpression(node.Initializer);
+            var variable = new VariableSymbol(name, isReadOnly, initializer.Type);
+
+            if (!_scope.TryDeclare(variable)) _diagnostics.ReportVariableReDeclaration(node.Identifier.Span, name);
+
+            return new BoundVariableDeclaration(variable, initializer);
+        }
+
+        private BoundStatement BindExpressionStatement(ExpressionStatementNode node)
+        {
+            var expression = BindExpression(node.Expression);
+            return new BoundExpressionStatement(expression);
+        }
+        
         public BoundExpression BindExpression(ExpressionNode node)
         {
             return node.Type switch
@@ -86,9 +131,11 @@ namespace Shore.CodeAnalysis.Binding
             
             if (!_scope.TryLookup(name, out var variable))
             {
-                variable = new VariableSymbol(name, boundExpression.Type);
-                _scope.TryDeclare(variable);
+                _diagnostics.ReportUndefinedName(node.IdentifierToken.Span, name);
+                return boundExpression;
             }
+
+            if (variable.IsReadOnly) _diagnostics.ReportCannotAssign(node.EqualsToken.Span, name);
 
             if (boundExpression.Type != variable.Type)
             {

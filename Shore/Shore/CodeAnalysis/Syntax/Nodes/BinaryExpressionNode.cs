@@ -1,15 +1,19 @@
 namespace Shore.CodeAnalysis.Syntax.Nodes
 {
-    public sealed class CompilationUnitNode : Node
+    public sealed class VariableDeclarationNode : StatementNode
     {
-        public ExpressionNode Expression { get; }
-        public Token EndOfFileToken { get; }
-        public override TokType Type => TokType.CompilationUnit;
+        public Token Keyword { get; }
+        public Token Identifier { get; }
+        public Token EqualsToken { get; }
+        public ExpressionNode Initializer { get; }
+        public override TokType Type => TokType.VariableDeclarationStatement;
 
-        public CompilationUnitNode(ExpressionNode expression, Token endOfFileToken)
+        public VariableDeclarationNode(Token keyword, Token identifier, Token equalsToken, ExpressionNode initializer)
         {
-            Expression = expression;
-            EndOfFileToken = endOfFileToken;
+            Keyword = keyword;
+            Identifier = identifier;
+            EqualsToken = equalsToken;
+            Initializer = initializer;
         }
     }
     public sealed class BinaryExpressionNode : ExpressionNode
