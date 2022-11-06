@@ -15,7 +15,7 @@ namespace Shore.CodeAnalysis
 
         private void ReportError(TextSpan span, string message)
         {
-            var eMessage = "ERROR: " + message;
+            var eMessage = message;
             var diagnostic = Diagnostic.Error(span, eMessage);
             _diagnostics.Add(diagnostic);
         }
@@ -46,7 +46,8 @@ namespace Shore.CodeAnalysis
 
         public void ReportUndefinedUnaryOperator(TextSpan span, string? operatorText, Type operandType)
         {
-            var message = $"Unary Operator '{operatorText}' is not defined for Type {operandType}.";
+            var sType = operandType.ToString().Replace("System.", "");
+            var message = $"Unary Operator '{operatorText}' is not defined for Type '{sType}'.";
             ReportError(span, message);
         }
 
@@ -54,31 +55,33 @@ namespace Shore.CodeAnalysis
         {
             var sLeftType = leftType.ToString().Replace("System.", "");
             var sRightType = rightType.ToString().Replace("System.", "");
-            var message = $"Binary Operator '{operatorText}' is not defined for Types {sLeftType} and {sRightType}.";
+            var message = $"Binary Operator '{operatorText}' is not defined for Types '{sLeftType}' and '{sRightType}'.";
             ReportError(span, message);
         }
 
         public void ReportUndefinedName(TextSpan span, string name)
         {
-            var message = $"'{name}' is not defined.";
+            var message = $"Variable '{name}' is not defined.";
             ReportError(span, message);
         }
 
         public void ReportCannotConvert(TextSpan span, Type fromType, Type toType)
         {
-            var message = $"Cannot Convert Type '{fromType}' to Type '{toType}'.";
+            var sFromType = fromType.ToString().Replace("System.", "");
+            var sToType = toType.ToString().Replace("System.", "");
+            var message = $"Cannot Convert Type '{sFromType}' to Type '{sToType}'.";
             ReportError(span, message);
         }
 
         public void ReportVariableReDeclaration(TextSpan span, string name)
         {
-            var message = $"Variable '{name}' has already been declared in this Scope!";
+            var message = $"Variable '{name}' has already been declared in this Scope.";
             ReportError(span, message);
         }
 
         public void ReportCannotAssign(TextSpan span, string name)
         {
-            var message = $"Variable '{name}' is Read-Only and cannot be re-assigned.";
+            var message = $"Variable '{name}' is read-only and cannot be re-assigned.";
             ReportError(span, message);
         }
     }

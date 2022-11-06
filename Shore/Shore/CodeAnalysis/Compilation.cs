@@ -13,7 +13,6 @@ namespace Shore.CodeAnalysis
         public Compilation(NodeTree nodeTree)
             : this(null, nodeTree)
         {
-            NodeTree = nodeTree;
         }
 
         private Compilation(Compilation? previous, NodeTree nodeTree)
