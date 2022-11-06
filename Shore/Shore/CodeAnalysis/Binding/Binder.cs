@@ -59,6 +59,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.BlockStatement => BindBlockStatement((BlockStatementNode)node),
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
                 TokType.IfStatement => BindIfStatement((IfStatementNode)node),
+                TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
                 TokType.ExpressionStatement => BindExpressionStatement((ExpressionStatementNode)node),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
@@ -100,6 +101,13 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundIfStatement(condition, thenStatement, elseStatement);
         }
 
+        private BoundStatement BindWhileStatement(WhileStatementNode node)
+        {
+            var condition = BindExpression(node.Condition, typeof(bool));
+            var body = BindStatement(node.Body);
+            return new BoundWhileStatement(condition, body);
+        }
+        
         private BoundStatement BindExpressionStatement(ExpressionStatementNode node)
         {
             var expression = BindExpression(node.Expression);

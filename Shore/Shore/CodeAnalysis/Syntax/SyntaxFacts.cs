@@ -48,6 +48,7 @@ namespace Shore.CodeAnalysis.Syntax
                 "readonly" => TokType.ReadOnlyKeyword,
                 "if" => TokType.IfKeyword,
                 "else" => TokType.ElseKeyword,
+                "while" => TokType.WhileKeyword,
                 _ => TokType.IdentifierToken
             };
         }
@@ -96,6 +97,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.ReadOnlyKeyword => "readonly",
                 TokType.IfKeyword => "if",
                 TokType.ElseKeyword => "else",
+                TokType.WhileKeyword => "while",
                 _ => null
             };
         }

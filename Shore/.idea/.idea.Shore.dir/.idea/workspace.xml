@@ -5,16 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6647fa5a-2700-43d0-bf2c-0aec1a45daff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundIfStatement.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/ElseNode.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/IfStatementNode.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/VariableDeclarationNode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundWhileStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/WhileStatementNode.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/EvaluatorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/EvaluatorTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Binder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Binder.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNodeKind.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNodeKind.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Evaluator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Evaluator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/BinaryExpressionNode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/BinaryExpressionNode.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Parser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/SyntaxFacts.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/SyntaxFacts.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/TokType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/TokType.cs" afterDir="false" />
@@ -76,7 +73,7 @@
       <workItem from="1667595333258" duration="197000" />
       <workItem from="1667595806156" duration="1051000" />
       <workItem from="1667667010797" duration="27714000" />
-      <workItem from="1667753505107" duration="4162000" />
+      <workItem from="1667753505107" duration="4799000" />
     </task>
     <servers />
   </component>

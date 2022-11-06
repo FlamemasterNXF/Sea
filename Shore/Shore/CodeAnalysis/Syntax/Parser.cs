@@ -114,6 +114,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
                 TokType.LetKeyword => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
+                TokType.WhileKeyword => ParseWhileStatement(),
                 _=> ParseExpressionStatement()
             };
         }
@@ -160,6 +161,14 @@ namespace Shore.CodeAnalysis.Syntax
             var keyword = NextToken();
             var statement = ParseStatement();
             return new ElseNode(keyword, statement);
+        }
+
+        private StatementNode ParseWhileStatement()
+        {
+            var keyword = MatchToken(TokType.WhileKeyword);
+            var condition = ParseExpression();
+            var body = ParseStatement();
+            return new WhileStatementNode(keyword, condition, body);
         }
 
         private ExpressionStatementNode ParseExpressionStatement()

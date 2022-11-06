@@ -10,6 +10,7 @@ namespace Shore.CodeAnalysis.Binding
         ExpressionStatement,
         BlockStatement,
         VariableDeclaration,
-        IfStatement
+        IfStatement,
+        WhileStatement
     }
 }

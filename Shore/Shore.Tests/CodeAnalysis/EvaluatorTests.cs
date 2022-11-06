@@ -45,11 +45,30 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("{ let a = 0 if a == 4 a = 10 a }", 0)]
         [InlineData("{ let a = 0 if a == 0 a = 10 else a = 5 a }", 10)]
         [InlineData("{ let a = 0 if a == 4 a = 10 else a = 5 a }", 5)]
+        [InlineData("{ let i = 10 let result = 0 while i > 0 { result = result + i i = i -1 } result }", 55)]
         public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
         {
             AssertValue(text, expectedValue);
         }
+        
+        [Fact]
+        public void Evaluator_While_Statement_Reports_CannotConvert()
+        {
+            var text = @"
+                {
+                    let x = 0
+                    while [10]
+                        x = 10
+                }
+            ";
 
+            var diagnostics = @"
+                Cannot Convert Type 'Int32' to Type 'Boolean'.
+            ";
+            
+            AssertDiagnostics(text, diagnostics);
+        }
+        
         [Fact]
         public void Evaluator_If_Statement_Reports_CannotConvert()
         {
