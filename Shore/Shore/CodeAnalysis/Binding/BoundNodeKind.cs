@@ -12,6 +12,9 @@ namespace Shore.CodeAnalysis.Binding
         VariableDeclaration,
         IfStatement,
         WhileStatement,
-        ForStatement
+        ForStatement,
+        ConiditonalGotoStatement,
+        GotoStatement,
+        LabelStatement
     }
 }
