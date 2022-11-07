@@ -65,6 +65,7 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("{ let a = 0 if a == 4 a = 10 else a = 5 a }", 5)]
         [InlineData("{ let i = 10 let result = 0 while i > 0 { result = result + i i = i -1 } result }", 55)]
         [InlineData("{ let result = 0 for i = 1 until 10 { result = result + i } result }", 55)]
+        [InlineData("{ let a = 10 for i = 1 until (a = a - 1) { } a }", 9)]
         public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
         {
             AssertValue(text, expectedValue);
