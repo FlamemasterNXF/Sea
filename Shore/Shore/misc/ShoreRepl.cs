@@ -20,13 +20,10 @@ namespace Shore.misc
                 var isKeyword = token.Type.ToString().EndsWith("Keyword");
                 var isNumber = token.Type == TokType.NumberToken;
 
-                if (isKeyword)
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                else if (!isNumber)
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                if (isKeyword) Console.ForegroundColor = ConsoleColor.Blue;
+                else if (!isNumber) Console.ForegroundColor = ConsoleColor.DarkGray;
 
                 Console.Write(token.Text);
-
                 Console.ResetColor();
             }
         }
@@ -58,30 +55,26 @@ namespace Shore.misc
 
         protected override bool IsCompleteSubmission(string text)
         {
-            if (string.IsNullOrEmpty(text))
-                return true;
+            if (string.IsNullOrEmpty(text)) return true;
+            var nodeTree = NodeTree.Parse(text);
+            
+            return !GetLastToken(nodeTree.Root.Statement).IsMissing;
+        }
 
-            var syntaxTree = NodeTree.Parse(text);
+        private static Token GetLastToken(Node node)
+        {
+            if (node is Token token) return token;
 
-            if (syntaxTree.Diagnostics.Any())
-                return false;
-
-            return true;
+            return GetLastToken(node.GetChildren().Last());
         }
 
         protected override void EvaluateSubmission(string text)
         {
-            var syntaxTree = NodeTree.Parse(text);
+            var nodeTree = NodeTree.Parse(text);
+            var compilation = _previous == null ? new Compilation(nodeTree) : _previous.ContinueWith(nodeTree);
 
-            var compilation = _previous == null
-                ? new Compilation(syntaxTree)
-                : _previous.ContinueWith(syntaxTree);
-
-            if (_showTree)
-                syntaxTree.Root.WriteTo(Console.Out);
-
-            if (_showProgram)
-                compilation.EmitTree(Console.Out);
+            if (_showTree) nodeTree.Root.WriteTo(Console.Out);
+            if (_showProgram) compilation.EmitTree(Console.Out);
 
             var result = compilation.Evaluate(_variables);
 
@@ -96,8 +89,8 @@ namespace Shore.misc
             {
                 foreach (var diagnostic in result.Diagnostics)
                 {
-                    var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
-                    var line = syntaxTree.Text.Lines[lineIndex];
+                    var lineIndex = nodeTree.Text.GetLineIndex(diagnostic.Span.Start);
+                    var line = nodeTree.Text.Lines[lineIndex];
                     var lineNumber = lineIndex + 1;
                     var character = diagnostic.Span.Start - line.Start + 1;
 
@@ -111,9 +104,9 @@ namespace Shore.misc
                     var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
                     var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
 
-                    var prefix = syntaxTree.Text.ToString(prefixSpan);
-                    var error = syntaxTree.Text.ToString(diagnostic.Span);
-                    var suffix = syntaxTree.Text.ToString(suffixSpan);
+                    var prefix = nodeTree.Text.ToString(prefixSpan);
+                    var error = nodeTree.Text.ToString(diagnostic.Span);
+                    var suffix = nodeTree.Text.ToString(suffixSpan);
 
                     Console.Write("    ");
                     Console.Write(prefix);
@@ -123,7 +116,6 @@ namespace Shore.misc
                     Console.ResetColor();
 
                     Console.Write(suffix);
-
                     Console.WriteLine();
                 }
 

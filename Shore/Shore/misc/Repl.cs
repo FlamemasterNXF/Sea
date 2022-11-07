@@ -5,7 +5,7 @@ namespace Shore.misc
 {
     internal abstract class Repl
     {
-        private List<string> _history = new List<string>();
+        private readonly List<string> _history = new List<string>();
         private int _historyIndex;
         private bool _done;
 
@@ -187,8 +187,7 @@ namespace Shore.misc
                 }
             }
 
-            if (key.KeyChar >= ' ')
-                HandleTyping(document, view, key.KeyChar.ToString());
+            if (key.KeyChar >= ' ') HandleTyping(document, view, key.KeyChar.ToString());
         }
 
         private void HandleEscape(ObservableCollection<string> document, View view)
@@ -224,27 +223,23 @@ namespace Shore.misc
 
         private void HandleLeftArrow(ObservableCollection<string> document, View view)
         {
-            if (view.CurrentCharacter > 0)
-                view.CurrentCharacter--;
+            if (view.CurrentCharacter > 0) view.CurrentCharacter--;
         }
 
         private void HandleRightArrow(ObservableCollection<string> document, View view)
         {
             var line = document[view.CurrentLine];
-            if (view.CurrentCharacter <= line.Length - 1)
-                view.CurrentCharacter++;
+            if (view.CurrentCharacter <= line.Length - 1) view.CurrentCharacter++;
         }
 
         private void HandleUpArrow(ObservableCollection<string> document, View view)
         {
-            if (view.CurrentLine > 0)
-                view.CurrentLine--;
+            if (view.CurrentLine > 0) view.CurrentLine--;
         }
 
         private void HandleDownArrow(ObservableCollection<string> document, View view)
         {
-            if (view.CurrentLine < document.Count - 1)
-                view.CurrentLine++;
+            if (view.CurrentLine < document.Count - 1) view.CurrentLine++;
         }
 
         private void HandleBackspace(ObservableCollection<string> document, View view)
@@ -252,8 +247,7 @@ namespace Shore.misc
             var start = view.CurrentCharacter;
             if (start == 0)
             {
-                if (view.CurrentLine == 0)
-                    return;
+                if (view.CurrentLine == 0) return;
 
                 var currentLine = document[view.CurrentLine];
                 var previousLine = document[view.CurrentLine - 1];
@@ -261,7 +255,6 @@ namespace Shore.misc
                 view.CurrentLine--;
                 document[view.CurrentLine] = previousLine + currentLine;
                 view.CurrentCharacter = previousLine.Length;
-                return;
             }
             else
             {
@@ -280,7 +273,14 @@ namespace Shore.misc
             var line = document[lineIndex];
             var start = view.CurrentCharacter;
             if (start >= line.Length)
+            {
+                if (view.CurrentLine == document.Count - 1) return;
+
+                var nextLine = document[view.CurrentLine + 1];
+                document[view.CurrentLine] += nextLine;
+                document.RemoveAt(view.CurrentLine + 1);
                 return;
+            }
 
             var before = line.Substring(0, start);
             var after = line.Substring(start + 1);            
@@ -304,21 +304,20 @@ namespace Shore.misc
         private void HandlePageUp(ObservableCollection<string> document, View view)
         {
             _historyIndex--;
-            if (_historyIndex < 0)
-                _historyIndex = _history.Count - 1;
+            if (_historyIndex < 0) _historyIndex = _history.Count - 1;
             UpdateDocumentFromHistory(document, view);
         }
 
         private void HandlePageDown(ObservableCollection<string> document, View view)
         {
             _historyIndex++;
-            if (_historyIndex > _history.Count -1)
-                _historyIndex = 0;
+            if (_historyIndex > _history.Count -1) _historyIndex = 0;
             UpdateDocumentFromHistory(document, view);
         }
 
         private void UpdateDocumentFromHistory(ObservableCollection<string> document, View view)
         {
+            if (_history.Count == 0) return;
             document.Clear();
 
             var historyItem = _history[_historyIndex];
