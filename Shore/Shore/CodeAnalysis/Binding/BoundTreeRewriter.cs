@@ -3,7 +3,7 @@
 namespace Shore.CodeAnalysis.Binding
 {
     internal abstract class BoundTreeRewriter
-    {
+    {        
         public virtual BoundStatement RewriteStatement(BoundStatement node)
         {
             return node.Kind switch
@@ -22,7 +22,7 @@ namespace Shore.CodeAnalysis.Binding
         {
             ImmutableArray<BoundStatement>.Builder? builder = null;
 
-            for (int i = 0; i < node.Statements.Length; i++)
+            for (var i = 0; i < node.Statements.Length; i++)
             {
                 var oldStatement = node.Statements[i];
                 var newStatement = RewriteStatement(oldStatement);
@@ -31,8 +31,8 @@ namespace Shore.CodeAnalysis.Binding
                     if (builder is null)
                     {
                         builder = ImmutableArray.CreateBuilder<BoundStatement>(node.Statements.Length);
-                        for (var j = 0; j < i; i++) builder.Add(node.Statements[j]);
-                    }
+                        for (var j = 0; j < i; j++) builder.Add(node.Statements[j]);
+                    }                    
                 }
 
                 if (builder is not null) builder.Add(newStatement);
@@ -50,7 +50,7 @@ namespace Shore.CodeAnalysis.Binding
 
             return new BoundVariableDeclaration(node.Variable, initializer);
         }
-        
+
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)
         {
             var condition = RewriteExpression(node.Condition);
@@ -74,7 +74,7 @@ namespace Shore.CodeAnalysis.Binding
         protected virtual BoundStatement RewriteForStatement(BoundForStatement node)
         {
             var lowerBound = RewriteExpression(node.LowerBound);
-            var upperBound = RewriteExpression(node.LowerBound);
+            var upperBound = RewriteExpression(node.UpperBound);
             var body = RewriteStatement(node.Body);
             if (lowerBound == node.LowerBound && upperBound == node.UpperBound && body == node.Body) return node;
 
@@ -103,7 +103,7 @@ namespace Shore.CodeAnalysis.Binding
         }
 
         protected virtual BoundExpression RewriteLiteralExpression(BoundLiteralExpression node) => node;
-        
+
         protected virtual BoundExpression RewriteVariableExpression(BoundVariableExpression node) => node;
 
         protected virtual BoundExpression RewriteAssignmentExpression(BoundAssignmentExpression node)

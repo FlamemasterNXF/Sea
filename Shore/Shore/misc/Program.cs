@@ -56,9 +56,6 @@ namespace Shore.misc
                 if(!isBlank && nodeTree.Diagnostics.Any()) continue;
 
                 var compilation = previous is null ? new Compilation(nodeTree) : previous.ContinueWith(nodeTree);
-                var result = compilation.Evaluate(variables);
-
-                var diagnostics = result.Diagnostics;
 
                 if (showTree)
                 {
@@ -67,11 +64,13 @@ namespace Shore.misc
                 }
                 
                 if (showBoundTree) compilation.EmitTree(Console.Out);
+                
+                var result = compilation.Evaluate(variables);
 
-                    if (!diagnostics.Any()) Console.WriteLine(result.Value);
+                if (!result.Diagnostics.Any()) Console.WriteLine(result.Value);
                 else
                 {
-                    foreach (var diagnostic in diagnostics)
+                    foreach (var diagnostic in result.Diagnostics)
                     {
                         var lineIndex = nodeTree.Text.GetLineIndex(diagnostic.Span.Start);
                         var line = nodeTree.Text.Lines[lineIndex];

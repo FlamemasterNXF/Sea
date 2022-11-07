@@ -38,10 +38,10 @@ namespace Shore.Tests.CodeAnalysis.Syntax
             var tokens = NodeTree.ParseTokens(text).ToArray();
             
             Assert.Equal(2, tokens.Length);
-            Assert.Equal(tokens[0].Type, type1);
-            Assert.Equal(tokens[0].Text, text1);
-            Assert.Equal(tokens[1].Type, type2);
-            Assert.Equal(tokens[1].Text, text2);
+            Assert.Equal(type1, tokens[0].Type);
+            Assert.Equal(text1, tokens[0].Text);
+            Assert.Equal(type2, tokens[1].Type);
+            Assert.Equal(text2, tokens[1].Text);
         }
 
         [Theory]
@@ -53,12 +53,12 @@ namespace Shore.Tests.CodeAnalysis.Syntax
             var tokens = NodeTree.ParseTokens(text).ToArray();
             
             Assert.Equal(3, tokens.Length);
-            Assert.Equal(tokens[0].Type, type1);
-            Assert.Equal(tokens[0].Text, text1);
-            Assert.Equal(tokens[1].Type, separatorType);
-            Assert.Equal(tokens[1].Text, separatorText);
-            Assert.Equal(tokens[2].Type, type2);
-            Assert.Equal(tokens[2].Text, text2);
+            Assert.Equal(type1, tokens[0].Type);
+            Assert.Equal(text1, tokens[0].Text);
+            Assert.Equal(separatorType, tokens[1].Type);
+            Assert.Equal(separatorText, tokens[1].Text);
+            Assert.Equal(type2, tokens[2].Type);
+            Assert.Equal(text2, tokens[2].Text);
         }
 
         public static IEnumerable<object[]> GetTokensData()
