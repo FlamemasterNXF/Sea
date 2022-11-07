@@ -1,5 +1,6 @@
 using Shore.CodeAnalysis.Syntax;
 using Shore.CodeAnalysis.Syntax.Nodes;
+using Shore.Text;
 using Xunit;
 
 namespace Shore.Tests.CodeAnalysis.Syntax
@@ -18,8 +19,22 @@ namespace Shore.Tests.CodeAnalysis.Syntax
             untestedTokenTypes.ExceptWith(testedTokenTypes);
             
             Assert.Empty(untestedTokenTypes);
-        } 
-            
+        }
+
+        [Fact]
+        public void Lexer_Lexes_UnterminatedString()
+        {
+            var text = "\"text";
+            var tokens = NodeTree.ParseTokens(text, out var diagnostics);
+            var token = Assert.Single(tokens);
+            Assert.Equal(TokType.StringToken, token.Type);
+            Assert.Equal(text, token.Text);
+
+            var diagnostic = Assert.Single(diagnostics);
+            Assert.Equal(new TextSpan(0, 1), diagnostic.Span);
+            Assert.Equal("Unterminated String.", diagnostic.Message);
+        }
+
         [Theory]
         [MemberData(nameof(GetTokensData))]
         public void Lexer_Lexes_Token(TokType type, string text)
@@ -99,6 +114,8 @@ namespace Shore.Tests.CodeAnalysis.Syntax
                 (TokType.NumberToken, "123"),
                 (TokType.IdentifierToken, "a"),
                 (TokType.IdentifierToken, "abc"),
+                (TokType.StringToken, "\"Test\""),
+                (TokType.StringToken, "\"Te\"\"st\""),
             };
 
             return fixedTokens.Concat(dynamicTokens);
@@ -149,11 +166,12 @@ namespace Shore.Tests.CodeAnalysis.Syntax
                 case TokType.LessThanToken when type2 == TokType.EqualsToken:
                 case TokType.LessThanToken when type2 == TokType.DoubleEqualsToken:
                 case TokType.IdentifierToken when twoIsKeyword:
-                case TokType.NumberToken when type2 == TokType.NumberToken:
                 case TokType.BangToken when type2 == TokType.EqualsToken:
                 case TokType.BangToken when type2 == TokType.DoubleEqualsToken:
                 case TokType.EqualsToken when type2 == TokType.EqualsToken:
-                case TokType.EqualsToken when type2 == TokType.DoubleEqualsToken: 
+                case TokType.EqualsToken when type2 == TokType.DoubleEqualsToken:
+                case TokType.NumberToken when type2 == TokType.NumberToken:
+                case TokType.StringToken when type2 == TokType.StringToken:
                     return true;
                 default:
                     return false;

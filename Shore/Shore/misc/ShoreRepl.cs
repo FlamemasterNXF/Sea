@@ -19,6 +19,16 @@ namespace Shore.misc
             {
                 var isKeyword = token.Type.ToString().EndsWith("Keyword");
                 var isNumber = token.Type == TokType.NumberToken;
+                var isIdentifier = token.Type == TokType.IdentifierToken;
+
+                if (isKeyword)
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                else if (isIdentifier)
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                else if (isNumber)
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                else
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
 
                 if (isKeyword) Console.ForegroundColor = ConsoleColor.Blue;
                 else if (!isNumber) Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -58,14 +68,7 @@ namespace Shore.misc
             if (string.IsNullOrEmpty(text)) return true;
             var nodeTree = NodeTree.Parse(text);
             
-            return !GetLastToken(nodeTree.Root.Statement).IsMissing;
-        }
-
-        private static Token GetLastToken(Node node)
-        {
-            if (node is Token token) return token;
-
-            return GetLastToken(node.GetChildren().Last());
+            return !(nodeTree.Root.Statement.GetLastToken().IsMissing);
         }
 
         protected override void EvaluateSubmission(string text)

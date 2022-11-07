@@ -57,6 +57,7 @@ namespace Shore.CodeAnalysis.Syntax
         PipeToken,
         AmpersandToken,
         CaratToken,
-        TildeToken
+        TildeToken,
+        StringToken
     }
 }

@@ -27,22 +27,36 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
 
         private static NodeTree Parse(SourceText text) => new NodeTree(text);
 
-        public static IEnumerable<Token> ParseTokens(string text)
+        public static ImmutableArray<Token> ParseTokens(string text)
         {
             var sourceText = SourceText.From(text);
             return ParseTokens(sourceText);
         }
 
-        private static IEnumerable<Token> ParseTokens(SourceText text)
+        public static ImmutableArray<Token> ParseTokens(string text, out ImmutableArray<Diagnostic> diagnostics)
         {
-            var lexer = new Lexer(text);
+            var sourceText = SourceText.From(text);
+            return ParseTokens(sourceText, out diagnostics);
+        }
 
-            while (true)
+        public static ImmutableArray<Token> ParseTokens(SourceText text) => ParseTokens(text, out _);
+
+        public static ImmutableArray<Token> ParseTokens(SourceText text, out ImmutableArray<Diagnostic> diagnostics)
+        {
+            IEnumerable<Token> LexTokens(Lexer lexer)
             {
-                var token = lexer.Lex();
-                if (token.Type is TokType.EndOfFileToken) break;
-                yield return token;
+                while (true)
+                {
+                    var token = lexer.Lex();
+                    if (token.Type == TokType.EndOfFileToken) break;
+                    yield return token;
+                }
             }
+
+            var lexer = new Lexer(text);
+            var result = LexTokens(lexer).ToImmutableArray();
+            diagnostics = lexer.Diagnostics.ToImmutableArray();
+            return result;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Text;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;
 
@@ -150,6 +151,9 @@ namespace Shore.CodeAnalysis.Syntax
                             break;
                     }
                     break;
+                case '"':
+                    ReadString();
+                    break;
                 case '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9':
                     ReadNumberToken();
                     break;
@@ -178,6 +182,45 @@ namespace Shore.CodeAnalysis.Syntax
             _type = TokType.WhitespaceToken;
         }
 
+        private void ReadString()
+        {
+            _position++;
+
+            var builder = new StringBuilder();
+            var done = false;
+
+            while (!done)
+            {
+                switch (Current)
+                {
+                    case '\0' or '\r' or '\n':
+                        var span = new TextSpan(_start, 1);
+                        _diagnostics.ReportUnterminatedString(span);
+                        done = true;
+                        break;
+                    case '"':
+                        if (Lookahead == '"')
+                        {
+                            builder.Append(Current);
+                            _position += 2;
+                        }
+                        else
+                        {
+                            _position++;
+                            done = true;
+                        }
+                        break;
+                    default:
+                        builder.Append(Current);
+                        _position++;
+                        break;
+                }
+            }
+
+            _type = TokType.StringToken;
+            _value = builder.ToString();
+        }
+        
         private void ReadNumberToken()
         {
             while (char.IsDigit(Current)) _position++;

@@ -204,6 +204,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.TrueKeyword => ParseBooleanLiteral(),
                 TokType.FalseKeyword => ParseBooleanLiteral(),
                 TokType.NumberToken => ParseNumberLiteral(),
+                TokType.StringToken => ParseStringLiteral(),
                 TokType.IdentifierToken => ParseNameExpression(),
                 _ => ParseNameExpression()
             };
@@ -228,6 +229,12 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var numberToken = MatchToken(TokType.NumberToken);
             return new LiteralExpressionNode(numberToken);
+        }
+        
+        private ExpressionNode ParseStringLiteral()
+        {
+            var stringToken = MatchToken(TokType.StringToken);
+            return new LiteralExpressionNode(stringToken);
         }
 
         private ExpressionNode ParseNameExpression()

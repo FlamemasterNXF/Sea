@@ -84,5 +84,11 @@ namespace Shore.CodeAnalysis
             var message = $"Variable '{name}' is read-only and cannot be re-assigned.";
             ReportError(span, message);
         }
+
+        public void ReportUnterminatedString(TextSpan span)
+        {
+            var message = "Unterminated String.";
+            ReportError(span, message);
+        }
     }
 }

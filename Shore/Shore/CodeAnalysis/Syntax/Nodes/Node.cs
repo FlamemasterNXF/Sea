@@ -35,11 +35,19 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
                 }
             }
         }
+        
+        public Token GetLastToken()
+        {
+            if (this is Token token) return token;
+
+            return GetChildren().Last().GetLastToken();
+        }
 
         public void WriteTo(TextWriter writer)
         {
             LogNode(writer, this);
         }
+        
         private static void LogNode(TextWriter writer, Node node, string indent = "", bool last = false)
         {
             var isToConsole = writer == Console.Out;
