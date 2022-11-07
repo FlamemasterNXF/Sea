@@ -1,4 +1,6 @@
-﻿namespace Shore.CodeAnalysis.Binding
+﻿using Shore.CodeAnalysis.Symbols;
+
+namespace Shore.CodeAnalysis.Binding
 {
     internal abstract class BoundStatement : BoundNode
     {

@@ -1,3 +1,5 @@
+using Shore.CodeAnalysis.Symbols;
+
 namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class BoundUnaryExpression : BoundExpression
@@ -11,7 +13,7 @@ namespace Shore.CodeAnalysis.Binding
             Operand = operand;
         }
 
-        public override Type Type => Op.ResultType;
+        public override TypeSymbol Type => Op.ResultType;
         
         public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
     }

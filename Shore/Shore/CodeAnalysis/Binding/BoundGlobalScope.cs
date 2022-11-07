@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using Shore.CodeAnalysis.Symbols;
 
 namespace Shore.CodeAnalysis.Binding
 {

@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Lowering;
+using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore.CodeAnalysis

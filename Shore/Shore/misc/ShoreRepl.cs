@@ -1,4 +1,5 @@
 ﻿using Shore.CodeAnalysis;
+using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;

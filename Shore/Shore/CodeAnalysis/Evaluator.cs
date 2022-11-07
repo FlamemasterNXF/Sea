@@ -1,4 +1,5 @@
 using Shore.CodeAnalysis.Binding;
+using Shore.CodeAnalysis.Symbols;
 
 namespace Shore.CodeAnalysis
 {
@@ -16,12 +17,12 @@ namespace Shore.CodeAnalysis
 
         public object Evaluate()
         {
-            var labelToIndex = new Dictionary<LabelSymbol, int>();
+            var labelToIndex = new Dictionary<BoundLabel, int>();
 
             for (var i = 0; i < _root.Statements.Length; i++)
             {
                 if (_root.Statements[i] is BoundLabelStatement l)
-                    labelToIndex.Add(l.Label, i + 1);
+                    labelToIndex.Add(l.BoundLabel, i + 1);
             }
 
             var index = 0;
@@ -42,12 +43,12 @@ namespace Shore.CodeAnalysis
                         break;
                     case BoundNodeKind.GotoStatement:
                         var gs = (BoundGotoStatement)s;
-                        index = labelToIndex[gs.Label];
+                        index = labelToIndex[gs.BoundLabel];
                         break;
                     case BoundNodeKind.ConiditonalGotoStatement:
                         var cgs = (BoundConditionalGotoStatement)s;
                         var condition = (bool)EvaluateExpression(cgs.Condition);
-                        if (condition == cgs.JumpIfTrue) index = labelToIndex[cgs.Label];
+                        if (condition == cgs.JumpIfTrue) index = labelToIndex[cgs.BoundLabel];
                         else index++;
                         break;
                     case BoundNodeKind.LabelStatement:
@@ -101,29 +102,32 @@ namespace Shore.CodeAnalysis
                 {
                     var left = EvaluateExpression(b.Left);
                     var right = EvaluateExpression(b.Right);
-                    
+
+                    var safeLeft = Convert.ToInt32(left);
+                    var safeRight = Convert.ToInt32(right);
+
                     return b.Op.Kind switch
                     {
-                        BoundBinaryOperatorKind.Addition => (int) left + (int) right,
-                        BoundBinaryOperatorKind.Subtraction => (int) left - (int) right,
-                        BoundBinaryOperatorKind.Multiplication => (int) left * (int) right,
-                        BoundBinaryOperatorKind.Division => (int) left / (int) right,
-                        BoundBinaryOperatorKind.BitwiseRightShift => (int) left >> (int) right,
-                        BoundBinaryOperatorKind.BitwiseLeftShift => (int) left << (int) right,
-                        BoundBinaryOperatorKind.BitwiseAnd when b.Type == typeof(int) => (int)left & (int)right,
-                        BoundBinaryOperatorKind.BitwiseAnd when b.Type == typeof(bool) => (bool)left & (bool)right,
-                        BoundBinaryOperatorKind.BitwiseOr when b.Type == typeof(int) => (int)left | (int)right,
-                        BoundBinaryOperatorKind.BitwiseOr when b.Type == typeof(bool) => (bool)left | (bool)right,
-                        BoundBinaryOperatorKind.BitwiseXor when b.Type == typeof(int) => (int)left ^ (int)right,
-                        BoundBinaryOperatorKind.BitwiseXor when b.Type == typeof(bool) => (bool)left ^ (bool)right,
+                        BoundBinaryOperatorKind.Addition => safeLeft + safeRight,
+                        BoundBinaryOperatorKind.Subtraction => safeLeft - safeRight,
+                        BoundBinaryOperatorKind.Multiplication => safeLeft * safeRight,
+                        BoundBinaryOperatorKind.Division => safeLeft / safeRight,
+                        BoundBinaryOperatorKind.BitwiseRightShift => safeLeft >> safeRight,
+                        BoundBinaryOperatorKind.BitwiseLeftShift => safeLeft << safeRight,
+                        BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => safeLeft & safeRight,
+                        BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool) => (bool) left & (bool) right,
+                        BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => safeLeft | safeRight,
+                        BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool)=> (bool) left | (bool) right,
+                        BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => safeLeft ^ safeRight,
+                        BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool) => (bool) left ^ (bool) right,
                         BoundBinaryOperatorKind.LogicalAnd => (bool) left && (bool) right,
                         BoundBinaryOperatorKind.LogicalOr => (bool) left || (bool) right,
                         BoundBinaryOperatorKind.LogicalEquals => Equals(left, right),
                         BoundBinaryOperatorKind.LogicalNotEquals => !Equals(left, right),
-                        BoundBinaryOperatorKind.GreaterThan => (int)left > (int)right,
-                        BoundBinaryOperatorKind.GreaterThanOrEqual => (int)left >= (int)right,
-                        BoundBinaryOperatorKind.LessThan => (int)left < (int)right,
-                        BoundBinaryOperatorKind.LessThanOrEqual => (int)left <= (int)right,
+                        BoundBinaryOperatorKind.GreaterThan => safeLeft > safeRight,
+                        BoundBinaryOperatorKind.GreaterThanOrEqual => safeLeft >= safeRight,
+                        BoundBinaryOperatorKind.LessThan => safeLeft < safeRight,
+                        BoundBinaryOperatorKind.LessThanOrEqual => safeLeft <= safeRight,
                         _ => throw new Exception($"Unexpected Binary Operator '{b.Op.Kind}'")
                     };
                 }

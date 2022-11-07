@@ -15,6 +15,7 @@ namespace Shore.CodeAnalysis.Binding
         ForStatement,
         ConiditonalGotoStatement,
         GotoStatement,
-        LabelStatement
+        LabelStatement,
+        NullExpression
     }
 }

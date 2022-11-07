@@ -1,3 +1,5 @@
+using Shore.CodeAnalysis.Symbols;
+
 namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class BoundVariableExpression : BoundExpression
@@ -10,6 +12,6 @@ namespace Shore.CodeAnalysis.Binding
         }
 
         public override BoundNodeKind Kind => BoundNodeKind.VariableExpression;
-        public override Type Type => Variable.Type;
+        public override TypeSymbol Type => Variable.Type;
     }
 }

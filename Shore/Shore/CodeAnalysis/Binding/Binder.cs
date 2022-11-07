@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
@@ -84,19 +85,16 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundStatement BindVariableDeclaration(VariableDeclarationNode node)
         {
-            var name = node.Identifier.Text;
             var isReadOnly = node.Keyword.Type == TokType.ReadOnlyKeyword;
             var initializer = BindExpression(node.Initializer);
-            var variable = new VariableSymbol(name, isReadOnly, initializer.Type);
-
-            if (!_scope.TryDeclare(variable)) _diagnostics.ReportVariableReDeclaration(node.Identifier.Span, name);
+            var variable = BindVariable(node.Identifier, isReadOnly, initializer.Type);
 
             return new BoundVariableDeclaration(variable, initializer);
         }
 
         private BoundStatement BindIfStatement(IfStatementNode node)
         {
-            var condition = BindExpression(node.Condition, typeof(bool));
+            var condition = BindExpression(node.Condition, TypeSymbol.Bool);
             var thenStatement = BindStatement(node.ThenStatement);
             var elseStatement = node.ElseNode == null ? null : BindStatement(node.ElseNode.ElseStatement);
             return new BoundIfStatement(condition, thenStatement, elseStatement);
@@ -104,21 +102,19 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundStatement BindWhileStatement(WhileStatementNode node)
         {
-            var condition = BindExpression(node.Condition, typeof(bool));
+            var condition = BindExpression(node.Condition, TypeSymbol.Bool);
             var body = BindStatement(node.Body);
             return new BoundWhileStatement(condition, body);
         }
 
         private BoundStatement BindForStatement(ForStatementNode node)
         {
-            var lowerBound = BindExpression(node.LowerBound, typeof(int));
-            var upperBound = BindExpression(node.UpperBound, typeof(int));
+            var lowerBound = BindExpression(node.LowerBound, TypeSymbol.Int32);
+            var upperBound = BindExpression(node.UpperBound, TypeSymbol.Int32);
 
             _scope = new BoundScope(_scope);
 
-            var name = node.Identifier.Text;
-            var variable = new VariableSymbol(name, true, typeof(int));
-            if (!_scope.TryDeclare(variable)) _diagnostics.ReportVariableReDeclaration(node.Identifier.Span, name);
+            var variable = BindVariable(node.Identifier, true, TypeSymbol.Int32);
             var body = BindStatement(node.Body);
 
             _scope = _scope.Parent;
@@ -131,10 +127,11 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundExpression BindExpression(ExpressionNode node, Type targetType)
+        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol targetType)
         {
             var result = BindExpression(node);
-            if (result.Type != targetType) _diagnostics.ReportCannotConvert(node.Span, result.Type, targetType);
+            if (targetType != TypeSymbol.Null && result.Type != TypeSymbol.Null && result.Type != targetType) 
+                _diagnostics.ReportCannotConvert(node.Span, result.Type, targetType);
             return result;
         }
         
@@ -159,14 +156,13 @@ namespace Shore.CodeAnalysis.Binding
             if (string.IsNullOrEmpty(name))
             {
                 // This ensures that 'Token Fabrication' does not cause an Error.
-                // An Error has already been thrown, so we just return an expression of 0.
-                return new BoundLiteralExpression(0);
+                return new BoundNullExpression();
             }
             
             if (!_scope.TryLookup(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Span, name);
-                return new BoundLiteralExpression(0);
+                return new BoundNullExpression();
             }
 
             return new BoundVariableExpression(variable);
@@ -205,10 +201,12 @@ namespace Shore.CodeAnalysis.Binding
             var boundOperand = BindExpression(node.Operand);
             var boundOperator = BoundUnaryOperator.Bind(node.OperatorToken.Type, boundOperand.Type);
             
+            if (boundOperand.Type == TypeSymbol.Null) return new BoundNullExpression();
+            
             if (boundOperator is null)
             {
                 _diagnostics.ReportUndefinedUnaryOperator(node.OperatorToken.Span, node.OperatorToken.Text, boundOperand.Type);
-                return boundOperand;
+                return new BoundNullExpression();
             }
             
             return new BoundUnaryExpression(boundOperator, boundOperand);
@@ -218,15 +216,36 @@ namespace Shore.CodeAnalysis.Binding
         {
             var boundLeft = BindExpression(node.Left);
             var boundRight = BindExpression(node.Right);
+            
+            if (boundLeft.Type == TypeSymbol.Null || boundRight.Type == TypeSymbol.Null) return new BoundNullExpression();
+            
             var boundOperator = BoundBinaryOperator.Bind(node.OperatorToken.Type, boundLeft.Type, boundRight.Type);
             
             if (boundOperator is null)
             {
                 _diagnostics.ReportUndefinedBinaryOperator(node.OperatorToken.Span, node.OperatorToken.Text, boundLeft.Type, boundRight.Type);
-                return boundLeft;
+                return new BoundNullExpression();
             }
 
             return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
         }
+        
+        private VariableSymbol BindVariable(Token identifier, bool isReadOnly, TypeSymbol type)
+        {
+            var name = identifier.Text ?? "?";
+            var declare = !identifier.IsMissing;
+            var variable = new VariableSymbol(name, isReadOnly, type);
+
+            if (declare && !_scope.TryDeclare(variable))
+                _diagnostics.ReportVariableReDeclaration(identifier.Span, name);
+
+            return variable;
+        }
+    }
+
+    internal sealed class BoundNullExpression : BoundExpression
+    {
+        public override BoundNodeKind Kind => BoundNodeKind.NullExpression;
+        public override TypeSymbol Type => TypeSymbol.Null;
     }
 }

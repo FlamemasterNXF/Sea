@@ -1,10 +1,10 @@
 ﻿namespace Shore.CodeAnalysis.Binding
 {
-    internal sealed class LabelSymbol
+    internal sealed class BoundLabel
     {
         public string Name { get; }
 
-        internal LabelSymbol(string name)
+        internal BoundLabel(string name)
         {
             Name = name;
         }

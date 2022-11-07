@@ -1,3 +1,5 @@
+using Shore.CodeAnalysis.Symbols;
+
 namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class BoundBinaryExpression : BoundExpression
@@ -13,7 +15,7 @@ namespace Shore.CodeAnalysis.Binding
             Right = right;
         }
 
-        public override Type Type => Op.ResultType;
+        public override TypeSymbol Type => Op.ResultType;
 
         public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
     }

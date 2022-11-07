@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6647fa5a-2700-43d0-bf2c-0aec1a45daff" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/Symbol.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/SymbolKind.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/TypeSymbol.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/Syntax/LexerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/Syntax/LexerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/EvaluatorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/EvaluatorTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.dll" afterDir="false" />
@@ -14,17 +17,35 @@
       <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.csproj.AssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/ref/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/ref/Shore.Tests.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/refint/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/refint/Shore.Tests.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Binder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Binder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundAssignmentExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundAssignmentExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundBinaryExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundBinaryExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundBinaryOperator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundBinaryOperator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundConditionalGotoStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundConditionalGotoStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundForStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundGlobalScope.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundGlobalScope.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundGotoStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundGotoStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundLabelStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundLabelStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundLiteralExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundLiteralExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNodeKind.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNodeKind.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundScope.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundScope.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundUnaryExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundUnaryExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundUnaryOperator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundUnaryOperator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundVariableExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundVariableExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Compilation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Compilation.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/DiagnosticBag.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/DiagnosticBag.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Evaluator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Evaluator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/LabelSymbol.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundLabel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Lowering/Lowerer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Lowering/Lowerer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Lexer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Lexer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/Node.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/Node.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/NodeTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/NodeTree.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Parser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/TokType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/TokType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/VariableSymbol.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/VariableSymbol.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/bin/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/bin/Debug/net6.0/Shore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/bin/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/bin/Debug/net6.0/Shore.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/misc/ShoreRepl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/misc/ShoreRepl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/ref/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/ref/Shore.dll" afterDir="false" />
@@ -34,6 +55,9 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2a925edfe5584632978e98fd8509cdf4d7a8/76/fb980912/InlineDataAttribute.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -87,7 +111,7 @@
       <workItem from="1667595333258" duration="197000" />
       <workItem from="1667595806156" duration="1051000" />
       <workItem from="1667667010797" duration="27714000" />
-      <workItem from="1667753505107" duration="25656000" />
+      <workItem from="1667753505107" duration="33470000" />
     </task>
     <servers />
   </component>

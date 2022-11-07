@@ -93,7 +93,7 @@ namespace Shore.CodeAnalysis.Binding
             var condition = RewriteExpression(node.Condition);
             if (condition == node.Condition) return node;
 
-            return new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfTrue);
+            return new BoundConditionalGotoStatement(node.BoundLabel, condition, node.JumpIfTrue);
         }
 
         protected virtual BoundStatement RewriteExpressionStatement(BoundExpressionStatement node)
@@ -108,6 +108,7 @@ namespace Shore.CodeAnalysis.Binding
         {
             return node.Kind switch
             {
+                BoundNodeKind.NullExpression => RewriteNullExpression((BoundNullExpression)node),
                 BoundNodeKind.LiteralExpression => RewriteLiteralExpression((BoundLiteralExpression)node),
                 BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
@@ -117,6 +118,8 @@ namespace Shore.CodeAnalysis.Binding
             };
         }
 
+        protected virtual BoundExpression RewriteNullExpression(BoundNullExpression node) => node;
+        
         protected virtual BoundExpression RewriteLiteralExpression(BoundLiteralExpression node) => node;
 
         protected virtual BoundExpression RewriteVariableExpression(BoundVariableExpression node) => node;

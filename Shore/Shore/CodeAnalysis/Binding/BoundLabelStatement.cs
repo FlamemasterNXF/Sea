@@ -2,12 +2,12 @@
 {
     internal sealed class BoundLabelStatement : BoundStatement
     {
-        public LabelSymbol Label { get; }
+        public BoundLabel BoundLabel { get; }
         public override BoundNodeKind Kind => BoundNodeKind.LabelStatement;
 
-        public BoundLabelStatement(LabelSymbol label)
+        public BoundLabelStatement(BoundLabel boundLabel)
         {
-            Label = label;
+            BoundLabel = boundLabel;
         }
     }
 }

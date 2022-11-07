@@ -1,4 +1,6 @@
-﻿using Shore.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Shore.CodeAnalysis;
+using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;
 using Xunit;
@@ -111,7 +113,7 @@ namespace Shore.Tests.CodeAnalysis
             ";
 
             var diagnostics = @"
-                Cannot Convert Type 'Boolean' to Type 'Int32'.
+                Cannot Convert Type 'bool' to Type 'int32'.
             ";
             
             AssertDiagnostics(text, diagnostics);
@@ -129,7 +131,7 @@ namespace Shore.Tests.CodeAnalysis
             ";
 
             var diagnostics = @"
-                Cannot Convert Type 'Boolean' to Type 'Int32'.
+                Cannot Convert Type 'bool' to Type 'int32'.
             ";
             
             AssertDiagnostics(text, diagnostics);
@@ -147,7 +149,7 @@ namespace Shore.Tests.CodeAnalysis
             ";
 
             var diagnostics = @"
-                Cannot Convert Type 'Int32' to Type 'Boolean'.
+                Cannot Convert Type 'int32' to Type 'bool'.
             ";
             
             AssertDiagnostics(text, diagnostics);
@@ -165,7 +167,7 @@ namespace Shore.Tests.CodeAnalysis
             ";
 
             var diagnostics = @"
-                Cannot Convert Type 'Int32' to Type 'Boolean'.
+                Cannot Convert Type 'int32' to Type 'bool'.
             ";
             
             AssertDiagnostics(text, diagnostics);
@@ -244,7 +246,7 @@ namespace Shore.Tests.CodeAnalysis
             ";
 
             var diagnostics = @"
-                Cannot Convert Type 'Boolean' to Type 'Int32'.
+                Cannot Convert Type 'bool' to Type 'int32'.
             ";
 
             AssertDiagnostics(text, diagnostics);
@@ -256,7 +258,7 @@ namespace Shore.Tests.CodeAnalysis
             var text = @"[+]true";
 
             var diagnostics = @"
-                Unary Operator '+' is not defined for Type 'Boolean'.
+                Unary Operator '+' is not defined for Type 'bool'.
             ";
 
             AssertDiagnostics(text, diagnostics);
@@ -268,7 +270,7 @@ namespace Shore.Tests.CodeAnalysis
             var text = @"10 [*] false";
 
             var diagnostics = @"
-                Binary Operator '*' is not defined for Types 'Int32' and 'Boolean'.
+                Binary Operator '*' is not defined for Types 'int32' and 'bool'.
             ";
 
             AssertDiagnostics(text, diagnostics);

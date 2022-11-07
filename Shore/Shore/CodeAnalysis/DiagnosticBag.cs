@@ -1,4 +1,5 @@
 using System.Collections;
+using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 using Shore.Text;
 
@@ -15,8 +16,7 @@ namespace Shore.CodeAnalysis
 
         private void ReportError(TextSpan span, string message)
         {
-            var eMessage = message;
-            var diagnostic = Diagnostic.Error(span, eMessage);
+            var diagnostic = Diagnostic.Error(span, message);
             _diagnostics.Add(diagnostic);
         }
 
@@ -26,7 +26,7 @@ namespace Shore.CodeAnalysis
             _diagnostics.Add(diagnostic);
         }
 
-        public void ReportInvalidNumber(TextSpan span, string text, Type type)
+        public void ReportInvalidNumber(TextSpan span, string text, TypeSymbol type)
         {
             var message = $"The number {text} isn't a valid {type}.";
             ReportError(span, message);
@@ -44,14 +44,14 @@ namespace Shore.CodeAnalysis
             ReportError(span, message);
         }
 
-        public void ReportUndefinedUnaryOperator(TextSpan span, string? operatorText, Type operandType)
+        public void ReportUndefinedUnaryOperator(TextSpan span, string? operatorText, TypeSymbol operandType)
         {
             var sType = operandType.ToString().Replace("System.", "");
             var message = $"Unary Operator '{operatorText}' is not defined for Type '{sType}'.";
             ReportError(span, message);
         }
 
-        public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, Type leftType, Type rightType)
+        public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, TypeSymbol leftType, TypeSymbol rightType)
         {
             var sLeftType = leftType.ToString().Replace("System.", "");
             var sRightType = rightType.ToString().Replace("System.", "");
@@ -65,7 +65,7 @@ namespace Shore.CodeAnalysis
             ReportError(span, message);
         }
 
-        public void ReportCannotConvert(TextSpan span, Type fromType, Type toType)
+        public void ReportCannotConvert(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
         {
             var sFromType = fromType.ToString().Replace("System.", "");
             var sToType = toType.ToString().Replace("System.", "");
