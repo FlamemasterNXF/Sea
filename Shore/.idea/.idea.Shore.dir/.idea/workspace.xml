@@ -5,23 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6647fa5a-2700-43d0-bf2c-0aec1a45daff" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Lowering/Lowerer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.csproj.AssemblyReference.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNode.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Compilation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Compilation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/bin/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/bin/Debug/net6.0/Shore.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/bin/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/bin/Debug/net6.0/Shore.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/misc/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/misc/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/Shore.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/ref/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/ref/Shore.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/refint/Shore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/obj/Debug/net6.0/refint/Shore.dll" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +67,7 @@
       <workItem from="1667595333258" duration="197000" />
       <workItem from="1667595806156" duration="1051000" />
       <workItem from="1667667010797" duration="27714000" />
-      <workItem from="1667753505107" duration="13195000" />
+      <workItem from="1667753505107" duration="16232000" />
     </task>
     <servers />
   </component>

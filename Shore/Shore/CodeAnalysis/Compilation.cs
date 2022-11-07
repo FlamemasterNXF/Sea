@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Shore.CodeAnalysis.Binding;
+using Shore.CodeAnalysis.Lowering;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore.CodeAnalysis
@@ -47,6 +48,16 @@ namespace Shore.CodeAnalysis
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }
 
-        public void EmitTree(TextWriter writer) => GlobalScope.Statement.WriteTo(writer);
+        public void EmitTree(TextWriter writer)
+        {
+            var statement = GetStatement();
+            statement.WriteTo(writer);
+        }
+
+        private BoundStatement GetStatement()
+        {
+            var result = GlobalScope.Statement;
+            return Lowerer.Lower(result);
+        }
     }
 }
