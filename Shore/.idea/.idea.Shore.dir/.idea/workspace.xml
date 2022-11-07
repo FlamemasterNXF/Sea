@@ -6,13 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="6647fa5a-2700-43d0-bf2c-0aec1a45daff" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/EvaluatorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/CodeAnalysis/EvaluatorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net6.0/Shore.Tests.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/Shore.Tests.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/ref/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/ref/Shore.Tests.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/refint/Shore.Tests.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net6.0/refint/Shore.Tests.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundConditionalGotoStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundConditionalGotoStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Evaluator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Evaluator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Lowering/Lowerer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Lowering/Lowerer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -72,7 +68,7 @@
       <workItem from="1667595333258" duration="197000" />
       <workItem from="1667595806156" duration="1051000" />
       <workItem from="1667667010797" duration="27714000" />
-      <workItem from="1667753505107" duration="21378000" />
+      <workItem from="1667753505107" duration="21583000" />
     </task>
     <servers />
   </component>
