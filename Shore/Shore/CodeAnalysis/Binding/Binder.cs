@@ -310,7 +310,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundConversionExpression(type, expression);
         }
 
-        private VariableSymbol BindVariable(Token identifier, bool isReadOnly, TypeSymbol type)
+        private VariableSymbol? BindVariable(Token identifier, bool isReadOnly, TypeSymbol type)
         {
             var name = identifier.Text ?? "?";
             var declare = !identifier.IsMissing;

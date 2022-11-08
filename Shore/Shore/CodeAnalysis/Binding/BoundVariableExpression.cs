@@ -4,9 +4,9 @@ namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class BoundVariableExpression : BoundExpression
     {
-        public VariableSymbol Variable { get; }
+        public VariableSymbol? Variable { get; }
 
-        public BoundVariableExpression(VariableSymbol variable)
+        public BoundVariableExpression(VariableSymbol? variable)
         {
             Variable = variable;
         }

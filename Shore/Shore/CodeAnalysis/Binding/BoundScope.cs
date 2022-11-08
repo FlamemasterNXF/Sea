@@ -6,61 +6,59 @@ namespace Shore.CodeAnalysis.Binding
     internal sealed class BoundScope
     {
         public BoundScope? Parent { get; }
-        private Dictionary<string, VariableSymbol>? _variables;
-        private Dictionary<string, FunctionSymbol>? _functions;
+        private Dictionary<string, Symbol>? _symbols;
 
         public BoundScope(BoundScope? parent)
         {
             Parent = parent;
         }
 
-        public bool TryDeclareVariable(VariableSymbol variable)
+        public bool TryDeclareVariable(VariableSymbol variable) => TryDeclare(variable);
+        
+        public bool TryDeclareFunction(FunctionSymbol function) => TryDeclare(function);
+
+        public bool TryLookupVariable(string name, out VariableSymbol? variable) => TryLookup(name, out variable);
+        
+        public bool TryLookupFunction(string name, out FunctionSymbol? function) => TryLookup(name, out function);
+        
+        public ImmutableArray<VariableSymbol> GetDeclaredVariables() => GetDeclared<VariableSymbol>();
+        
+        public ImmutableArray<FunctionSymbol> GetDeclaredFunctions() => GetDeclared<FunctionSymbol>();
+
+        private bool TryDeclare<TSymbol>(TSymbol symbol)
+            where TSymbol : Symbol
         {
-            _variables ??= new Dictionary<string, VariableSymbol>();
-            if (_variables.ContainsKey(variable.Name)) return false;
+            _symbols ??= new Dictionary<string, Symbol>();
+            if (_symbols.ContainsKey(symbol.Name)) return false;
             
-            _variables.Add(variable.Name, variable);
+            _symbols.Add(symbol.Name, symbol);
             return true;
-        }
-
-        public bool TryLookupVariable(string name, out VariableSymbol? variable)
-        {
-            variable = null;
-
-            if (_variables is not null && _variables.TryGetValue(name, out variable)) return true;
-
-            if (Parent is null) return false;
-            return Parent.TryLookupVariable(name, out variable);
-        }
-
-        public bool TryDeclareFunction(FunctionSymbol function)
-        {
-            _functions ??= new Dictionary<string, FunctionSymbol>();
-            
-            if (_functions.ContainsKey(function.Name)) return false;
-            
-            _functions.Add(function.Name, function);
-            return true;
-        }
-
-        public bool TryLookupFunction(string name, out FunctionSymbol? function)
-        {
-            function = null;
-
-            if (_functions is not null && _functions.TryGetValue(name, out function)) return true;
-
-            if (Parent is null) return false;
-            return Parent.TryLookupFunction(name, out function);
-        }
-
-        public ImmutableArray<VariableSymbol> GetDeclaredVariables()
-        {
-            return _variables is null ? ImmutableArray<VariableSymbol>.Empty : _variables.Values.ToImmutableArray();
         }
         
-        public ImmutableArray<FunctionSymbol> GetDeclaredFunctions()
+        private bool TryLookup<TSymbol>(string name, out TSymbol? symbol)
+            where TSymbol : Symbol 
         {
-            return _functions is null ? ImmutableArray<FunctionSymbol>.Empty : _functions.Values.ToImmutableArray();
+            symbol = null;
+
+            if (_symbols is not null && _symbols.TryGetValue(name, out var declaredSymbol))
+            {
+                if (declaredSymbol is TSymbol matchingSymbol)
+                {
+                    symbol = matchingSymbol;
+                    return true;
+                }
+
+                return false;
+            }
+
+            return Parent is not null && Parent.TryLookup<TSymbol>(name, out symbol);
+        }
+
+        private ImmutableArray<TSymbol> GetDeclared<TSymbol>()
+            where TSymbol : Symbol
+        {
+            if (_symbols is null) return ImmutableArray<TSymbol>.Empty;
+            return _symbols.Values.OfType<TSymbol>().ToImmutableArray();
         }
     }
 }

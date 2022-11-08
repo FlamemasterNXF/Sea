@@ -6,10 +6,10 @@ namespace Shore.CodeAnalysis
     internal sealed class Evaluator
     {
         private readonly BoundBlockStatement _root;
-        private readonly Dictionary<VariableSymbol, object> _variables;
+        private readonly Dictionary<VariableSymbol?, object> _variables;
         private object _lastValue;
 
-        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
+        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol?, object> variables)
         {
             _root = root;
             _variables = variables;

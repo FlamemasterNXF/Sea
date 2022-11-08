@@ -280,7 +280,7 @@ namespace Shore.Tests.CodeAnalysis
         {
             var nodeTree = NodeTree.Parse(text);
             var compilation = new Compilation(nodeTree);
-            var variables = new Dictionary<VariableSymbol, object>();
+            var variables = new Dictionary<VariableSymbol?, object>();
             var result = compilation.Evaluate(variables);
             
             Assert.Empty(result.Diagnostics);
@@ -292,7 +292,7 @@ namespace Shore.Tests.CodeAnalysis
             var annotatedText = AnnotatedText.Parse(text);
             var syntaxTree = NodeTree.Parse(annotatedText.Text);
             var compilation = new Compilation(syntaxTree);
-            var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
+            var result = compilation.Evaluate(new Dictionary<VariableSymbol?, object>());
 
             var expectedDiagnostics = AnnotatedText.UnindentLines(diagnosticText);
 

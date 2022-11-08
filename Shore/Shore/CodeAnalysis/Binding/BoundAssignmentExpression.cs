@@ -4,10 +4,10 @@ namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class BoundAssignmentExpression : BoundExpression
     {
-        public VariableSymbol Variable { get; }
+        public VariableSymbol? Variable { get; }
         public BoundExpression Expression { get; }
 
-        public BoundAssignmentExpression(VariableSymbol variable, BoundExpression expression)
+        public BoundAssignmentExpression(VariableSymbol? variable, BoundExpression expression)
         {
             Variable = variable;
             Expression = expression;
