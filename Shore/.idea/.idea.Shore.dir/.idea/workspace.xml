@@ -6,9 +6,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6647fa5a-2700-43d0-bf2c-0aec1a45daff" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundConversionExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Converting/Conversion.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Binder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Binder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundScope.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundScope.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNodeKind.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNodeKind.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/TypeSymbol.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/TypeSymbol.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +25,7 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectId" id="2H6AnSczvzWtMf0DnqH7exQoH1c" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -100,16 +105,27 @@
       <workItem from="1667937637536" duration="119000" />
       <workItem from="1667937788691" duration="50000" />
       <workItem from="1667938039871" duration="121000" />
-      <workItem from="1667938205806" duration="6884000" />
+      <workItem from="1667938205806" duration="8065000" />
     </task>
+    <task id="LOCAL-00001" summary="fix(git): Add BoundNullExpression.cs to git">
+      <created>1667946714152</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1667946714153</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="fix(git): Add BoundNullExpression.cs to git" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(git): Add BoundNullExpression.cs to git" />
   </component>
 </project>

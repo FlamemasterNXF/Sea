@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Shore.CodeAnalysis.Binding.Converting;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 using Shore.CodeAnalysis.Syntax.Nodes;
@@ -255,6 +256,8 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundExpression BindCallExpression(CallExpressionNode node)
         {
+            if (node.Arguments.Count == 1 && LookupType(node.Identifier.Text) is TypeSymbol type)
+                return BindConversion(type, node.Arguments[0]);
             var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
             foreach (var argument in node.Arguments)
@@ -294,6 +297,19 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundCallExpression(function, boundArguments.ToImmutable());
         }
 
+        private BoundExpression BindConversion(TypeSymbol type, ExpressionNode node)
+        {
+            var expression = BindExpression(node);
+            var conversion = Conversion.Classify(expression.Type, type);
+            if (!conversion.Exists)
+            {
+                _diagnostics.ReportCannotConvert(node.Span, expression.Type, type);
+                return new BoundNullExpression();
+            }
+
+            return new BoundConversionExpression(type, expression);
+        }
+
         private VariableSymbol BindVariable(Token identifier, bool isReadOnly, TypeSymbol type)
         {
             var name = identifier.Text ?? "?";
@@ -304,6 +320,20 @@ namespace Shore.CodeAnalysis.Binding
                 _diagnostics.ReportVariableReDeclaration(identifier.Span, name);
 
             return variable;
+        }
+
+        private TypeSymbol? LookupType(string name)
+        {
+            return name switch
+            {
+                "bool" => TypeSymbol.Bool,
+                "string" => TypeSymbol.String,
+                "int8" => TypeSymbol.Int8,
+                "int16" => TypeSymbol.Int16,
+                "int32" => TypeSymbol.Int32,
+                "int64" => TypeSymbol.Int64,
+                _ => null
+            };
         }
     }
 }

@@ -17,11 +17,9 @@
         public static readonly TypeSymbol Void = new("void", null);
 
         
-        public static readonly TypeSymbol Byte = new ("byte", Number);
         public static readonly TypeSymbol Int8 = new ("int8", Number);
         public static readonly TypeSymbol Int16 = new ("int16", Number);
         public static readonly TypeSymbol Int32 = new ("int32", Number);
-        public static readonly TypeSymbol Int = new ("int", Number);
         public static readonly TypeSymbol Int64 = new ("int64", Number);
 
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
@@ -31,7 +29,7 @@
         {
             if (parent == Bool) return null;
             if (parent == String) return null;
-            return parent == Number ? new List<TypeSymbol>() { Byte, Int8, Int16, Int32, Int, Int64 } : null;
+            return parent == Number ? new List<TypeSymbol>() { Int8, Int16, Int32, Int64 } : null;
         }
     }
 }
