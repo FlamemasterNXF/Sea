@@ -129,6 +129,17 @@ namespace Shore.CodeAnalysis
                         _ => throw new Exception($"Unexpected Binary Operator '{b.Op.Kind}'")
                     };
                 }
+                case BoundCallExpression c: 
+                    if (c.Function == BuiltinFunctions.Input) return Console.ReadLine();
+                    
+                    if (c.Function == BuiltinFunctions.Print)
+                    {
+                        var message = (string)EvaluateExpression(c.Arguments[0]);
+                        Console.WriteLine(message);
+                        return null;
+                    }
+                    throw new Exception($"Unexpected function {c.Function}");
+                
                 default:
                     throw new Exception($"Unexpected Node '{node.Type}'");
             }

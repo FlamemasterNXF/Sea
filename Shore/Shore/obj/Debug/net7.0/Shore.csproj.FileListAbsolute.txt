@@ -1,0 +1,15 @@
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\bin\Debug\net7.0\Shore.exe
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\bin\Debug\net7.0\Shore.deps.json
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\bin\Debug\net7.0\Shore.runtimeconfig.json
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\bin\Debug\net7.0\Shore.dll
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\bin\Debug\net7.0\Shore.pdb
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\Shore.csproj.AssemblyReference.cache
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\Shore.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\Shore.AssemblyInfoInputs.cache
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\Shore.AssemblyInfo.cs
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\Shore.csproj.CoreCompileInputs.cache
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\Shore.dll
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\refint\Shore.dll
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\Shore.pdb
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\Shore.genruntimeconfig.cache
+C:\Users\flame\Documents\GitHub\Sea\Shore\Shore\obj\Debug\net7.0\ref\Shore.dll

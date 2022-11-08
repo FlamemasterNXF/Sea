@@ -1,6 +1,6 @@
 namespace Shore.CodeAnalysis.Symbols
 {
-    public sealed class VariableSymbol : Symbol
+    public class VariableSymbol : Symbol
     {
         public TypeSymbol Type { get; }
         public bool IsReadOnly { get; }

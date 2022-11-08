@@ -58,6 +58,8 @@ namespace Shore.CodeAnalysis.Syntax
         AmpersandToken,
         CaratToken,
         TildeToken,
-        StringToken
+        StringToken,
+        CallExpression,
+        CommaToken
     }
 }

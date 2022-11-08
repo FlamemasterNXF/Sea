@@ -90,5 +90,29 @@ namespace Shore.CodeAnalysis
             var message = "Unterminated String.";
             ReportError(span, message);
         }
+        
+        public void ReportUndefinedFunction(TextSpan span, string name)
+        {
+            var message = $"Function '{name}' doesn't exist.";
+            ReportError(span, message);
+        }
+
+        public void ReportWrongArgumentCount(TextSpan span, string name, int expectedCount, int actualCount)
+        {
+            var message = $"Function '{name}' requires {expectedCount} arguments but was given {actualCount}.";
+            ReportError(span, message);
+        }
+
+        public void ReportWrongArgumentType(TextSpan span, string name, TypeSymbol expectedType, TypeSymbol actualType)
+        {
+            var message = $"Parameter '{name}' requires a value of Type '{expectedType}' but was given a value of Type '{actualType}'.";
+            ReportError(span, message);
+        }
+
+        public void ReportExpressionMustHaveValue(TextSpan span)
+        {
+            var message = "Expression must have a value.";
+            ReportError(span, message);
+        }
     }
 }

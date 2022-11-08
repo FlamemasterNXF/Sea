@@ -73,7 +73,11 @@ namespace Shore.CodeAnalysis.Syntax
                 case '}':
                     _type = TokType.CloseBraceToken;
                     _position++;
-                    break; 
+                    break;
+                case ',':
+                    _type = TokType.CommaToken;
+                    _position++;
+                    break;
                 case '~':
                     _type = TokType.TildeToken;
                     _position++;

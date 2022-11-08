@@ -114,6 +114,7 @@ namespace Shore.CodeAnalysis.Binding
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
                 BoundNodeKind.UnaryExpression => RewriteUnaryExpression((BoundUnaryExpression)node),
                 BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
+                BoundNodeKind.CallExpression => RewriteCallExpression((BoundCallExpression)node),
                 _ => throw new Exception($"Unexpected Node: {node.Kind}")
             };
         }
@@ -147,6 +148,26 @@ namespace Shore.CodeAnalysis.Binding
             if (left == node.Left && right == node.Right) return node;
 
             return new BoundBinaryExpression(left, node.Op, right);
+        }
+
+        protected virtual BoundExpression RewriteCallExpression(BoundCallExpression node)
+        {
+            ImmutableArray<BoundExpression>.Builder? builder = null;
+
+            for (int i = 0; i < node.Arguments.Length; i++)
+            {
+                var oldArgument = node.Arguments[i];
+                var newArgument = RewriteExpression(oldArgument);
+                if (newArgument != oldArgument && builder is null)
+                {
+                    builder = ImmutableArray.CreateBuilder<BoundExpression>(node.Arguments.Length);
+                    for (var j = 0; j < i; j++) builder.Add(node.Arguments[j]);
+                }
+
+                builder?.Add(newArgument);
+            }
+
+            return builder is null ? node : new BoundCallExpression(node.Function, builder.MoveToImmutable());
         }
     }
 }

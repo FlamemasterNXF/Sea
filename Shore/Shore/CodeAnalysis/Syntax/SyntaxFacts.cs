@@ -106,6 +106,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.CloseParenToken => ")",
                 TokType.OpenBraceToken => "{",
                 TokType.CloseBraceToken => "}",
+                TokType.CommaToken => ",",
                 TokType.FalseKeyword => "false",
                 TokType.TrueKeyword => "true",
                 TokType.LetKeyword => "let",

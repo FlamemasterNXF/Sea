@@ -14,6 +14,7 @@
         public static readonly TypeSymbol Bool = new ("bool", null);
         public static readonly TypeSymbol String = new ("string", null);
         public static readonly TypeSymbol Number = new("Number", null);
+        public static readonly TypeSymbol Void = new("void", null);
 
         
         public static readonly TypeSymbol Byte = new ("byte", Number);

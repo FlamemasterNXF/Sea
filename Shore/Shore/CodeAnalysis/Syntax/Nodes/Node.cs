@@ -28,6 +28,11 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
                     var child = (Node)property.GetValue(this);
                     yield return child;
                 }
+                else if (typeof(SeparatedNodeList).IsAssignableFrom(property.PropertyType))
+                {
+                    var separatedNodeList = (SeparatedNodeList)property.GetValue(this);
+                    foreach (var child in separatedNodeList.GetWithSeparators()) yield return child;
+                }
                 else if (typeof(IEnumerable<Node>).IsAssignableFrom(property.PropertyType))
                 {
                     var children = (IEnumerable<Node>)property.GetValue(this);

@@ -205,7 +205,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.FalseKeyword => ParseBooleanLiteral(),
                 TokType.NumberToken => ParseNumberLiteral(),
                 TokType.StringToken => ParseStringLiteral(),
-                TokType.IdentifierToken => ParseNameExpression(),
+                TokType.IdentifierToken => ParseNameOrCallExpression(),
                 _ => ParseNameExpression()
             };
         }
@@ -235,6 +235,42 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var stringToken = MatchToken(TokType.StringToken);
             return new LiteralExpressionNode(stringToken);
+        }
+
+        private ExpressionNode ParseNameOrCallExpression()
+        {
+            if (CurrentToken.Type == TokType.IdentifierToken && PeekToken(1).Type == TokType.OpenParenToken)
+                return ParseCallExpression();
+
+            return ParseNameExpression();
+        }
+
+        private ExpressionNode ParseCallExpression()
+        {
+            var identifier = MatchToken(TokType.IdentifierToken);
+            var openParenToken = MatchToken(TokType.OpenParenToken);
+            var arguments = ParseArguments();
+            var closeParenToken = MatchToken(TokType.CloseParenToken);
+            return new CallExpressionNode(identifier, openParenToken, arguments, closeParenToken);
+        }
+
+        private SeparatedNodeList<ExpressionNode> ParseArguments()
+        {
+            var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
+
+            while (CurrentToken.Type != TokType.CloseParenToken && CurrentToken.Type != TokType.EndOfFileToken)
+            {
+                var expression = ParseExpression();
+                nodesAndSeparators.Add(expression);
+
+                if (CurrentToken.Type != TokType.CloseParenToken)
+                {
+                    var comma = MatchToken(TokType.CommaToken);
+                    nodesAndSeparators.Add(comma);
+                }
+            }
+
+            return new SeparatedNodeList<ExpressionNode>(nodesAndSeparators.ToImmutable());
         }
 
         private ExpressionNode ParseNameExpression()
