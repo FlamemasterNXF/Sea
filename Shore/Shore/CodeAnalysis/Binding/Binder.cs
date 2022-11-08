@@ -24,13 +24,13 @@ namespace Shore.CodeAnalysis.Binding
                 previous = previous.Previous;
             }
 
-            BoundScope? parent = null;
+            BoundScope parent = CreateRootScope();
 
             while (stack.Count > 0)
             {
                 previous = stack.Pop();
                 var scope = new BoundScope(parent);
-                foreach (var v in previous.Variables) scope.TryDeclare(v);
+                foreach (var v in previous.Variables) scope.TryDeclareVariable(v);
 
                 parent = scope;
             }
@@ -49,6 +49,13 @@ namespace Shore.CodeAnalysis.Binding
             if (previous is not null) diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
 
             return new BoundGlobalScope(previous, diagnostics, variables, expression);
+        }
+
+        private static BoundScope CreateRootScope()
+        {
+            var result = new BoundScope(null);
+            foreach (var function in BuiltinFunctions.GetAll()) result.TryDeclareFunction(function);
+            return result;
         }
 
         public DiagnosticBag Diagnostics => _diagnostics;
@@ -172,7 +179,7 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
-            if (!_scope.TryLookup(name, out var variable))
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Span, name);
                 return new BoundNullExpression();
@@ -186,7 +193,7 @@ namespace Shore.CodeAnalysis.Binding
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpressionDistributor(node.Expression);
 
-            if (!_scope.TryLookup(name, out var variable))
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Span, name);
                 return boundExpression;
@@ -293,7 +300,7 @@ namespace Shore.CodeAnalysis.Binding
             var declare = !identifier.IsMissing;
             var variable = new VariableSymbol(name, isReadOnly, type);
 
-            if (declare && !_scope.TryDeclare(variable))
+            if (declare && !_scope.TryDeclareVariable(variable))
                 _diagnostics.ReportVariableReDeclaration(identifier.Span, name);
 
             return variable;

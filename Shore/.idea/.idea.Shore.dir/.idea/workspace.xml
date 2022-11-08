@@ -6,156 +6,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6647fa5a-2700-43d0-bf2c-0aec1a45daff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/CoverletSourceRootsMapping" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Microsoft.TestPlatform.CommunicationUtilities.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Microsoft.TestPlatform.CoreUtilities.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Microsoft.TestPlatform.CrossPlatEngine.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Microsoft.TestPlatform.PlatformAbstractions.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Microsoft.TestPlatform.Utilities.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Microsoft.VisualStudio.TestPlatform.Common.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Newtonsoft.Json.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/NuGet.Frameworks.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.Tests.deps.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.Tests.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.Tests.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.Tests.runtimeconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.deps.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/Shore.runtimeconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/cs/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/cs/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/cs/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/cs/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/cs/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/de/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/de/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/de/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/de/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/de/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/es/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/es/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/es/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/es/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/es/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/fr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/fr/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/fr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/fr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/fr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/it/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/it/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/it/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/it/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/it/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ja/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ja/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ja/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ja/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ja/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ko/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ko/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ko/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ko/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ko/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pl/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pl/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pl/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pl/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pl/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pt-BR/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pt-BR/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pt-BR/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pt-BR/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/pt-BR/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ru/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ru/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ru/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ru/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/ru/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/testhost.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/testhost.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/tr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/tr/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/tr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/tr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/tr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/xunit.abstractions.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/xunit.assert.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/xunit.core.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/xunit.execution.dotnet.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/xunit.runner.reporters.netcoreapp10.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/xunit.runner.utility.netcoreapp10.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/xunit.runner.visualstudio.dotnetcore.testadapter.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hans/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hans/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hans/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hant/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/bin/Debug/net7.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/.NETCoreApp,Version=v7.0.AssemblyAttributes.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.AssemblyInfo.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.AssemblyInfoInputs.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.GlobalUsings.g.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.assets.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.csproj.AssemblyReference.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.csproj.CopyComplete" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.genruntimeconfig.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/Shore.Tests.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/ref/Shore.Tests.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore.Tests/obj/Debug/net7.0/refint/Shore.Tests.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundCallExpression.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/BuiltinFunctions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/FunctionSymbol.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/ParameterSymbol.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/CallExpressionNode.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/SeparatedNodeList.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/bin/Debug/net7.0/Shore.deps.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/bin/Debug/net7.0/Shore.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/bin/Debug/net7.0/Shore.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/bin/Debug/net7.0/Shore.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/bin/Debug/net7.0/Shore.runtimeconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/.NETCoreApp,Version=v7.0.AssemblyAttributes.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.AssemblyInfo.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.AssemblyInfoInputs.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.GlobalUsings.g.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.assets.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.csproj.AssemblyReference.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.genruntimeconfig.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/Shore.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/apphost.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/ref/Shore.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shore/obj/Debug/net7.0/refint/Shore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shore.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Binder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/Binder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNodeKind.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundNodeKind.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundTreeRewriter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/DiagnosticBag.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/DiagnosticBag.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Evaluator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Evaluator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/SymbolKind.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/SymbolKind.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/TypeSymbol.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/TypeSymbol.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/VariableSymbol.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Symbols/VariableSymbol.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Lexer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Lexer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/Node.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Nodes/Node.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/Parser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/SyntaxFacts.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/SyntaxFacts.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/TokType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Syntax/TokType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shore/misc/ShoreRepl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/misc/ShoreRepl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundScope.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shore/CodeAnalysis/Binding/BoundScope.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -247,7 +100,7 @@
       <workItem from="1667937637536" duration="119000" />
       <workItem from="1667937788691" duration="50000" />
       <workItem from="1667938039871" duration="121000" />
-      <workItem from="1667938205806" duration="6114000" />
+      <workItem from="1667938205806" duration="6884000" />
     </task>
     <servers />
   </component>
