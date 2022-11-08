@@ -102,32 +102,30 @@ namespace Shore.CodeAnalysis
                 {
                     var left = EvaluateExpression(b.Left);
                     var right = EvaluateExpression(b.Right);
-
-                    var safeLeft = Convert.ToInt32(left);
-                    var safeRight = Convert.ToInt32(right);
-
+                    
                     return b.Op.Kind switch
                     {
-                        BoundBinaryOperatorKind.Addition => safeLeft + safeRight,
-                        BoundBinaryOperatorKind.Subtraction => safeLeft - safeRight,
-                        BoundBinaryOperatorKind.Multiplication => safeLeft * safeRight,
-                        BoundBinaryOperatorKind.Division => safeLeft / safeRight,
-                        BoundBinaryOperatorKind.BitwiseRightShift => safeLeft >> safeRight,
-                        BoundBinaryOperatorKind.BitwiseLeftShift => safeLeft << safeRight,
-                        BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => safeLeft & safeRight,
+                        BoundBinaryOperatorKind.Addition when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left + (int) right,
+                        BoundBinaryOperatorKind.Addition when TypeSymbol.CheckType(b.Type, TypeSymbol.String) => (string) left + (string) right,
+                        BoundBinaryOperatorKind.Subtraction => (int) left - (int) right,
+                        BoundBinaryOperatorKind.Multiplication => (int) left * (int) right,
+                        BoundBinaryOperatorKind.Division => (int) left / (int) right,
+                        BoundBinaryOperatorKind.BitwiseRightShift => (int) left >> (int) right,
+                        BoundBinaryOperatorKind.BitwiseLeftShift => (int) left << (int) right,
+                        BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left & (int) right,
                         BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool) => (bool) left & (bool) right,
-                        BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => safeLeft | safeRight,
+                        BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left | (int) right,
                         BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool)=> (bool) left | (bool) right,
-                        BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => safeLeft ^ safeRight,
+                        BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left ^ (int) right,
                         BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool) => (bool) left ^ (bool) right,
                         BoundBinaryOperatorKind.LogicalAnd => (bool) left && (bool) right,
                         BoundBinaryOperatorKind.LogicalOr => (bool) left || (bool) right,
                         BoundBinaryOperatorKind.LogicalEquals => Equals(left, right),
                         BoundBinaryOperatorKind.LogicalNotEquals => !Equals(left, right),
-                        BoundBinaryOperatorKind.GreaterThan => safeLeft > safeRight,
-                        BoundBinaryOperatorKind.GreaterThanOrEqual => safeLeft >= safeRight,
-                        BoundBinaryOperatorKind.LessThan => safeLeft < safeRight,
-                        BoundBinaryOperatorKind.LessThanOrEqual => safeLeft <= safeRight,
+                        BoundBinaryOperatorKind.GreaterThan => (int) left > (int) right,
+                        BoundBinaryOperatorKind.GreaterThanOrEqual => (int) left >= (int) right,
+                        BoundBinaryOperatorKind.LessThan => (int) left < (int) right,
+                        BoundBinaryOperatorKind.LessThanOrEqual => (int) left <= (int) right,
                         _ => throw new Exception($"Unexpected Binary Operator '{b.Op.Kind}'")
                     };
                 }

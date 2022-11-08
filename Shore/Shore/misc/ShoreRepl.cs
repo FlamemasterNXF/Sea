@@ -20,6 +20,7 @@ namespace Shore.misc
             {
                 var isKeyword = token.Type.ToString().EndsWith("Keyword");
                 var isNumber = token.Type == TokType.NumberToken;
+                var isString = token.Type == TokType.StringToken;
                 var isIdentifier = token.Type == TokType.IdentifierToken;
 
                 if (isKeyword)
@@ -28,6 +29,8 @@ namespace Shore.misc
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
                 else if (isNumber)
                     Console.ForegroundColor = ConsoleColor.Cyan;
+                else if (isString)
+                    Console.ForegroundColor = ConsoleColor.Magenta;
                 else
                     Console.ForegroundColor = ConsoleColor.DarkGray;
 
@@ -84,7 +87,7 @@ namespace Shore.misc
 
             if (!result.Diagnostics.Any())
             {
-                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine(result.Value);
                 Console.ResetColor();
                 _previous = compilation;

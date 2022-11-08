@@ -1,5 +1,7 @@
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
+using static Shore.CodeAnalysis.Binding.BoundBinaryOperatorKind;
+using static Shore.CodeAnalysis.Syntax.TokType;
 
 namespace Shore.CodeAnalysis.Binding
 {
@@ -28,19 +30,21 @@ namespace Shore.CodeAnalysis.Binding
         
         private static readonly List<BoundBinaryOperator> FixedOperators = new List<BoundBinaryOperator>()
         {
-            new (TokType.CaratToken, BoundBinaryOperatorKind.BitwiseXor, TypeSymbol.Int32),
-            new (TokType.AmpersandToken, BoundBinaryOperatorKind.BitwiseAnd, TypeSymbol.Int32),
-            new (TokType.PipeToken, BoundBinaryOperatorKind.BitwiseOr, TypeSymbol.Int32),
-            new (TokType.RightShiftToken, BoundBinaryOperatorKind.BitwiseRightShift, TypeSymbol.Int32),
-            new (TokType.LeftShiftToken, BoundBinaryOperatorKind.BitwiseLeftShift, TypeSymbol.Int32),
+            new (CaratToken, BitwiseXor, TypeSymbol.Int32),
+            new (AmpersandToken, BitwiseAnd, TypeSymbol.Int32),
+            new (PipeToken, BitwiseOr, TypeSymbol.Int32),
+            new (RightShiftToken, BitwiseRightShift, TypeSymbol.Int32),
+            new (LeftShiftToken, BitwiseLeftShift, TypeSymbol.Int32),
             
-            new (TokType.CaratToken, BoundBinaryOperatorKind.BitwiseXor, TypeSymbol.Bool),
-            new (TokType.AmpersandToken, BoundBinaryOperatorKind.BitwiseAnd, TypeSymbol.Bool),
-            new (TokType.PipeToken, BoundBinaryOperatorKind.BitwiseOr, TypeSymbol.Bool),
-            new (TokType.DoubleAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, TypeSymbol.Bool),
-            new (TokType.DoublePipeToken, BoundBinaryOperatorKind.LogicalOr, TypeSymbol.Bool),
-            new (TokType.DoubleEqualsToken, BoundBinaryOperatorKind.LogicalEquals, TypeSymbol.Bool),
-            new (TokType.BangEqualsToken, BoundBinaryOperatorKind.LogicalNotEquals, TypeSymbol.Bool),
+            new (CaratToken, BitwiseXor, TypeSymbol.Bool),
+            new (AmpersandToken, BitwiseAnd, TypeSymbol.Bool),
+            new (PipeToken, BitwiseOr, TypeSymbol.Bool),
+            new (DoubleAmpersandToken, LogicalAnd, TypeSymbol.Bool),
+            new (DoublePipeToken, LogicalOr, TypeSymbol.Bool),
+            new (DoubleEqualsToken, LogicalEquals, TypeSymbol.Bool),
+            new (BangEqualsToken, LogicalNotEquals, TypeSymbol.Bool),
+            
+            new (PlusToken, Addition, TypeSymbol.String),
         };
 
         private static BoundBinaryOperator[] Operators()
@@ -48,16 +52,16 @@ namespace Shore.CodeAnalysis.Binding
             List<BoundBinaryOperator> dynamicOperators = new List<BoundBinaryOperator>();
             foreach (var type in TypeSymbol.GetChildrenTypes(TypeSymbol.Number)!)
             {
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.PlusToken, BoundBinaryOperatorKind.Addition, type));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.DashToken, BoundBinaryOperatorKind.Subtraction, type));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.StarToken, BoundBinaryOperatorKind.Multiplication, type));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.SlashToken, BoundBinaryOperatorKind.Division, type));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.DoubleEqualsToken, BoundBinaryOperatorKind.LogicalEquals, type, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.BangEqualsToken, BoundBinaryOperatorKind.LogicalNotEquals, type, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.GreaterThanToken, BoundBinaryOperatorKind.GreaterThan, type, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.GreaterThanOrEqualToken, BoundBinaryOperatorKind.GreaterThanOrEqual, type, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.LessThanToken, BoundBinaryOperatorKind.LessThan, type, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(TokType.LessThanOrEqualToken, BoundBinaryOperatorKind.LessThanOrEqual, type, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(PlusToken, Addition, type));
+                dynamicOperators.Add(new BoundBinaryOperator(DashToken, Subtraction, type));
+                dynamicOperators.Add(new BoundBinaryOperator(StarToken, Multiplication, type));
+                dynamicOperators.Add(new BoundBinaryOperator(SlashToken, Division, type));
+                dynamicOperators.Add(new BoundBinaryOperator(DoubleEqualsToken, LogicalEquals, type, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(BangEqualsToken, LogicalNotEquals, type, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(GreaterThanToken, GreaterThan, type, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(GreaterThanOrEqualToken, GreaterThanOrEqual, type, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(LessThanToken, LessThan, type, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(LessThanOrEqualToken, LessThanOrEqual, type, TypeSymbol.Bool));
             }
             
             var operators = dynamicOperators.Concat(FixedOperators);

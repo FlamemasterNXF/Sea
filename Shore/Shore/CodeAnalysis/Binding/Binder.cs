@@ -50,7 +50,7 @@ namespace Shore.CodeAnalysis.Binding
 
             return new BoundGlobalScope(previous, diagnostics, variables, expression);
         }
-        
+
         public DiagnosticBag Diagnostics => _diagnostics;
 
         private BoundStatement BindStatement(StatementNode node)
@@ -120,7 +120,7 @@ namespace Shore.CodeAnalysis.Binding
             _scope = _scope.Parent;
             return new BoundForStatement(variable, lowerBound, upperBound, body);
         }
-        
+
         private BoundStatement BindExpressionStatement(ExpressionStatementNode node)
         {
             var expression = BindExpression(node.Expression);
@@ -130,11 +130,11 @@ namespace Shore.CodeAnalysis.Binding
         private BoundExpression BindExpression(ExpressionNode node, TypeSymbol targetType)
         {
             var result = BindExpression(node);
-            if (targetType != TypeSymbol.Null && result.Type != TypeSymbol.Null && result.Type != targetType) 
+            if (targetType != TypeSymbol.Null && result.Type != TypeSymbol.Null && result.Type != targetType)
                 _diagnostics.ReportCannotConvert(node.Span, result.Type, targetType);
             return result;
         }
-        
+
         private BoundExpression BindExpression(ExpressionNode node)
         {
             return node.Type switch
@@ -148,7 +148,7 @@ namespace Shore.CodeAnalysis.Binding
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
         }
-        
+
         private BoundExpression BindNameExpression(NameExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
@@ -158,7 +158,7 @@ namespace Shore.CodeAnalysis.Binding
                 // This ensures that 'Token Fabrication' does not cause an Error.
                 return new BoundNullExpression();
             }
-            
+
             if (!_scope.TryLookup(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Span, name);
@@ -172,7 +172,7 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpression(node.Expression);
-            
+
             if (!_scope.TryLookup(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Span, name);
@@ -186,7 +186,7 @@ namespace Shore.CodeAnalysis.Binding
                 _diagnostics.ReportCannotConvert(node.Expression.Span, boundExpression.Type, variable.Type);
                 return boundExpression;
             }
-            
+
             return new BoundAssignmentExpression(variable, boundExpression);
         }
 
@@ -200,15 +200,16 @@ namespace Shore.CodeAnalysis.Binding
         {
             var boundOperand = BindExpression(node.Operand);
             var boundOperator = BoundUnaryOperator.Bind(node.OperatorToken.Type, boundOperand.Type);
-            
+
             if (boundOperand.Type == TypeSymbol.Null) return new BoundNullExpression();
-            
+
             if (boundOperator is null)
             {
-                _diagnostics.ReportUndefinedUnaryOperator(node.OperatorToken.Span, node.OperatorToken.Text, boundOperand.Type);
+                _diagnostics.ReportUndefinedUnaryOperator(node.OperatorToken.Span, node.OperatorToken.Text,
+                    boundOperand.Type);
                 return new BoundNullExpression();
             }
-            
+
             return new BoundUnaryExpression(boundOperator, boundOperand);
         }
 
@@ -216,20 +217,22 @@ namespace Shore.CodeAnalysis.Binding
         {
             var boundLeft = BindExpression(node.Left);
             var boundRight = BindExpression(node.Right);
-            
-            if (boundLeft.Type == TypeSymbol.Null || boundRight.Type == TypeSymbol.Null) return new BoundNullExpression();
-            
+
+            if (boundLeft.Type == TypeSymbol.Null || boundRight.Type == TypeSymbol.Null)
+                return new BoundNullExpression();
+
             var boundOperator = BoundBinaryOperator.Bind(node.OperatorToken.Type, boundLeft.Type, boundRight.Type);
-            
+
             if (boundOperator is null)
             {
-                _diagnostics.ReportUndefinedBinaryOperator(node.OperatorToken.Span, node.OperatorToken.Text, boundLeft.Type, boundRight.Type);
+                _diagnostics.ReportUndefinedBinaryOperator(node.OperatorToken.Span, node.OperatorToken.Text,
+                    boundLeft.Type, boundRight.Type);
                 return new BoundNullExpression();
             }
 
             return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
         }
-        
+
         private VariableSymbol BindVariable(Token identifier, bool isReadOnly, TypeSymbol type)
         {
             var name = identifier.Text ?? "?";
@@ -241,11 +244,5 @@ namespace Shore.CodeAnalysis.Binding
 
             return variable;
         }
-    }
-
-    internal sealed class BoundNullExpression : BoundExpression
-    {
-        public override BoundNodeKind Kind => BoundNodeKind.NullExpression;
-        public override TypeSymbol Type => TypeSymbol.Null;
     }
 }

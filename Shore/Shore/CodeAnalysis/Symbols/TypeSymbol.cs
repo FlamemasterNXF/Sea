@@ -9,7 +9,7 @@
         {
             ParentType = parentType;
         }
-
+        
         public static readonly TypeSymbol Null = new("null", null);
         public static readonly TypeSymbol Bool = new ("bool", null);
         public static readonly TypeSymbol String = new ("string", null);
