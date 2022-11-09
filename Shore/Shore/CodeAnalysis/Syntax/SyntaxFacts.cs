@@ -63,6 +63,7 @@ namespace Shore.CodeAnalysis.Syntax
                 "while" => TokType.WhileKeyword,
                 "for" => TokType.ForKeyword,
                 "until" => TokType.UntilKeyword,
+                "function" => TokType.FunctionKeyword,
                 _ => TokType.IdentifierToken
             };
         }
@@ -125,6 +126,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.ElseKeyword => "else",
                 TokType.WhileKeyword => "while",
                 TokType.ForKeyword => "for",
+                TokType.FunctionKeyword => "function",
                 TokType.UntilKeyword => "until",
                 _ => null
             };

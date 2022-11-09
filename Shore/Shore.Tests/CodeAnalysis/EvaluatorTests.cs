@@ -92,7 +92,7 @@ namespace Shore.Tests.CodeAnalysis
         [Fact]
         public void Evaluator_NameExpression_Reports_NoError_ForTokenFabrication()
         {
-            var text = @"[]";
+            var text = @"1 + []";
 
             var diagnostics = @"
                 Unexpected Token EndOfFileToken, IdentifierToken was expected.

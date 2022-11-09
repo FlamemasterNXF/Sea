@@ -101,9 +101,76 @@ namespace Shore.CodeAnalysis.Syntax
 
         public CompilationUnitNode ParseCompilationUnit()
         {
-            var statement = ParseStatement();
+            var members = ParseMembers();
             var eof = MatchToken(TokType.EndOfFileToken);
-            return new CompilationUnitNode(statement, eof);
+            return new CompilationUnitNode(members, eof);
+        }
+
+        private ImmutableArray<MemberNode> ParseMembers()
+        {
+            var members = ImmutableArray.CreateBuilder<MemberNode>();
+
+            while (CurrentToken.Type != TokType.EndOfFileToken)
+            {
+                var startToken = CurrentToken;
+                var member = ParseMember();
+                members.Add(member);
+
+                if (CurrentToken == startToken) NextToken();
+            }
+
+            return members.ToImmutable();
+        }
+
+        private MemberNode ParseMember()
+        {
+            if (CurrentToken.Type == TokType.FunctionKeyword) return ParseFunctionDeclaration();
+            return ParseGlobalStatement();
+        }
+
+        private MemberNode ParseFunctionDeclaration()
+        {
+            var functionKeyword = MatchToken(TokType.FunctionKeyword);
+            var type = MatchToken(CurrentToken.Type);
+            var identifier = MatchToken(TokType.IdentifierToken);
+            var openParenToken = MatchToken(TokType.OpenParenToken);
+            var parameters = ParseParameterList();
+            var closeParenToken = MatchToken(TokType.CloseParenToken);
+            var body = ParseBlockStatement();
+            return new FunctionDeclarationNode(functionKeyword, type, identifier, openParenToken, parameters,
+                closeParenToken, body);
+        }
+
+        private SeparatedNodeList<ParameterNode> ParseParameterList()
+        {
+            var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
+
+            while (CurrentToken.Type != TokType.CloseParenToken && CurrentToken.Type != TokType.EndOfFileToken)
+            {
+                var parameter = ParseParameter();
+                nodesAndSeparators.Add(parameter);
+
+                if (CurrentToken.Type != TokType.CloseParenToken)
+                {
+                    var comma = MatchToken(TokType.CommaToken);
+                    nodesAndSeparators.Add(comma);
+                }
+            }
+
+            return new SeparatedNodeList<ParameterNode>(nodesAndSeparators.ToImmutable());
+        }
+
+        private ParameterNode ParseParameter()
+        {
+            var type = MatchToken(CurrentToken.Type);
+            var identifier = MatchToken(TokType.IdentifierToken);
+            return new ParameterNode(type, identifier);
+        }
+
+        private MemberNode ParseGlobalStatement()
+        {
+            var statement = ParseStatement();
+            return new GlobalStatementNode(statement);
         }
 
         private StatementNode ParseStatement()

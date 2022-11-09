@@ -72,7 +72,7 @@ namespace Shore.misc
             if (string.IsNullOrEmpty(text)) return true;
             var nodeTree = NodeTree.Parse(text);
             
-            return !(nodeTree.Root.Statement.GetLastToken().IsMissing);
+            return !(nodeTree.Root.Members.Last().GetLastToken().IsMissing);
         }
 
         protected override void EvaluateSubmission(string text)

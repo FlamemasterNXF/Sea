@@ -127,5 +127,23 @@ namespace Shore.CodeAnalysis
                 $"Cannot convert Type '{fromType}' to '{toType}'. An explicit conversion exists (are you missing a cast?).";
             ReportError(span, message);
         }
+
+        public void ReportFunctionsAreUnsupported(TextSpan span)
+        {
+            var message = "Functions with return values are unsupported.";
+            ReportError(span, message);
+        }
+
+        public void ReportSymbolAlreadyDeclared(TextSpan span, string? functionName)
+        {
+            var message = $"A Function with the name '{functionName}' already exists.";
+            ReportError(span, message);
+        }
+
+        public void ReportParameterAlreadyDeclared(TextSpan span, string? parameterName)
+        {
+            var message = $"A parameter with the name '{parameterName}' already exists.";
+            ReportError(span, message);
+        }
     }
 }

@@ -1,14 +1,16 @@
-﻿namespace Shore.CodeAnalysis.Syntax.Nodes
+﻿using System.Collections.Immutable;
+
+namespace Shore.CodeAnalysis.Syntax.Nodes
 {
     public sealed class CompilationUnitNode : Node
     {
-        public StatementNode Statement { get; }
+        public ImmutableArray<MemberNode> Members { get; }
         public Token EndOfFileToken { get; }
         public override TokType Type => TokType.CompilationUnit;
 
-        public CompilationUnitNode(StatementNode statement, Token endOfFileToken)
+        public CompilationUnitNode(ImmutableArray<MemberNode> members, Token endOfFileToken)
         {
-            Statement = statement;
+            Members = members;
             EndOfFileToken = endOfFileToken;
         }
     }

@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Shore.CodeAnalysis.Binding.Converting;
+using Shore.CodeAnalysis.Lowering;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 using Shore.CodeAnalysis.Syntax.Nodes;
@@ -9,12 +10,19 @@ namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class Binder
     {
+        private readonly FunctionSymbol? _function;
         private BoundScope _scope;
         private DiagnosticBag _diagnostics = new DiagnosticBag();
 
-        public Binder(BoundScope parent)
+        public Binder(BoundScope parent, FunctionSymbol? function)
         {
+            _function = function;
             _scope = new BoundScope(parent);
+
+            if (function is not null)
+            {
+                foreach (var parameter in function.Parameters) _scope.TryDeclareVariable(parameter);
+            }
         }
 
         private static BoundScope? CreateParentScope(BoundGlobalScope? previous)
@@ -32,6 +40,7 @@ namespace Shore.CodeAnalysis.Binding
             {
                 previous = stack.Pop();
                 var scope = new BoundScope(parent);
+                foreach (var f in previous.Functions) scope.TryDeclareFunction(f);
                 foreach (var v in previous.Variables) scope.TryDeclareVariable(v);
 
                 parent = scope;
@@ -43,14 +52,82 @@ namespace Shore.CodeAnalysis.Binding
         public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitNode node)
         {
             var parentScope = CreateParentScope(previous);
-            var binder = new Binder(parentScope);
-            var expression = binder.BindStatement(node.Statement);
+            var binder = new Binder(parentScope, null);
+
+            foreach (var function in node.Members.OfType<FunctionDeclarationNode>())
+                binder.BindFunctionDeclaration(function);
+
+            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+
+            foreach (var globalStatement in node.Members.OfType<GlobalStatementNode>())
+            {
+                var statement = binder.BindStatement(globalStatement.Statement);
+                statements.Add(statement);
+            }
+            
+            var functions = binder._scope.GetDeclaredFunctions();
             var variables = binder._scope.GetDeclaredVariables();
             var diagnostics = binder.Diagnostics.ToImmutableArray();
 
             if (previous is not null) diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
 
-            return new BoundGlobalScope(previous, diagnostics, variables, expression);
+            return new BoundGlobalScope(previous, diagnostics, functions, variables, statements.ToImmutable());
+        }
+
+        public static BoundProgram BindProgram(BoundGlobalScope globalScope)
+        {
+            var parentScope = CreateParentScope(globalScope);
+
+            var functionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
+            var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
+
+            var scope = globalScope;
+            while (scope is not null)
+            {
+                foreach (var function in scope.Functions)
+                {
+                    var binder = new Binder(parentScope, function);
+                    var body = binder.BindStatement(function.Declaration.Body);
+                    var loweredBody = Lowerer.Lower(body);
+                    functionBodies.Add(function, loweredBody);
+                    
+                    diagnostics.AddRange(binder.Diagnostics);
+                }
+
+                scope = scope.Previous;
+            }
+
+            var statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
+            return new BoundProgram(diagnostics.ToImmutable(), functionBodies.ToImmutable(), statement);
+        }
+
+        private void BindFunctionDeclaration(FunctionDeclarationNode node)
+        {
+            var parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
+            var seenParameterNames = new HashSet<string?>();
+
+            foreach (var parameterNode in node.Parameters)
+            {
+                var parameterName = parameterNode.Identifier.Text;
+                var parameterType = LookupType(parameterNode.PType.ToString());
+                if (!seenParameterNames.Add(parameterName))
+                {
+                    _diagnostics.ReportParameterAlreadyDeclared(parameterNode.Span, parameterName);
+                }
+                else
+                {
+                    var parameter = new ParameterSymbol(parameterName, parameterType);
+                }
+                
+            }
+
+            var type = LookupType(node.Type.ToString()) ?? TypeSymbol.Void;
+
+            if (type != TypeSymbol.Void) _diagnostics.ReportFunctionsAreUnsupported(node.Span);
+
+            var function = new FunctionSymbol(node.Identifier.Text, parameters.ToImmutable(), type, node);
+            if (!_scope.TryDeclareFunction(function))
+                _diagnostics.ReportSymbolAlreadyDeclared(node.Identifier.Span, function.Name);
         }
 
         private static BoundScope CreateRootScope()
@@ -292,7 +369,7 @@ namespace Shore.CodeAnalysis.Binding
 
                 if (argument.Type != parameter.Type)
                 {
-                    _diagnostics.ReportWrongArgumentType(node.Span, parameter.Name, parameter.Type, argument.Type);
+                    _diagnostics.ReportWrongArgumentType(node.Arguments[i].Span, parameter.Name, parameter.Type, argument.Type);
                     return new BoundNullExpression();
                 }
             }
@@ -330,8 +407,10 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = identifier.Text ?? "?";
             var declare = !identifier.IsMissing;
-            var variable = new VariableSymbol(name, isReadOnly, type);
-
+            var variable = _function == null
+                ? (VariableSymbol)new GlobalVariableSymbol(name, isReadOnly, type)
+                : new LocalVariableSymbol(name, isReadOnly, type);
+            
             if (declare && !_scope.TryDeclareVariable(variable))
                 _diagnostics.ReportVariableReDeclaration(identifier.Span, name);
 

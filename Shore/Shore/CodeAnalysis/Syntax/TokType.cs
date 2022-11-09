@@ -66,6 +66,10 @@ namespace Shore.CodeAnalysis.Syntax
         Int8Keyword,
         Int16Keyword,
         Int32Keyword,
-        Int64Keyword
+        Int64Keyword,
+        Parameter,
+        GlobalStatement,
+        FunctionDeclaration,
+        FunctionKeyword
     }
 }
