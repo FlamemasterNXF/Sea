@@ -7,7 +7,7 @@ namespace Shore.CodeAnalysis.Binding.Converting
         public bool Exists { get; }
         public bool IsIdentity { get; }
         public bool IsImplicit { get; }
-        public bool IsExplicit => Exists && !IsExplicit;
+        public bool IsExplicit => Exists && !IsImplicit;
 
         private Conversion(bool exists, bool isIdentity, bool isImplicit)
         {

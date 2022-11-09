@@ -37,7 +37,7 @@ namespace Shore.CodeAnalysis.Syntax
         CloseBraceToken,
         OpenBraceToken,
         VariableDeclarationStatement,
-        LetKeyword,
+        //LetKeyword,
         ReadOnlyKeyword,
         GreaterThanOrEqualToken,
         GreaterThanToken,
@@ -60,6 +60,12 @@ namespace Shore.CodeAnalysis.Syntax
         TildeToken,
         StringToken,
         CallExpression,
-        CommaToken
+        CommaToken,
+        BoolKeyword,
+        StringKeyword,
+        Int8Keyword,
+        Int16Keyword,
+        Int32Keyword,
+        Int64Keyword
     }
 }

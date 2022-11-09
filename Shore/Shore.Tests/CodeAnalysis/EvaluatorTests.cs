@@ -59,15 +59,15 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("true", true)]
         [InlineData("!true", false)]
         [InlineData("!false", true)]
-        [InlineData("let a = 10", 10)]
-        [InlineData("{ let b = 0 (b = 10) * b}", 100)]
-        [InlineData("{ let a = 0 if a == 0 a = 10 a }", 10)]
-        [InlineData("{ let a = 0 if a == 4 a = 10 a }", 0)]
-        [InlineData("{ let a = 0 if a == 0 a = 10 else a = 5 a }", 10)]
-        [InlineData("{ let a = 0 if a == 4 a = 10 else a = 5 a }", 5)]
-        [InlineData("{ let i = 10 let result = 0 while i > 0 { result = result + i i = i -1 } result }", 55)]
-        [InlineData("{ let result = 0 for i = 1 until 10 { result = result + i } result }", 55)]
-        [InlineData("{ let a = 10 for i = 1 until (a = a - 1) { } a }", 9)]
+        [InlineData("int a = 10", 10)]
+        [InlineData("{ int b = 0 (b = 10) * b}", 100)]
+        [InlineData("{ int a = 0 if a == 0 a = 10 a }", 10)]
+        [InlineData("{ int a = 0 if a == 4 a = 10 a }", 0)]
+        [InlineData("{ int a = 0 if a == 0 a = 10 else a = 5 a }", 10)]
+        [InlineData("{ int a = 0 if a == 4 a = 10 else a = 5 a }", 5)]
+        [InlineData("{ int i = 10 int result = 0 while i > 0 { result = result + i i = i -1 } result }", 55)]
+        [InlineData("{ int result = 0 for i = 1 until 10 { result = result + i } result }", 55)]
+        [InlineData("{ int a = 10 for i = 1 until (a = a - 1) { } a }", 9)]
         public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
         {
             AssertValue(text, expectedValue);
@@ -106,7 +106,7 @@ namespace Shore.Tests.CodeAnalysis
         {
             var text = @"
                 {
-                    let result = 0
+                    int result = 0
                     for i = [false] until 10
                         result = result + i
                 }
@@ -124,7 +124,7 @@ namespace Shore.Tests.CodeAnalysis
         {
             var text = @"
                 {
-                    let result = 0
+                    int result = 0
                     for i = 1 until [true]
                         result = result + i
                 }
@@ -142,7 +142,7 @@ namespace Shore.Tests.CodeAnalysis
         {
             var text = @"
                 {
-                    let x = 0
+                    int x = 0
                     while [10]
                         x = 10
                 }
@@ -160,7 +160,7 @@ namespace Shore.Tests.CodeAnalysis
         {
             var text = @"
                 {
-                    let x = 0
+                    int x = 0
                     if [10]
                         x = 10
                 }
@@ -178,12 +178,12 @@ namespace Shore.Tests.CodeAnalysis
         {
             var text = @"
                 {
-                    let x = 10
-                    let y = 100
+                    int x = 10
+                    int y = 100
                     {
-                        let x = 10
+                        int x = 10
                     }
-                    let [x] = 5
+                    int [x] = 5
                 }
             ";
 
@@ -240,7 +240,7 @@ namespace Shore.Tests.CodeAnalysis
         {
             var text = @"
                 {
-                    let x = 10
+                    int x = 10
                     x = [true]
                 }
             ";

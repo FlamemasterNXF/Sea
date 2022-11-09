@@ -114,5 +114,18 @@ namespace Shore.CodeAnalysis
             var message = "Expression must have a value.";
             ReportError(span, message);
         }
+
+        public void ReportInvalidType(TextSpan span, string type)
+        {
+            var message = $"Type '{type}' is invalid.";
+            ReportError(span, message);
+        }
+
+        public void ReportCannotConvertImplicitly(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
+        {
+            var message =
+                $"Cannot convert Type '{fromType}' to '{toType}'. An explicit conversion exists (are you missing a cast?).";
+            ReportError(span, message);
+        }
     }
 }

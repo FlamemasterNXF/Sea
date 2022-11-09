@@ -112,7 +112,8 @@ namespace Shore.CodeAnalysis.Syntax
             {
                 TokType.OpenBraceToken => ParseBlockStatement(),
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
-                TokType.LetKeyword => ParseVariableDeclaration(),
+                TokType.BoolKeyword or TokType.StringKeyword or TokType.Int8Keyword or TokType.Int16Keyword or 
+                    TokType.Int32Keyword or TokType.Int64Keyword => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
                 TokType.ForKeyword => ParseForStatement(),
@@ -144,8 +145,7 @@ namespace Shore.CodeAnalysis.Syntax
 
         private StatementNode ParseVariableDeclaration()
         {
-            var expected = CurrentToken.Type == TokType.LetKeyword ? TokType.LetKeyword : TokType.ReadOnlyKeyword;
-            var keyword = MatchToken(expected);
+            var keyword = MatchToken(CurrentToken.Type);
             var identifier = MatchToken(TokType.IdentifierToken);
             var equals = MatchToken(TokType.EqualsToken);
             var initializer = ParseExpression();

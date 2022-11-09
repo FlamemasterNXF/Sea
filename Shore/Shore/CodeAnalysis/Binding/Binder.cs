@@ -94,11 +94,13 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundStatement BindVariableDeclaration(VariableDeclarationNode node)
         {
-            var isReadOnly = node.Keyword.Type == TokType.ReadOnlyKeyword;
+            var isReadOnly = node.VType.Type == TokType.ReadOnlyKeyword;
             var initializer = BindExpressionDistributor(node.Initializer);
-            var variable = BindVariable(node.Identifier, isReadOnly, initializer.Type);
+            var type = LookupType(node.VType.Text) ?? initializer.Type;
+            var variable = BindVariable(node.Identifier, isReadOnly, type);
 
-            return new BoundVariableDeclaration(variable, initializer);
+            var convertedInitializer = BindConversion(node.Initializer.Span, initializer, type);
+            return new BoundVariableDeclaration(variable, convertedInitializer);
         }
 
         private BoundStatement BindIfStatement(IfStatementNode node)
@@ -258,7 +260,7 @@ namespace Shore.CodeAnalysis.Binding
         private BoundExpression BindCallExpression(CallExpressionNode node)
         {
             if (node.Arguments.Count == 1 && LookupType(node.Identifier.Text) is TypeSymbol type)
-                return BindConversion(node.Arguments[0], type);
+                return BindConversion(node.Arguments[0], type, true);
             var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
             foreach (var argument in node.Arguments)
@@ -298,14 +300,15 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundCallExpression(function, boundArguments.ToImmutable());
         }
 
-        private BoundExpression BindConversion(ExpressionNode node, TypeSymbol type)
+        private BoundExpression BindConversion(ExpressionNode node, TypeSymbol type, bool allowExplicit = false)
         {
             var expression = BindExpression(node);
-            return BindConversion(node.Span, expression, type);
+            return BindConversion(node.Span, expression, type, allowExplicit);
 
         }
 
-        private BoundExpression BindConversion(TextSpan diagnosticSpan, BoundExpression expression, TypeSymbol type)
+        private BoundExpression BindConversion(TextSpan diagnosticSpan, BoundExpression expression, TypeSymbol type, 
+            bool allowExplicit = false)
         {
             var conversion = Conversion.Classify(expression.Type, type);
 
@@ -315,6 +318,9 @@ namespace Shore.CodeAnalysis.Binding
                     _diagnostics.ReportCannotConvert(diagnosticSpan, expression.Type, type);
                 return new BoundNullExpression();
             }
+
+            if (!allowExplicit && conversion.IsExplicit)
+                _diagnostics.ReportCannotConvertImplicitly(diagnosticSpan, expression.Type, type);
 
             if (conversion.IsIdentity) return expression;
             return new BoundConversionExpression(type, expression);

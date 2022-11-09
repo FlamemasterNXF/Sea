@@ -2,15 +2,15 @@
 {
     public sealed class VariableDeclarationNode : StatementNode
     {
-        public Token Keyword { get; }
+        public Token VType { get; }
         public Token Identifier { get; }
         public Token EqualsToken { get; }
         public ExpressionNode Initializer { get; }
         public override TokType Type => TokType.VariableDeclarationStatement;
 
-        public VariableDeclarationNode(Token keyword, Token identifier, Token equalsToken, ExpressionNode initializer)
+        public VariableDeclarationNode(Token type, Token identifier, Token equalsToken, ExpressionNode initializer)
         {
-            Keyword = keyword;
+            VType = type;
             Identifier = identifier;
             EqualsToken = equalsToken;
             Initializer = initializer;
