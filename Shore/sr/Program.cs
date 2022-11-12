@@ -1,8 +1,8 @@
-﻿namespace Shore.misc
+﻿namespace Shore
 {
     internal static class Program
     {
-        private static void Main(string[] args)
+        internal static void Main(string[] args)
         {
             var repl = new ShoreRepl();
             repl.Run();

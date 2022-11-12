@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace Shore.misc
+namespace Shore
 {
     internal abstract class Repl
     {
@@ -163,7 +163,7 @@ namespace Shore.misc
                     case ConsoleKey.Home:
                         HandleHome(document, view);
                         break;
-                    case ConsoleKey.End:
+                    case ConsoleKey.F2:
                         HandleEnd(document, view);
                         break;
                     case ConsoleKey.Tab:
@@ -289,7 +289,7 @@ namespace Shore.misc
 
         private void HandleHome(ObservableCollection<string> document, View view) => view.CurrentCharacter = 0;
 
-        private void HandleEnd(ObservableCollection<string> document, View view) => view.CurrentCharacter = document[view.CurrentLine].Length;
+        private void HandleEnd(ObservableCollection<string> document, View view) => Environment.Exit(1);
 
         private void HandleTab(ObservableCollection<string> document, View view)
         {

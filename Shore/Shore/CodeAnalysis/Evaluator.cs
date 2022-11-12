@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Symbols;
 

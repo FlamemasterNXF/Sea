@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using Shore.CodeAnalysis;
+﻿using Shore.CodeAnalysis;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;
