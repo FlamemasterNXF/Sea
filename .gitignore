@@ -3,9 +3,11 @@
 /.idea
 
 /Shore/.idea
-/Shore/bin
-/Shore/obj
 
-/CodeAnalysis/bin
-/CodeAnalysis/obj
+/Shore/Shore.idea
+/Shore/Shore/bin
+/Shore/Shore/obj
+
+/Shore/Shore.Tests/CodeAnalysis/bin
+/Shore/Shore.Tests/CodeAnalysis/obj
 
