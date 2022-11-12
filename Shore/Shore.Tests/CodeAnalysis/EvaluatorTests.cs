@@ -76,6 +76,43 @@ namespace Shore.Tests.CodeAnalysis
         }
 
         [Fact]
+        public void Evaluator_InvokeFunctionArguments_NoInfiniteLoop()
+        {
+            var text = @"
+                print(""Hi""[[=]][)]
+            ";
+
+            var diagnostics = @"
+                Unexpected Token EqualsToken, CloseParenToken was expected.
+                Unexpected Token EqualsToken, IdentifierToken was expected.
+                Unexpected Token CloseParenToken, IdentifierToken was expected.
+            ";
+
+            AssertDiagnostics(text, diagnostics);
+        }
+        
+        [Fact]
+        public void Evaluator_FunctionParameters_NoInfiniteLoop()
+        {
+            var text = @"
+                function void hi(string name[[[=]]][)]
+                {
+                    print(""Hi "" + name + ""!"" )
+                }[]
+            ";
+
+            var diagnostics = @"
+                Unexpected Token EqualsToken, CloseParenToken was expected.
+                Unexpected Token EqualsToken, OpenBraceToken was expected.
+                Unexpected Token EqualsToken, IdentifierToken was expected.
+                Unexpected Token CloseParenToken, IdentifierToken was expected.
+                Unexpected Token EndOfFileToken, CloseBraceToken was expected.
+            ";
+
+            AssertDiagnostics(text, diagnostics);
+        }
+        
+        [Fact]
         public void Evaluator_No_InfiniteLoop()
         {
             var text = @"

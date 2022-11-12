@@ -145,16 +145,18 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
 
-            while (CurrentToken.Type != TokType.CloseParenToken && CurrentToken.Type != TokType.EndOfFileToken)
+            var parseNextParameter = true;
+            while (parseNextParameter && CurrentToken.Type != TokType.CloseParenToken && CurrentToken.Type != TokType.EndOfFileToken)
             {
                 var parameter = ParseParameter();
                 nodesAndSeparators.Add(parameter);
 
-                if (CurrentToken.Type != TokType.CloseParenToken)
+                if (CurrentToken.Type == TokType.CommaToken)
                 {
                     var comma = MatchToken(TokType.CommaToken);
                     nodesAndSeparators.Add(comma);
                 }
+                else parseNextParameter = false;
             }
 
             return new SeparatedNodeList<ParameterNode>(nodesAndSeparators.ToImmutable());
@@ -325,16 +327,18 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
 
-            while (CurrentToken.Type != TokType.CloseParenToken && CurrentToken.Type != TokType.EndOfFileToken)
+            var parseNextArgument = true;
+            while (parseNextArgument && CurrentToken.Type != TokType.CloseParenToken && CurrentToken.Type != TokType.EndOfFileToken)
             {
                 var expression = ParseExpression();
                 nodesAndSeparators.Add(expression);
 
-                if (CurrentToken.Type != TokType.CloseParenToken)
+                if (CurrentToken.Type == TokType.CommaToken)
                 {
                     var comma = MatchToken(TokType.CommaToken);
                     nodesAndSeparators.Add(comma);
                 }
+                else parseNextArgument = false;
             }
 
             return new SeparatedNodeList<ExpressionNode>(nodesAndSeparators.ToImmutable());
