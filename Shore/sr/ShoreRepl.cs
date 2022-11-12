@@ -97,7 +97,7 @@ namespace Shore
             }
             else
             {
-                foreach (var diagnostic in result.Diagnostics)
+                foreach (var diagnostic in result.Diagnostics.OrderBy(d => d.Span, new TextSpanComparer()))
                 {
                     var lineIndex = nodeTree.Text.GetLineIndex(diagnostic.Span.Start);
                     var line = nodeTree.Text.Lines[lineIndex];
