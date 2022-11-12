@@ -39,7 +39,7 @@ namespace Shore.CodeAnalysis
 
         public Compilation ContinueWith(NodeTree nodeTree) => new Compilation(this, nodeTree);
 
-        public EvaluationResult Evaluate(Dictionary<VariableSymbol?, object> variables)
+        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
             var diagnostics = NodeTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToImmutableArray();
             if (diagnostics.Any()) return new EvaluationResult(diagnostics, null);

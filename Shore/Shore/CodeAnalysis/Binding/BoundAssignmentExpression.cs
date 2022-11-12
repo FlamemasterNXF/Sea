@@ -14,6 +14,6 @@ namespace Shore.CodeAnalysis.Binding
         }
 
         public override BoundNodeKind Kind => BoundNodeKind.AssignmentExpression;
-        public override TypeSymbol Type => Expression.Type;
+        public override TypeSymbol? Type => Expression.Type;
     }
 }

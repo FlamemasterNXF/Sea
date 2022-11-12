@@ -11,10 +11,10 @@ namespace Shore.CodeAnalysis.Binding
     internal sealed class Binder
     {
         private readonly FunctionSymbol? _function;
-        private BoundScope _scope;
-        private DiagnosticBag _diagnostics = new DiagnosticBag();
+        private BoundScope? _scope;
+        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
 
-        public Binder(BoundScope parent, FunctionSymbol? function)
+        private Binder(BoundScope parent, FunctionSymbol? function)
         {
             _function = function;
             _scope = new BoundScope(parent);
@@ -25,7 +25,7 @@ namespace Shore.CodeAnalysis.Binding
             }
         }
 
-        private static BoundScope? CreateParentScope(BoundGlobalScope? previous)
+        private static BoundScope CreateParentScope(BoundGlobalScope? previous)
         {
             var stack = new Stack<BoundGlobalScope>();
             while (previous != null)
@@ -41,6 +41,7 @@ namespace Shore.CodeAnalysis.Binding
                 previous = stack.Pop();
                 var scope = new BoundScope(parent);
                 foreach (var f in previous.Functions) scope.TryDeclareFunction(f);
+
                 foreach (var v in previous.Variables) scope.TryDeclareVariable(v);
 
                 parent = scope;
@@ -87,10 +88,10 @@ namespace Shore.CodeAnalysis.Binding
                 foreach (var function in scope.Functions)
                 {
                     var binder = new Binder(parentScope, function);
-                    var body = binder.BindStatement(function.Declaration.Body);
+                    var body = binder.BindStatement(function.Declaration?.Body);
                     var loweredBody = Lowerer.Lower(body);
                     functionBodies.Add(function, loweredBody);
-                    
+
                     diagnostics.AddRange(binder.Diagnostics);
                 }
 
@@ -104,12 +105,13 @@ namespace Shore.CodeAnalysis.Binding
         private void BindFunctionDeclaration(FunctionDeclarationNode node)
         {
             var parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
-            var seenParameterNames = new HashSet<string?>();
+
+            var seenParameterNames = new HashSet<string>();
 
             foreach (var parameterNode in node.Parameters)
             {
                 var parameterName = parameterNode.Identifier.Text;
-                var parameterType = LookupType(parameterNode.PType.ToString());
+                var parameterType = LookupType(parameterNode.PType.Text);
                 if (!seenParameterNames.Add(parameterName))
                 {
                     _diagnostics.ReportParameterAlreadyDeclared(parameterNode.Span, parameterName);
@@ -117,16 +119,16 @@ namespace Shore.CodeAnalysis.Binding
                 else
                 {
                     var parameter = new ParameterSymbol(parameterName, parameterType);
+                    parameters.Add(parameter);
                 }
-                
             }
 
-            var type = LookupType(node.Type.ToString()) ?? TypeSymbol.Void;
+            var type = LookupType(node.FType.Text) ?? TypeSymbol.Void;
 
             if (type != TypeSymbol.Void) _diagnostics.ReportFunctionsAreUnsupported(node.Span);
-
+            
             var function = new FunctionSymbol(node.Identifier.Text, parameters.ToImmutable(), type, node);
-            if (!_scope.TryDeclareFunction(function))
+            if (!_scope!.TryDeclareFunction(function))
                 _diagnostics.ReportSymbolAlreadyDeclared(node.Identifier.Span, function.Name);
         }
 
@@ -139,9 +141,9 @@ namespace Shore.CodeAnalysis.Binding
 
         public DiagnosticBag Diagnostics => _diagnostics;
 
-        private BoundStatement BindStatement(StatementNode node)
+        private BoundStatement BindStatement(StatementNode? node)
         {
-            return node.Type switch
+            return node?.Type switch
             {
                 TokType.BlockStatement => BindBlockStatement((BlockStatementNode)node),
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
@@ -149,7 +151,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
                 TokType.ForStatement => BindForStatement((ForStatementNode)node),
                 TokType.ExpressionStatement => BindExpressionStatement((ExpressionStatementNode)node),
-                _ => throw new Exception($"Unexpected Node {node.Type}")
+                _ => throw new Exception($"Unexpected Node {node?.Type}")
             };
         }
 
@@ -215,7 +217,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol targetType)
+        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType)
         {
             return BindConversion(node, targetType);
         }
@@ -232,7 +234,7 @@ namespace Shore.CodeAnalysis.Binding
             return result;
         }
 
-        private BoundExpression BindExpressionDistributor(ExpressionNode node, TypeSymbol targetType)
+        private BoundExpression BindExpressionDistributor(ExpressionNode node, TypeSymbol? targetType)
         {
             var result = BindExpressionDistributor(node);
             if (targetType != TypeSymbol.Null && result.Type != TypeSymbol.Null && result.Type != targetType)
@@ -265,7 +267,7 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
-            if (!_scope.TryLookupVariable(name, out var variable))
+            if (!_scope!.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Span, name);
                 return new BoundNullExpression();
@@ -279,21 +281,21 @@ namespace Shore.CodeAnalysis.Binding
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpressionDistributor(node.Expression);
 
-            if (!_scope.TryLookupVariable(name, out var variable))
+            if (!_scope!.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Span, name);
                 return boundExpression;
             }
 
-            if (variable.IsReadOnly) _diagnostics.ReportCannotAssign(node.EqualsToken.Span, name);
+            if (variable!.IsReadOnly) _diagnostics.ReportCannotAssign(node.EqualsToken.Span, name);
 
             var convertedExpression = BindConversion(node.Expression.Span, boundExpression, variable.Type);
             return new BoundAssignmentExpression(variable, convertedExpression);
         }
 
-        private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
+        private BoundExpression BindLiteralExpression(LiteralExpressionNode? node)
         {
-            var value = node.Value ?? 0;
+            var value = node?.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 
@@ -337,7 +339,8 @@ namespace Shore.CodeAnalysis.Binding
         private BoundExpression BindCallExpression(CallExpressionNode node)
         {
             if (node.Arguments.Count == 1 && LookupType(node.Identifier.Text) is TypeSymbol type)
-                return BindConversion(node.Arguments[0], type, true);
+                return BindConversion(node.Arguments[0], type, allowExplicit: true);
+
             var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
             foreach (var argument in node.Arguments)
@@ -346,10 +349,7 @@ namespace Shore.CodeAnalysis.Binding
                 boundArguments.Add(boundArgument);
             }
 
-            var functions = BuiltinFunctions.GetAll();
-
-            var function = functions.SingleOrDefault(f => f.Name == node.Identifier.Text);
-            if (function is null)
+            if (!_scope.TryLookupFunction(node.Identifier.Text, out var function))
             {
                 _diagnostics.ReportUndefinedFunction(node.Identifier.Span, node.Identifier.Text);
                 return new BoundNullExpression();
@@ -357,12 +357,11 @@ namespace Shore.CodeAnalysis.Binding
 
             if (node.Arguments.Count != function.Parameters.Length)
             {
-                _diagnostics.ReportWrongArgumentCount(node.Span, function.Name, function.Parameters.Length,
-                    node.Arguments.Count);
+                _diagnostics.ReportWrongArgumentCount(node.Span, function.Name, function.Parameters.Length, node.Arguments.Count);
                 return new BoundNullExpression();
             }
 
-            for (int i = 0; i < node.Arguments.Count; i++)
+            for (var i = 0; i < node.Arguments.Count; i++)
             {
                 var argument = boundArguments[i];
                 var parameter = function.Parameters[i];
@@ -377,14 +376,14 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundCallExpression(function, boundArguments.ToImmutable());
         }
 
-        private BoundExpression BindConversion(ExpressionNode node, TypeSymbol type, bool allowExplicit = false)
+        private BoundExpression BindConversion(ExpressionNode node, TypeSymbol? type, bool allowExplicit = false)
         {
             var expression = BindExpression(node);
             return BindConversion(node.Span, expression, type, allowExplicit);
 
         }
 
-        private BoundExpression BindConversion(TextSpan diagnosticSpan, BoundExpression expression, TypeSymbol type, 
+        private BoundExpression BindConversion(TextSpan diagnosticSpan, BoundExpression expression, TypeSymbol? type, 
             bool allowExplicit = false)
         {
             var conversion = Conversion.Classify(expression.Type, type);
@@ -403,7 +402,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundConversionExpression(type, expression);
         }
 
-        private VariableSymbol? BindVariable(Token identifier, bool isReadOnly, TypeSymbol type)
+        private VariableSymbol BindVariable(Token identifier, bool isReadOnly, TypeSymbol? type)
         {
             var name = identifier.Text ?? "?";
             var declare = !identifier.IsMissing;
@@ -411,7 +410,7 @@ namespace Shore.CodeAnalysis.Binding
                 ? (VariableSymbol)new GlobalVariableSymbol(name, isReadOnly, type)
                 : new LocalVariableSymbol(name, isReadOnly, type);
             
-            if (declare && !_scope.TryDeclareVariable(variable))
+            if (declare && !_scope!.TryDeclareVariable(variable))
                 _diagnostics.ReportVariableReDeclaration(identifier.Span, name);
 
             return variable;
@@ -423,10 +422,10 @@ namespace Shore.CodeAnalysis.Binding
             {
                 "bool" => TypeSymbol.Bool,
                 "string" => TypeSymbol.String,
-                "int8" => TypeSymbol.Int8,
-                "int16" => TypeSymbol.Int16,
-                "int32" => TypeSymbol.Int32,
-                "int64" => TypeSymbol.Int64,
+                "int8" or "byte" => TypeSymbol.Int8,
+                "int16" or "short" => TypeSymbol.Int16,
+                "int32" or "int" => TypeSymbol.Int32,
+                "int64" or "long" => TypeSymbol.Int64,
                 _ => null
             };
         }

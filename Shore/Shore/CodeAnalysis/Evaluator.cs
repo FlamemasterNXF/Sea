@@ -8,14 +8,14 @@ namespace Shore.CodeAnalysis
     {
         private readonly BoundProgram _program;
         private readonly Dictionary<VariableSymbol?, object> _globals;
-        private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
+        private readonly Stack<Dictionary<VariableSymbol?, object>> _locals = new();
         private object _lastValue;
 
         public Evaluator(BoundProgram program, Dictionary<VariableSymbol?, object> variables)
         {
             _program = program;
             _globals = variables;
-            _locals.Push(new Dictionary<VariableSymbol, object>());
+            _locals.Push(new Dictionary<VariableSymbol?, object>());
         }
 
         public object Evaluate()
@@ -154,12 +154,12 @@ namespace Shore.CodeAnalysis
                     var callLocals = new Dictionary<VariableSymbol, object>();
                     for (int i = 0; i < c.Arguments.Length; i++)
                     {
-                        var parameter = c.Function.Parameters[i];
+                        var parameter = c.Function?.Parameters[i];
                         var value = EvaluateExpression(c.Arguments[i]);
-                        callLocals.Add(parameter, value);
+                        callLocals.Add(parameter ?? throw new InvalidOperationException(), value);
                     }
 
-                    _locals.Push(callLocals);
+                    _locals.Push(callLocals!);
 
                     var statement = _program.Functions[c.Function];
                     var result = EvaluateStatement(statement);

@@ -113,9 +113,10 @@ namespace Shore.CodeAnalysis.Syntax
             while (CurrentToken.Type != TokType.EndOfFileToken)
             {
                 var startToken = CurrentToken;
+
                 var member = ParseMember();
                 members.Add(member);
-
+                
                 if (CurrentToken == startToken) NextToken();
             }
 
@@ -124,8 +125,7 @@ namespace Shore.CodeAnalysis.Syntax
 
         private MemberNode ParseMember()
         {
-            if (CurrentToken.Type == TokType.FunctionKeyword) return ParseFunctionDeclaration();
-            return ParseGlobalStatement();
+            return CurrentToken.Type == TokType.FunctionKeyword ? ParseFunctionDeclaration() : ParseGlobalStatement();
         }
 
         private MemberNode ParseFunctionDeclaration()
@@ -135,7 +135,7 @@ namespace Shore.CodeAnalysis.Syntax
             var identifier = MatchToken(TokType.IdentifierToken);
             var openParenToken = MatchToken(TokType.OpenParenToken);
             var parameters = ParseParameterList();
-            var closeParenToken = MatchToken(TokType.CloseParenToken);
+            var closeParenToken= MatchToken(TokType.CloseParenToken);
             var body = ParseBlockStatement();
             return new FunctionDeclarationNode(functionKeyword, type, identifier, openParenToken, parameters,
                 closeParenToken, body);
@@ -173,7 +173,7 @@ namespace Shore.CodeAnalysis.Syntax
             return new GlobalStatementNode(statement);
         }
 
-        private StatementNode ParseStatement()
+        private StatementNode? ParseStatement()
         {
             return CurrentToken.Type switch
             {
@@ -188,9 +188,9 @@ namespace Shore.CodeAnalysis.Syntax
             };
         }
 
-        private BlockStatementNode ParseBlockStatement()
+        private BlockStatementNode? ParseBlockStatement()
         {
-            var statements = ImmutableArray.CreateBuilder<StatementNode>();
+            ImmutableArray<StatementNode>.Builder statements = ImmutableArray.CreateBuilder<StatementNode>();
             var openBraceToken = MatchToken(TokType.OpenBraceToken);
 
             while (CurrentToken.Type != TokType.EndOfFileToken && CurrentToken.Type != TokType.CloseBraceToken)
@@ -210,7 +210,7 @@ namespace Shore.CodeAnalysis.Syntax
             return new BlockStatementNode(openBraceToken, statements.ToImmutable(), closeBraceToken);
         }
 
-        private StatementNode ParseVariableDeclaration()
+        private StatementNode? ParseVariableDeclaration()
         {
             var keyword = MatchToken(CurrentToken.Type);
             var identifier = MatchToken(TokType.IdentifierToken);
@@ -219,7 +219,7 @@ namespace Shore.CodeAnalysis.Syntax
             return new VariableDeclarationNode(keyword, identifier, equals, initializer);
         }
 
-        private StatementNode ParseIfStatement()
+        private StatementNode? ParseIfStatement()
         {
             var keyword = MatchToken(TokType.IfKeyword);
             var condition = ParseExpression();
@@ -237,7 +237,7 @@ namespace Shore.CodeAnalysis.Syntax
             return new ElseNode(keyword, statement);
         }
 
-        private StatementNode ParseWhileStatement()
+        private StatementNode? ParseWhileStatement()
         {
             var keyword = MatchToken(TokType.WhileKeyword);
             var condition = ParseExpression();
@@ -245,7 +245,7 @@ namespace Shore.CodeAnalysis.Syntax
             return new WhileStatementNode(keyword, condition, body);
         }
 
-        private StatementNode ParseForStatement()
+        private StatementNode? ParseForStatement()
         {
             var keyword = MatchToken(TokType.ForKeyword);
             var identifier = MatchToken(TokType.IdentifierToken);
@@ -257,7 +257,7 @@ namespace Shore.CodeAnalysis.Syntax
             return new ForStatementNode(keyword, identifier, equalsToken, lowerBound, untilKeyword, upperBound, body);
         }
 
-        private ExpressionStatementNode ParseExpressionStatement()
+        private ExpressionStatementNode? ParseExpressionStatement()
         {
             var expression = ParseExpression();
             return new ExpressionStatementNode(expression);

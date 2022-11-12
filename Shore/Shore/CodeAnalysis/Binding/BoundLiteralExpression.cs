@@ -22,7 +22,7 @@ namespace Shore.CodeAnalysis.Binding
             };
         }
 
-        public override TypeSymbol Type { get;  }
+        public override TypeSymbol? Type { get;  }
 
         public override BoundNodeKind Kind => BoundNodeKind.LiteralExpression;
     }

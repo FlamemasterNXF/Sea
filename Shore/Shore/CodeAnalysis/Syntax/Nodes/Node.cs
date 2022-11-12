@@ -84,7 +84,7 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
             }
         }
 
-        public override string ToString()
+        public override string? ToString()
         {
             using var writer = new StringWriter();
             WriteTo(writer);

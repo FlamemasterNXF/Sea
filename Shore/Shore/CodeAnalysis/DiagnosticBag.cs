@@ -26,7 +26,7 @@ namespace Shore.CodeAnalysis
             _diagnostics.Add(diagnostic);
         }
 
-        public void ReportInvalidNumber(TextSpan span, string text, TypeSymbol type)
+        public void ReportInvalidNumber(TextSpan span, string text, TypeSymbol? type)
         {
             var message = $"The number {text} isn't a valid {type}.";
             ReportError(span, message);
@@ -44,28 +44,26 @@ namespace Shore.CodeAnalysis
             ReportError(span, message);
         }
 
-        public void ReportUndefinedUnaryOperator(TextSpan span, string? operatorText, TypeSymbol operandType)
+        public void ReportUndefinedUnaryOperator(TextSpan span, string? operatorText, TypeSymbol? operandType)
         {
             var sType = operandType.ToString().Replace("System.", "");
             var message = $"Unary Operator '{operatorText}' is not defined for Type '{sType}'.";
             ReportError(span, message);
         }
 
-        public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, TypeSymbol leftType, TypeSymbol rightType)
+        public void ReportUndefinedBinaryOperator(TextSpan span, string operatorText, TypeSymbol leftType, TypeSymbol rightType)
         {
-            var sLeftType = leftType.ToString().Replace("System.", "");
-            var sRightType = rightType.ToString().Replace("System.", "");
-            var message = $"Binary Operator '{operatorText}' is not defined for Types '{sLeftType}' and '{sRightType}'.";
+            var message = $"Binary Operator '{operatorText}' is not defined for Types '{leftType}' and '{rightType}'.";
             ReportError(span, message);
         }
 
-        public void ReportUndefinedName(TextSpan span, string name)
+        public void ReportUndefinedName(TextSpan span, string? name)
         {
             var message = $"Variable '{name}' is not defined.";
             ReportError(span, message);
         }
 
-        public void ReportCannotConvert(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
+        public void ReportCannotConvert(TextSpan span, TypeSymbol? fromType, TypeSymbol? toType)
         {
             var sFromType = fromType.ToString().Replace("System.", "");
             var sToType = toType.ToString().Replace("System.", "");
@@ -79,7 +77,7 @@ namespace Shore.CodeAnalysis
             ReportError(span, message);
         }
 
-        public void ReportCannotAssign(TextSpan span, string name)
+        public void ReportCannotAssign(TextSpan span, string? name)
         {
             var message = $"Variable '{name}' is read-only and cannot be re-assigned.";
             ReportError(span, message);
@@ -91,19 +89,19 @@ namespace Shore.CodeAnalysis
             ReportError(span, message);
         }
         
-        public void ReportUndefinedFunction(TextSpan span, string name)
+        public void ReportUndefinedFunction(TextSpan span, string? name)
         {
             var message = $"Function '{name}' doesn't exist.";
             ReportError(span, message);
         }
 
-        public void ReportWrongArgumentCount(TextSpan span, string name, int expectedCount, int actualCount)
+        public void ReportWrongArgumentCount(TextSpan span, string? name, int expectedCount, int actualCount)
         {
             var message = $"Function '{name}' requires {expectedCount} arguments but was given {actualCount}.";
             ReportError(span, message);
         }
 
-        public void ReportWrongArgumentType(TextSpan span, string name, TypeSymbol expectedType, TypeSymbol actualType)
+        public void ReportWrongArgumentType(TextSpan span, string? name, TypeSymbol? expectedType, TypeSymbol? actualType)
         {
             var message = $"Parameter '{name}' requires a value of Type '{expectedType}' but was given a value of Type '{actualType}'.";
             ReportError(span, message);
@@ -121,7 +119,7 @@ namespace Shore.CodeAnalysis
             ReportError(span, message);
         }
 
-        public void ReportCannotConvertImplicitly(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
+        public void ReportCannotConvertImplicitly(TextSpan span, TypeSymbol? fromType, TypeSymbol? toType)
         {
             var message =
                 $"Cannot convert Type '{fromType}' to '{toType}'. An explicit conversion exists (are you missing a cast?).";

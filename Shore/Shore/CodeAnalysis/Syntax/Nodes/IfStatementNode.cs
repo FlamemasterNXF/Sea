@@ -4,11 +4,11 @@
     {
         public Token IfKeyword { get; }
         public ExpressionNode Condition { get; }
-        public StatementNode ThenStatement { get; }
+        public StatementNode? ThenStatement { get; }
         public ElseNode? ElseNode { get; }
         public override TokType Type => TokType.IfStatement;
 
-        public IfStatementNode(Token ifKeyword, ExpressionNode condition, StatementNode thenStatement,
+        public IfStatementNode(Token ifKeyword, ExpressionNode condition, StatementNode? thenStatement,
             ElseNode? elseNode)
         {
             IfKeyword = ifKeyword;

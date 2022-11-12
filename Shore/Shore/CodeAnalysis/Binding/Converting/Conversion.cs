@@ -21,14 +21,14 @@ namespace Shore.CodeAnalysis.Binding.Converting
         public static readonly Conversion Implicit = new Conversion(true, false, true);
         public static readonly Conversion Explicit = new Conversion(true, false, false);
 
-        public static Conversion Classify(TypeSymbol from, TypeSymbol to)
+        public static Conversion Classify(TypeSymbol? from, TypeSymbol? to)
         {
             if (from == to) return Identity;
 
-            if ((from == TypeSymbol.Bool || from.ParentType == TypeSymbol.Number) && to == TypeSymbol.String) 
+            if ((from == TypeSymbol.Bool || from?.ParentType == TypeSymbol.Number) && to == TypeSymbol.String) 
                 return Explicit;
 
-            if (from == TypeSymbol.String && (to == TypeSymbol.Bool || to.ParentType == TypeSymbol.Number))
+            if (from == TypeSymbol.String && (to == TypeSymbol.Bool || to?.ParentType == TypeSymbol.Number))
                 return Explicit;
 
             return None;

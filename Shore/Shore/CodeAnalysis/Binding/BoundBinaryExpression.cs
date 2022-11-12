@@ -15,7 +15,7 @@ namespace Shore.CodeAnalysis.Binding
             Right = right;
         }
 
-        public override TypeSymbol Type => Op.ResultType;
+        public override TypeSymbol? Type => Op?.ResultType;
 
         public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
     }

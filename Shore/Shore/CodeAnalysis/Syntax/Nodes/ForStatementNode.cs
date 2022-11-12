@@ -8,11 +8,11 @@
         public ExpressionNode LowerBound { get; }
         public Token UntilToken { get; }
         public ExpressionNode UpperBound { get; }
-        public StatementNode Body { get; }
+        public StatementNode? Body { get; }
         public override TokType Type => TokType.ForStatement;
 
         public ForStatementNode(Token keyword, Token identifier, Token equalsToken, ExpressionNode lowerBound,
-            Token untilToken, ExpressionNode upperBound, StatementNode body)
+            Token untilToken, ExpressionNode upperBound, StatementNode? body)
         {
             Keyword = keyword;
             Identifier = identifier;

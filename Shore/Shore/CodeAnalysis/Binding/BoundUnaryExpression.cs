@@ -13,7 +13,7 @@ namespace Shore.CodeAnalysis.Binding
             Operand = operand;
         }
 
-        public override TypeSymbol Type => Op.ResultType;
+        public override TypeSymbol? Type => Op.ResultType;
         
         public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
     }

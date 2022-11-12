@@ -4,7 +4,7 @@
     {
         public override SymbolKind Kind => SymbolKind.LocalVariable;
 
-        internal LocalVariableSymbol(string? name, bool isReadOnly, TypeSymbol? type)
+        internal LocalVariableSymbol(string name, bool isReadOnly, TypeSymbol type)
             : base(name, isReadOnly, type)
         {
         }
