@@ -1,4 +1,3 @@
-/.idea
 /.vscode
 /.idea
 
@@ -8,6 +7,6 @@
 /Shore/Shore/bin
 /Shore/Shore/obj
 
-/Shore/Shore.Tests/CodeAnalysis/bin
-/Shore/Shore.Tests/CodeAnalysis/obj
+/Shore/Shore.Tests/bin
+/Shore/Shore.Tests/obj
 
