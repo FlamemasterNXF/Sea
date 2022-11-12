@@ -68,6 +68,8 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("{ int i = 10 int result = 0 while i > 0 { result = result + i i = i -1 } result }", 55)]
         [InlineData("{ int result = 0 for i = 1 until 10 { result = result + i } result }", 55)]
         [InlineData("{ int a = 10 for i = 1 until (a = a - 1) { } a }", 9)]
+        [InlineData("function void tester(){ 1 } tester()", 1)]
+        [InlineData("function void tester(int num, int numTwo){ num + numTwo } tester(1,1)", 2)]
         public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
         {
             AssertValue(text, expectedValue);
