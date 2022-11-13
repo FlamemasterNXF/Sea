@@ -45,6 +45,8 @@ namespace Shore.CodeAnalysis.Binding
             new (BangEqualsToken, LogicalNotEquals, TypeSymbol.Bool),
             
             new (PlusToken, Addition, TypeSymbol.String),
+            new (DoubleEqualsToken, LogicalEquals, TypeSymbol.String, TypeSymbol.Bool),
+            new (BangEqualsToken, LogicalNotEquals, TypeSymbol.String, TypeSymbol.Bool)
         };
 
         private static BoundBinaryOperator[] Operators()
