@@ -58,6 +58,8 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("true", true)]
         [InlineData("!true", false)]
         [InlineData("!false", true)]
+        [InlineData("\"test\"", "test")]
+        [InlineData("\"te\"\"st\"", "te\"st")]
         [InlineData("int a = 10", 10)]
         [InlineData("{ int b = 0 (b = 10) * b}", 100)]
         [InlineData("{ int a = 0 if a == 0 a = 10 a }", 10)]
