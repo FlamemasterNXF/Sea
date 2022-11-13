@@ -15,7 +15,7 @@ namespace Shore.CodeAnalysis.Binding
                 BoundNodeKind.ForStatement => RewriteForStatement((BoundForStatement)node),
                 BoundNodeKind.LabelStatement => RewriteLabelStatement((BoundLabelStatement)node),
                 BoundNodeKind.GotoStatement => RewriteGotoStatement((BoundGotoStatement)node),
-                BoundNodeKind.ConiditonalGotoStatement => RewriteConditionalGotoStatement((BoundConditionalGotoStatement)node),
+                BoundNodeKind.ConditionalGotoStatement => RewriteConditionalGotoStatement((BoundConditionalGotoStatement)node),
                 BoundNodeKind.ExpressionStatement => RewriteExpressionStatement((BoundExpressionStatement)node),
                 _ => throw new Exception($"Unexpected Node: {node.Kind}")
             };

@@ -13,7 +13,7 @@ namespace Shore.CodeAnalysis.Binding
         IfStatement,
         WhileStatement,
         ForStatement,
-        ConiditonalGotoStatement,
+        ConditionalGotoStatement,
         GotoStatement,
         LabelStatement,
         NullExpression,

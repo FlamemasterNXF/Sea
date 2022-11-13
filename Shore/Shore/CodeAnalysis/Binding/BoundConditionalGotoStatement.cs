@@ -9,7 +9,7 @@
             JumpIfTrue = jumpIfTrue;
         }
 
-        public override BoundNodeKind Kind => BoundNodeKind.ConiditonalGotoStatement;
+        public override BoundNodeKind Kind => BoundNodeKind.ConditionalGotoStatement;
         public BoundLabel BoundLabel { get; }
         public BoundExpression Condition { get; }
         public bool JumpIfTrue { get; }
