@@ -65,6 +65,8 @@ namespace Shore.CodeAnalysis.Syntax
                 "until" => TokType.UntilKeyword,
                 "function" => TokType.FunctionKeyword,
                 "void" => TokType.VoidKeyword,
+                "break" => TokType.BreakKeyword,
+                "continue" => TokType.ContinueKeyword,
                 _ => TokType.IdentifierToken
             };
         }
@@ -127,9 +129,11 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.ElseKeyword => "else",
                 TokType.WhileKeyword => "while",
                 TokType.ForKeyword => "for",
+                TokType.UntilKeyword => "until",
                 TokType.FunctionKeyword => "function",
                 TokType.VoidKeyword => "void",
-                TokType.UntilKeyword => "until",
+                TokType.BreakKeyword => "break",
+                TokType.ContinueKeyword => "continue",
                 _ => null
             };
         }

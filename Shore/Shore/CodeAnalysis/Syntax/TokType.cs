@@ -71,6 +71,10 @@ namespace Shore.CodeAnalysis.Syntax
         GlobalStatement,
         FunctionDeclaration,
         FunctionKeyword,
-        VoidKeyword
+        VoidKeyword,
+        ContinueStatement,
+        BreakStatement,
+        BreakKeyword,
+        ContinueKeyword
     }
 }

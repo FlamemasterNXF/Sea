@@ -2,7 +2,7 @@
 
 namespace Shore.CodeAnalysis.Binding
 {
-    internal sealed class BoundForStatement : BoundStatement
+    internal sealed class BoundForStatement : BoundLoopStatement
     {
         public VariableSymbol? Variable { get; }
         public BoundExpression LowerBound { get; }
@@ -11,7 +11,7 @@ namespace Shore.CodeAnalysis.Binding
         public override BoundNodeKind Kind => BoundNodeKind.ForStatement;
 
         public BoundForStatement(VariableSymbol? variable, BoundExpression lowerBound, BoundExpression upperBound,
-            BoundStatement body)
+            BoundStatement body, BoundLabel breakLabel, BoundLabel continueLabel) : base(breakLabel, continueLabel)
         {
             Variable = variable;
             LowerBound = lowerBound;

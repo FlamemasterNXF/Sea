@@ -12,7 +12,9 @@ namespace Shore.CodeAnalysis.Binding
     {
         private readonly FunctionSymbol? _function;
         private BoundScope? _scope;
-        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
+        private readonly DiagnosticBag _diagnostics = new();
+        private Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> _loopStack = new();
+        private int _labelCounter;
 
         private Binder(BoundScope parent, FunctionSymbol? function)
         {
@@ -25,6 +27,8 @@ namespace Shore.CodeAnalysis.Binding
             }
         }
 
+        public DiagnosticBag Diagnostics => _diagnostics;
+        
         private static BoundScope CreateParentScope(BoundGlobalScope? previous)
         {
             var stack = new Stack<BoundGlobalScope>();
@@ -101,6 +105,13 @@ namespace Shore.CodeAnalysis.Binding
             var statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
             return new BoundProgram(diagnostics.ToImmutable(), functionBodies.ToImmutable(), statement);
         }
+        
+        private static BoundScope CreateRootScope()
+        {
+            var result = new BoundScope(null);
+            foreach (var function in BuiltinFunctions.GetAll()) result.TryDeclareFunction(function);
+            return result;
+        }
 
         private void BindFunctionDeclaration(FunctionDeclarationNode node)
         {
@@ -132,14 +143,10 @@ namespace Shore.CodeAnalysis.Binding
                 _diagnostics.ReportSymbolAlreadyDeclared(node.Identifier.Span, function.Name);
         }
 
-        private static BoundScope CreateRootScope()
+        private BoundStatement BindNullStatement()
         {
-            var result = new BoundScope(null);
-            foreach (var function in BuiltinFunctions.GetAll()) result.TryDeclareFunction(function);
-            return result;
+            return new BoundExpressionStatement(new BoundNullExpression());
         }
-
-        public DiagnosticBag Diagnostics => _diagnostics;
 
         private BoundStatement BindStatement(StatementNode? node)
         {
@@ -150,6 +157,8 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.IfStatement => BindIfStatement((IfStatementNode)node),
                 TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
                 TokType.ForStatement => BindForStatement((ForStatementNode)node),
+                TokType.BreakStatement => BindBreakStatement((BreakStatementNode)node),
+                TokType.ContinueStatement => BindContinueStatement((ContinueStatementNode)node),
                 TokType.ExpressionStatement => BindExpressionStatement((ExpressionStatementNode)node),
                 _ => throw new Exception($"Unexpected Node {node?.Type}")
             };
@@ -193,8 +202,8 @@ namespace Shore.CodeAnalysis.Binding
         private BoundStatement BindWhileStatement(WhileStatementNode node)
         {
             var condition = BindExpressionDistributor(node.Condition, TypeSymbol.Bool);
-            var body = BindStatement(node.Body);
-            return new BoundWhileStatement(condition, body);
+            var body = BindLoopBody(node.Body, out var breakLabel, out var continueLabel);
+            return new BoundWhileStatement(condition, body, breakLabel, continueLabel);
         }
 
         private BoundStatement BindForStatement(ForStatementNode node)
@@ -205,10 +214,47 @@ namespace Shore.CodeAnalysis.Binding
             _scope = new BoundScope(_scope);
 
             var variable = BindVariable(node.Identifier, true, TypeSymbol.Int32);
-            var body = BindStatement(node.Body);
+            var body = BindLoopBody(node.Body, out var breakLabel, out var continueLabel);
 
             _scope = _scope.Parent;
-            return new BoundForStatement(variable, lowerBound, upperBound, body);
+            return new BoundForStatement(variable, lowerBound, upperBound, body, breakLabel, continueLabel);
+        }
+
+        private BoundStatement BindLoopBody(StatementNode body, out BoundLabel breakLabel, out BoundLabel continueLabel)
+        {
+            _labelCounter++;
+            breakLabel = new BoundLabel($"break{_labelCounter}");
+            continueLabel = new BoundLabel($"continue{_labelCounter}");
+            
+            _loopStack.Push((breakLabel, continueLabel));
+            var boundBody = BindStatement(body);
+            _loopStack.Pop();
+
+            return boundBody;
+        }
+
+        private BoundStatement BindBreakStatement(BreakStatementNode node)
+        {
+            if (_loopStack.Count == 0)
+            {
+                _diagnostics.ReportInvalidBreakOrContinue(node.Keyword.Span, node.Keyword.Text);
+                return BindNullStatement();
+            }
+
+            var breakLabel = _loopStack.Peek().BreakLabel;
+            return new BoundGotoStatement(breakLabel);
+        }
+        
+        private BoundStatement BindContinueStatement(ContinueStatementNode node)
+        {
+            if (_loopStack.Count == 0)
+            {
+                _diagnostics.ReportInvalidBreakOrContinue(node.Keyword.Span, node.Keyword.Text);
+                return BindNullStatement();
+            }
+
+            var continueLabel = _loopStack.Peek().ContinueLabel;
+            return new BoundGotoStatement(continueLabel);
         }
 
         private BoundStatement BindExpressionStatement(ExpressionStatementNode node)

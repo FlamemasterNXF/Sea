@@ -143,5 +143,11 @@ namespace Shore.CodeAnalysis
             var message = $"A parameter with the name '{parameterName}' already exists.";
             ReportError(span, message);
         }
+
+        public void ReportInvalidBreakOrContinue(TextSpan span, string? text)
+        {
+            var message = $"'{text}' can only be used inside of Loops.";
+            ReportError(span, message);
+        }
     }
 }

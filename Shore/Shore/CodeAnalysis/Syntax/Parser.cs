@@ -186,6 +186,8 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
                 TokType.ForKeyword => ParseForStatement(),
+                TokType.BreakKeyword => ParseBreakStatement(),
+                TokType.ContinueKeyword => ParseContinueStatement(),
                 _=> ParseExpressionStatement()
             };
         }
@@ -257,6 +259,18 @@ namespace Shore.CodeAnalysis.Syntax
             var upperBound = ParseExpression();
             var body = ParseStatement();
             return new ForStatementNode(keyword, identifier, equalsToken, lowerBound, untilKeyword, upperBound, body);
+        }
+
+        private StatementNode ParseBreakStatement()
+        {
+            var keyword = MatchToken(TokType.BreakKeyword);
+            return new BreakStatementNode(keyword);
+        }
+        
+        private StatementNode ParseContinueStatement()
+        {
+            var keyword = MatchToken(TokType.ContinueKeyword);
+            return new ContinueStatementNode(keyword);
         }
 
         private ExpressionStatementNode? ParseExpressionStatement()
