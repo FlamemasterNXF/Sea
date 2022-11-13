@@ -77,9 +77,53 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("{ int a = 10 for i = 1 until (a = a - 1) { } a }", 9)]
         [InlineData("function void tester(){ 1 } tester()", 1)]
         [InlineData("function void tester(int num, int numTwo){ num + numTwo } tester(1,1)", 2)]
+        [InlineData("function string tester(){ return \"hello\" } tester()", "hello")]
+        [InlineData("function string tester(string str){ return str } tester(\"hi\")", "hi")]
         public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
         {
             AssertValue(text, expectedValue);
+        }
+
+        [Fact]
+        public void Evaluator_Reports_Void_Return()
+        {
+            var text = @"
+                function void tester() {return [1]}
+            ";
+
+            var diagnostics = @"
+                Since the Function 'tester' is of Type 'void' 'return' cannot be followed by an expression.
+            ";
+            
+            AssertDiagnostics(text, diagnostics);
+        }
+        
+        [Fact]
+        public void Evaluator_Reports_Function_TypeMismatch()
+        {
+            var text = @"
+                function string tester() {return [1]}
+            ";
+
+            var diagnostics = @"
+                Cannot convert Type 'int32' to 'string'. An explicit conversion exists (are you missing a cast?).
+            ";
+            
+            AssertDiagnostics(text, diagnostics);
+        }
+        
+        [Fact]
+        public void Evaluator_Reports_Function_Argument_TypeMismatch()
+        {
+            var text = @"
+                function string tester(int arg) {return [arg]}
+            ";
+
+            var diagnostics = @"
+                Cannot convert Type 'int32' to 'string'. An explicit conversion exists (are you missing a cast?).
+            ";
+            
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]

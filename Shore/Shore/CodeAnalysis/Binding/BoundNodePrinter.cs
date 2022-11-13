@@ -43,6 +43,9 @@ namespace Shore.CodeAnalysis.Binding
                 case BoundNodeKind.ConditionalGotoStatement:
                     WriteConditionalGotoStatement((BoundConditionalGotoStatement)node, writer);
                     break;
+                case BoundNodeKind.ReturnStatement:
+                    WriteReturnStatement((BoundReturnStatement)node, writer);
+                    break;
                 case BoundNodeKind.ExpressionStatement:
                     WriteExpressionStatement((BoundExpressionStatement)node, writer);
                     break;
@@ -191,6 +194,17 @@ namespace Shore.CodeAnalysis.Binding
             writer.WriteLine();
         }
 
+        private static void WriteReturnStatement(BoundReturnStatement node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword("return");
+            if (node.Expression != null)
+            {
+                writer.Write(" ");
+                node.Expression.WriteTo(writer);
+            }
+            writer.WriteLine();
+        }
+        
         private static void WriteExpressionStatement(BoundExpressionStatement node, IndentedTextWriter writer)
         {
             node.Expression.WriteTo(writer);

@@ -67,6 +67,7 @@ namespace Shore.CodeAnalysis.Syntax
                 "void" => TokType.VoidKeyword,
                 "break" => TokType.BreakKeyword,
                 "continue" => TokType.ContinueKeyword,
+                "return" => TokType.ReturnKeyword,
                 _ => TokType.IdentifierToken
             };
         }
@@ -134,6 +135,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.VoidKeyword => "void",
                 TokType.BreakKeyword => "break",
                 TokType.ContinueKeyword => "continue",
+                TokType.ReturnKeyword => "return",
                 _ => null
             };
         }

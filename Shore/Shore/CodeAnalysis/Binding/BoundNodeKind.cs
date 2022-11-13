@@ -18,6 +18,7 @@ namespace Shore.CodeAnalysis.Binding
         LabelStatement,
         NullExpression,
         CallExpression,
-        ConversionExpression
+        ConversionExpression,
+        ReturnStatement
     }
 }

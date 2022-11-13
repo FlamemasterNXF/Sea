@@ -4,9 +4,9 @@ namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class BoundLiteralExpression : BoundExpression
     {
-        public object Value { get; }
+        public object? Value { get; }
 
-        public BoundLiteralExpression(object value)
+        public BoundLiteralExpression(object? value)
         {
             Value = value;
 

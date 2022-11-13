@@ -126,12 +126,6 @@ namespace Shore.CodeAnalysis
             ReportError(span, message);
         }
 
-        public void ReportFunctionsAreUnsupported(TextSpan span)
-        {
-            var message = "Functions with return values are unsupported.";
-            ReportError(span, message);
-        }
-
         public void ReportSymbolAlreadyDeclared(TextSpan span, string? functionName)
         {
             var message = $"A Function with the name '{functionName}' already exists.";
@@ -147,6 +141,24 @@ namespace Shore.CodeAnalysis
         public void ReportInvalidBreakOrContinue(TextSpan span, string? text)
         {
             var message = $"'{text}' can only be used inside of Loops.";
+            ReportError(span, message);
+        }
+
+        public void ReportInvalidReturn(TextSpan span)
+        {
+            var message = "The 'return' Keyword can only be used inside of Functions.";
+            ReportError(span, message);
+        }
+
+        public void ReportInvalidReturnExpression(TextSpan span, string name)
+        {
+            var message = $"Since the Function '{name}' is of Type 'void' 'return' cannot be followed by an expression.";
+            ReportError(span, message);
+        }
+
+        public void ReportMissingReturnExpression(TextSpan span, TypeSymbol type)
+        {
+            var message = $"Expected an expression of Type '{type}'.";
             ReportError(span, message);
         }
     }

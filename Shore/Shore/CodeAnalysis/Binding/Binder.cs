@@ -135,8 +135,6 @@ namespace Shore.CodeAnalysis.Binding
             }
 
             var type = LookupType(node.FType.Text) ?? TypeSymbol.Void;
-
-            if (type != TypeSymbol.Void) _diagnostics.ReportFunctionsAreUnsupported(node.Span);
             
             var function = new FunctionSymbol(node.Identifier.Text, parameters.ToImmutable(), type, node);
             if (!_scope!.TryDeclareFunction(function))
@@ -159,6 +157,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.ForStatement => BindForStatement((ForStatementNode)node),
                 TokType.BreakStatement => BindBreakStatement((BreakStatementNode)node),
                 TokType.ContinueStatement => BindContinueStatement((ContinueStatementNode)node),
+                TokType.ReturnStatement => BindReturnStatement((ReturnStatementNode)node),
                 TokType.ExpressionStatement => BindExpressionStatement((ExpressionStatementNode)node),
                 _ => throw new Exception($"Unexpected Node {node?.Type}")
             };
@@ -255,6 +254,25 @@ namespace Shore.CodeAnalysis.Binding
 
             var continueLabel = _loopStack.Peek().ContinueLabel;
             return new BoundGotoStatement(continueLabel);
+        }
+
+        private BoundStatement BindReturnStatement(ReturnStatementNode node)
+        {
+            var expression = node.Expression == null ? null : BindExpression(node.Expression);
+            
+            if (_function == null) _diagnostics.ReportInvalidReturn(node.Keyword.Span);
+            else
+            {
+                if (_function.Type == TypeSymbol.Void && expression != null) 
+                    _diagnostics.ReportInvalidReturnExpression(node.Expression.Span, _function.Name);
+                else
+                {
+                    if (expression == null) _diagnostics.ReportMissingReturnExpression(node.Keyword.Span, _function.Type);
+                    else expression = BindConversion(node.Expression.Span, expression, _function.Type);
+                }
+            }
+
+            return new BoundReturnStatement(expression);
         }
 
         private BoundStatement BindExpressionStatement(ExpressionStatementNode node)

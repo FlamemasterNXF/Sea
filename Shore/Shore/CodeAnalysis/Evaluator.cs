@@ -6,23 +6,23 @@ namespace Shore.CodeAnalysis
     internal sealed class Evaluator
     {
         private readonly BoundProgram _program;
-        private readonly Dictionary<VariableSymbol?, object> _globals;
-        private readonly Stack<Dictionary<VariableSymbol?, object>> _locals = new();
-        private object _lastValue;
+        private readonly Dictionary<VariableSymbol, object?> _globals;
+        private readonly Stack<Dictionary<VariableSymbol, object?>> _locals = new();
+        private object? _lastValue;
 
-        public Evaluator(BoundProgram program, Dictionary<VariableSymbol?, object> variables)
+        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object?> variables)
         {
             _program = program;
             _globals = variables;
-            _locals.Push(new Dictionary<VariableSymbol?, object>());
+            _locals.Push(new Dictionary<VariableSymbol, object?>());
         }
 
-        public object Evaluate()
+        public object? Evaluate()
         {
             return EvaluateStatement(_program.Statement);
         }
 
-        private object EvaluateStatement(BoundBlockStatement body)
+        private object? EvaluateStatement(BoundBlockStatement body)
         {
             var labelToIndex = new Dictionary<BoundLabel, int>();
 
@@ -44,6 +44,10 @@ namespace Shore.CodeAnalysis
                         EvaluateVariableDeclaration((BoundVariableDeclaration)s);
                         index++;
                         break;
+                    case BoundNodeKind.ReturnStatement:
+                        var rs = (BoundReturnStatement)s;
+                        _lastValue = rs.Expression == null ? null : EvaluateExpression(rs.Expression);
+                        return _lastValue;
                     case BoundNodeKind.ExpressionStatement:
                         EvaluateExpressionStatement((BoundExpressionStatement)s);
                         index++;
@@ -54,7 +58,7 @@ namespace Shore.CodeAnalysis
                         break;
                     case BoundNodeKind.ConditionalGotoStatement:
                         var cgs = (BoundConditionalGotoStatement)s;
-                        var condition = (bool)EvaluateExpression(cgs.Condition);
+                        var condition = (bool)EvaluateExpression(cgs.Condition)!;
                         if (condition == cgs.JumpIfTrue) index = labelToIndex[cgs.BoundLabel];
                         else index++;
                         break;
@@ -78,14 +82,14 @@ namespace Shore.CodeAnalysis
         private void EvaluateExpressionStatement(BoundExpressionStatement node) =>
             _lastValue = EvaluateExpression(node.Expression);
 
-        private object EvaluateExpression(BoundExpression node)
+        private object? EvaluateExpression(BoundExpression node)
         {
             switch (node)
             {
                 case BoundLiteralExpression n:
                     return n.Value;
                 case BoundVariableExpression v:
-                    if (v.Variable.Kind == SymbolKind.GlobalVariable)
+                    if (v.Variable!.Kind == SymbolKind.GlobalVariable)
                         return _globals[v.Variable];
                     
                     var locals = _locals.Peek();
@@ -102,10 +106,10 @@ namespace Shore.CodeAnalysis
 
                     return u.Op.Kind switch
                     {
-                        BoundUnaryOperatorKind.Identity => (int) operand,
-                        BoundUnaryOperatorKind.Negation => -(int) operand,
-                        BoundUnaryOperatorKind.LogicalNegation => !(bool) operand,
-                        BoundUnaryOperatorKind.OnesComplement => ~(int) operand,
+                        BoundUnaryOperatorKind.Identity => (int) operand!,
+                        BoundUnaryOperatorKind.Negation => -(int) operand!,
+                        BoundUnaryOperatorKind.LogicalNegation => !(bool) operand!,
+                        BoundUnaryOperatorKind.OnesComplement => ~(int) operand!,
                         _ => throw new Exception($"Unexpected Unary Operator '{u.Op.Kind}'")
                     };
                 }
@@ -114,29 +118,29 @@ namespace Shore.CodeAnalysis
                     var left = EvaluateExpression(b.Left);
                     var right = EvaluateExpression(b.Right);
                     
-                    return b.Op.Kind switch
+                    return b.Op!.Kind switch
                     {
-                        BoundBinaryOperatorKind.Addition when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left + (int) right,
-                        BoundBinaryOperatorKind.Addition when TypeSymbol.CheckType(b.Type, TypeSymbol.String) => (string) left + (string) right,
-                        BoundBinaryOperatorKind.Subtraction => (int) left - (int) right,
-                        BoundBinaryOperatorKind.Multiplication => (int) left * (int) right,
-                        BoundBinaryOperatorKind.Division => (int) left / (int) right,
-                        BoundBinaryOperatorKind.BitwiseRightShift => (int) left >> (int) right,
-                        BoundBinaryOperatorKind.BitwiseLeftShift => (int) left << (int) right,
-                        BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left & (int) right,
-                        BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool) => (bool) left & (bool) right,
-                        BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left | (int) right,
-                        BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool)=> (bool) left | (bool) right,
-                        BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left ^ (int) right,
-                        BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool) => (bool) left ^ (bool) right,
-                        BoundBinaryOperatorKind.LogicalAnd => (bool) left && (bool) right,
-                        BoundBinaryOperatorKind.LogicalOr => (bool) left || (bool) right,
+                        BoundBinaryOperatorKind.Addition when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left! + (int) right!,
+                        BoundBinaryOperatorKind.Addition when TypeSymbol.CheckType(b.Type, TypeSymbol.String) => (string) left! + (string) right!,
+                        BoundBinaryOperatorKind.Subtraction => (int) left! - (int) right!,
+                        BoundBinaryOperatorKind.Multiplication => (int) left! * (int) right!,
+                        BoundBinaryOperatorKind.Division => (int) left! / (int) right!,
+                        BoundBinaryOperatorKind.BitwiseRightShift => (int) left! >> (int) right!,
+                        BoundBinaryOperatorKind.BitwiseLeftShift => (int) left! << (int) right!,
+                        BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left! & (int) right!,
+                        BoundBinaryOperatorKind.BitwiseAnd when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool) => (bool) left! & (bool) right!,
+                        BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left! | (int) right!,
+                        BoundBinaryOperatorKind.BitwiseOr when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool)=> (bool) left! | (bool) right!,
+                        BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Number) => (int) left! ^ (int) right!,
+                        BoundBinaryOperatorKind.BitwiseXor when TypeSymbol.CheckType(b.Type, TypeSymbol.Bool) => (bool) left! ^ (bool) right!,
+                        BoundBinaryOperatorKind.LogicalAnd => (bool) left! && (bool) right!,
+                        BoundBinaryOperatorKind.LogicalOr => (bool) left! || (bool) right!,
                         BoundBinaryOperatorKind.LogicalEquals => Equals(left, right),
                         BoundBinaryOperatorKind.LogicalNotEquals => !Equals(left, right),
-                        BoundBinaryOperatorKind.GreaterThan => (int) left > (int) right,
-                        BoundBinaryOperatorKind.GreaterThanOrEqual => (int) left >= (int) right,
-                        BoundBinaryOperatorKind.LessThan => (int) left < (int) right,
-                        BoundBinaryOperatorKind.LessThanOrEqual => (int) left <= (int) right,
+                        BoundBinaryOperatorKind.GreaterThan => (int) left! > (int) right!,
+                        BoundBinaryOperatorKind.GreaterThanOrEqual => (int) left! >= (int) right!,
+                        BoundBinaryOperatorKind.LessThan => (int) left! < (int) right!,
+                        BoundBinaryOperatorKind.LessThanOrEqual => (int) left! <= (int) right!,
                         _ => throw new Exception($"Unexpected Binary Operator '{b.Op.Kind}'")
                     };
                 }
@@ -145,12 +149,12 @@ namespace Shore.CodeAnalysis
                     
                     if (c.Function == BuiltinFunctions.Print)
                     {
-                        var message = (string)EvaluateExpression(c.Arguments[0]);
+                        var message = (string)EvaluateExpression(c.Arguments[0])!;
                         Console.WriteLine(message);
                         return null;
                     }
                     
-                    var callLocals = new Dictionary<VariableSymbol, object>();
+                    var callLocals = new Dictionary<VariableSymbol, object?>();
                     for (int i = 0; i < c.Arguments.Length; i++)
                     {
                         var parameter = c.Function?.Parameters[i];
@@ -158,9 +162,9 @@ namespace Shore.CodeAnalysis
                         callLocals.Add(parameter ?? throw new InvalidOperationException(), value);
                     }
 
-                    _locals.Push(callLocals!);
+                    _locals.Push(callLocals);
 
-                    var statement = _program.Functions[c.Function];
+                    var statement = _program.Functions[c.Function!];
                     var result = EvaluateStatement(statement);
 
                     _locals.Pop();
@@ -172,9 +176,9 @@ namespace Shore.CodeAnalysis
             }
         }
 
-        private void Assign(VariableSymbol variable, object value)
+        private void Assign(VariableSymbol? variable, object? value)
         {
-            if (variable.Kind == SymbolKind.GlobalVariable) _globals[variable] = value;
+            if (variable!.Kind == SymbolKind.GlobalVariable) _globals[variable] = value;
             else
             {
                 var locals = _locals.Peek();

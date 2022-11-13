@@ -16,6 +16,7 @@ namespace Shore.CodeAnalysis.Binding
                 BoundNodeKind.LabelStatement => RewriteLabelStatement((BoundLabelStatement)node),
                 BoundNodeKind.GotoStatement => RewriteGotoStatement((BoundGotoStatement)node),
                 BoundNodeKind.ConditionalGotoStatement => RewriteConditionalGotoStatement((BoundConditionalGotoStatement)node),
+                BoundNodeKind.ReturnStatement => RewriteReturnStatement((BoundReturnStatement)node),
                 BoundNodeKind.ExpressionStatement => RewriteExpressionStatement((BoundExpressionStatement)node),
                 _ => throw new Exception($"Unexpected Node: {node.Kind}")
             };
@@ -96,6 +97,15 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundConditionalGotoStatement(node.BoundLabel, condition, node.JumpIfTrue);
         }
 
+        protected virtual BoundStatement RewriteReturnStatement(BoundReturnStatement node)
+        {
+            var expression = node.Expression == null ? null : RewriteExpression(node.Expression);
+            if (expression == node.Expression)
+                return node;
+
+            return new BoundReturnStatement(expression);
+        }
+        
         protected virtual BoundStatement RewriteExpressionStatement(BoundExpressionStatement node)
         {
             var expression = RewriteExpression(node.Expression);

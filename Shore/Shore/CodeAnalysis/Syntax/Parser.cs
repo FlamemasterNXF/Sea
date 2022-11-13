@@ -188,6 +188,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.ForKeyword => ParseForStatement(),
                 TokType.BreakKeyword => ParseBreakStatement(),
                 TokType.ContinueKeyword => ParseContinueStatement(),
+                TokType.ReturnKeyword => ParseReturnStatement(),
                 _=> ParseExpressionStatement()
             };
         }
@@ -271,6 +272,17 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var keyword = MatchToken(TokType.ContinueKeyword);
             return new ContinueStatementNode(keyword);
+        }
+
+        private StatementNode ParseReturnStatement()
+        {
+            var keyword = MatchToken(TokType.ReturnKeyword);
+            var keywordLine = _text.GetLineIndex(keyword.Span.Start);
+            var currentLine = _text.GetLineIndex(CurrentToken.Span.Start);
+            var isEof = CurrentToken.Type == TokType.EndOfFileToken;
+            var sameLine = !isEof && keywordLine == currentLine;
+            var expression = sameLine ? ParseExpression() : null;
+            return new ReturnStatementNode(keyword, expression);
         }
 
         private ExpressionStatementNode? ParseExpressionStatement()
