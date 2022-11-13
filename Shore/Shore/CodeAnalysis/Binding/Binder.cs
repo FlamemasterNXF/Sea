@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Shore.CodeAnalysis.Binding.ControlFlow;
 using Shore.CodeAnalysis.Binding.Converting;
 using Shore.CodeAnalysis.Lowering;
 using Shore.CodeAnalysis.Symbols;
@@ -94,6 +95,10 @@ namespace Shore.CodeAnalysis.Binding
                     var binder = new Binder(parentScope, function);
                     var body = binder.BindStatement(function.Declaration?.Body);
                     var loweredBody = Lowerer.Lower(body);
+                    
+                    if (function.Type != TypeSymbol.Void && !ControlFlowGraph.AllPathsReturn(loweredBody))
+                        binder._diagnostics.ReportAllPathsMustReturn(function.Declaration.Identifier.Span);
+                    
                     functionBodies.Add(function, loweredBody);
 
                     diagnostics.AddRange(binder.Diagnostics);
@@ -281,12 +286,12 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType)
+        private BoundExpression? BindExpression(ExpressionNode node, TypeSymbol? targetType)
         {
             return BindConversion(node, targetType);
         }
 
-        private BoundExpression BindExpression(ExpressionNode node, bool canBeVoid = false)
+        private BoundExpression? BindExpression(ExpressionNode node, bool canBeVoid = false)
         {
             var result = BindExpressionDistributor(node);
             if (!canBeVoid && result.Type == TypeSymbol.Void)
@@ -298,7 +303,7 @@ namespace Shore.CodeAnalysis.Binding
             return result;
         }
 
-        private BoundExpression BindExpressionDistributor(ExpressionNode node, TypeSymbol? targetType)
+        private BoundExpression? BindExpressionDistributor(ExpressionNode node, TypeSymbol? targetType)
         {
             var result = BindExpressionDistributor(node);
             if (targetType != TypeSymbol.Null && result.Type != TypeSymbol.Null && result.Type != targetType)
@@ -306,7 +311,7 @@ namespace Shore.CodeAnalysis.Binding
             return result;
         }
 
-        private BoundExpression BindExpressionDistributor(ExpressionNode node)
+        private BoundExpression? BindExpressionDistributor(ExpressionNode node)
         {
             return node.Type switch
             {
@@ -321,7 +326,7 @@ namespace Shore.CodeAnalysis.Binding
             };
         }
 
-        private BoundExpression BindNameExpression(NameExpressionNode node)
+        private BoundExpression? BindNameExpression(NameExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
 
@@ -340,7 +345,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundVariableExpression(variable);
         }
 
-        private BoundExpression BindAssignmentExpression(AssignmentExpressionNode node)
+        private BoundExpression? BindAssignmentExpression(AssignmentExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpressionDistributor(node.Expression);
@@ -357,13 +362,13 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundAssignmentExpression(variable, convertedExpression);
         }
 
-        private BoundExpression BindLiteralExpression(LiteralExpressionNode? node)
+        private BoundExpression? BindLiteralExpression(LiteralExpressionNode? node)
         {
             var value = node?.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 
-        private BoundExpression BindUnaryExpression(UnaryExpressionNode node)
+        private BoundExpression? BindUnaryExpression(UnaryExpressionNode node)
         {
             var boundOperand = BindExpressionDistributor(node.Operand);
             var boundOperator = BoundUnaryOperator.Bind(node.OperatorToken.Type, boundOperand.Type);
@@ -380,7 +385,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundUnaryExpression(boundOperator, boundOperand);
         }
 
-        private BoundExpression BindBinaryExpression(BinaryExpressionNode node)
+        private BoundExpression? BindBinaryExpression(BinaryExpressionNode node)
         {
             var boundLeft = BindExpressionDistributor(node.Left);
             var boundRight = BindExpressionDistributor(node.Right);
@@ -400,12 +405,12 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
         }
 
-        private BoundExpression BindCallExpression(CallExpressionNode node)
+        private BoundExpression? BindCallExpression(CallExpressionNode node)
         {
             if (node.Arguments.Count == 1 && LookupType(node.Identifier.Text) is TypeSymbol type)
                 return BindConversion(node.Arguments[0], type, allowExplicit: true);
 
-            var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
+            ImmutableArray<BoundExpression?>.Builder boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
             foreach (var argument in node.Arguments)
             {
@@ -440,14 +445,14 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundCallExpression(function, boundArguments.ToImmutable());
         }
 
-        private BoundExpression BindConversion(ExpressionNode node, TypeSymbol? type, bool allowExplicit = false)
+        private BoundExpression? BindConversion(ExpressionNode node, TypeSymbol? type, bool allowExplicit = false)
         {
             var expression = BindExpression(node);
             return BindConversion(node.Span, expression, type, allowExplicit);
 
         }
 
-        private BoundExpression BindConversion(TextSpan diagnosticSpan, BoundExpression expression, TypeSymbol? type, 
+        private BoundExpression? BindConversion(TextSpan diagnosticSpan, BoundExpression? expression, TypeSymbol? type, 
             bool allowExplicit = false)
         {
             var conversion = Conversion.Classify(expression.Type, type);

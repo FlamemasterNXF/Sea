@@ -114,7 +114,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        public virtual BoundExpression RewriteExpression(BoundExpression node)
+        public virtual BoundExpression? RewriteExpression(BoundExpression? node)
         {
             return node.Kind switch
             {
@@ -130,13 +130,13 @@ namespace Shore.CodeAnalysis.Binding
             };
         }
 
-        protected virtual BoundExpression RewriteNullExpression(BoundNullExpression node) => node;
+        protected virtual BoundExpression? RewriteNullExpression(BoundNullExpression? node) => node;
         
-        protected virtual BoundExpression RewriteLiteralExpression(BoundLiteralExpression node) => node;
+        protected virtual BoundExpression? RewriteLiteralExpression(BoundLiteralExpression? node) => node;
 
-        protected virtual BoundExpression RewriteVariableExpression(BoundVariableExpression node) => node;
+        protected virtual BoundExpression? RewriteVariableExpression(BoundVariableExpression? node) => node;
 
-        protected virtual BoundExpression RewriteAssignmentExpression(BoundAssignmentExpression node)
+        protected virtual BoundExpression? RewriteAssignmentExpression(BoundAssignmentExpression? node)
         {
             var expression = RewriteExpression(node.Expression);
             if (expression == node.Expression) return node;
@@ -144,7 +144,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundAssignmentExpression(node.Variable, expression);
         }
 
-        protected virtual BoundExpression RewriteUnaryExpression(BoundUnaryExpression node)
+        protected virtual BoundExpression? RewriteUnaryExpression(BoundUnaryExpression? node)
         {
             var operand = RewriteExpression(node.Operand);
             if (operand == node.Operand) return node;
@@ -152,7 +152,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundUnaryExpression(node.Op, operand);
         }
 
-        protected virtual BoundExpression RewriteBinaryExpression(BoundBinaryExpression node)
+        protected virtual BoundExpression? RewriteBinaryExpression(BoundBinaryExpression? node)
         {
             var left = RewriteExpression(node.Left);
             var right = RewriteExpression(node.Right);
@@ -161,9 +161,9 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundBinaryExpression(left, node.Op, right);
         }
 
-        protected virtual BoundExpression RewriteCallExpression(BoundCallExpression node)
+        protected virtual BoundExpression? RewriteCallExpression(BoundCallExpression? node)
         {
-            ImmutableArray<BoundExpression>.Builder? builder = null;
+            ImmutableArray<BoundExpression?>.Builder? builder = null;
 
             for (int i = 0; i < node.Arguments.Length; i++)
             {
@@ -181,7 +181,7 @@ namespace Shore.CodeAnalysis.Binding
             return builder is null ? node : new BoundCallExpression(node.Function, builder.MoveToImmutable());
         }
 
-        protected virtual BoundExpression RewriteConversionExpression(BoundConversionExpression node)
+        protected virtual BoundExpression? RewriteConversionExpression(BoundConversionExpression? node)
         {
             var expression = RewriteExpression(node.Expression);
             if (expression == node.Expression) return node;

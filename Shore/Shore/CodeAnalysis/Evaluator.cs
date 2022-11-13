@@ -10,7 +10,7 @@ namespace Shore.CodeAnalysis
         private readonly Stack<Dictionary<VariableSymbol, object?>> _locals = new();
         private object? _lastValue;
 
-        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object?> variables)
+        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object> variables)
         {
             _program = program;
             _globals = variables;
@@ -82,7 +82,7 @@ namespace Shore.CodeAnalysis
         private void EvaluateExpressionStatement(BoundExpressionStatement node) =>
             _lastValue = EvaluateExpression(node.Expression);
 
-        private object? EvaluateExpression(BoundExpression node)
+        private object? EvaluateExpression(BoundExpression? node)
         {
             switch (node)
             {

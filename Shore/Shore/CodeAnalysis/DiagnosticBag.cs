@@ -161,5 +161,11 @@ namespace Shore.CodeAnalysis
             var message = $"Expected an expression of Type '{type}'.";
             ReportError(span, message);
         }
+
+        public void ReportAllPathsMustReturn(TextSpan span)
+        {
+            var message = "Not all code paths return a value.";
+            ReportError(span, message);
+        }
     }
 }

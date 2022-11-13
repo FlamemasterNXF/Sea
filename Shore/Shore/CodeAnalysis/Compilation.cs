@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Shore.CodeAnalysis.Binding;
+using Shore.CodeAnalysis.Binding.ControlFlow;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
 
@@ -42,8 +43,18 @@ namespace Shore.CodeAnalysis
         {
             var diagnostics = NodeTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToImmutableArray();
             if (diagnostics.Any()) return new EvaluationResult(diagnostics, null);
-
+            
             var program = Binder.BindProgram(GlobalScope);
+            
+            var appPath = Environment.GetCommandLineArgs()[0];
+            var appDirectory = Path.GetDirectoryName(appPath);
+            var cfgPath = Path.Combine(appDirectory, "cfg.dot");
+            var cfgStatement = !program.Statement.Statements.Any() && program.Functions.Any()
+                ? program.Functions.Last().Value
+                : program.Statement;
+            var cfg = ControlFlowGraph.Create(cfgStatement);
+            using (var streamWriter = new StreamWriter(cfgPath)) cfg.WriteTo(streamWriter);
+            
             if (program.Diagnostics.Any()) return new EvaluationResult(program.Diagnostics.ToImmutableArray(), null);
             
 
