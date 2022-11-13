@@ -55,7 +55,17 @@ namespace Shore.CodeAnalysis
         public void EmitTree(TextWriter writer)
         {
             var program = Binder.BindProgram(GlobalScope);
-            program.Statement.WriteTo(writer);
+
+            if (program.Statement.Statements.Any()) program.Statement.WriteTo(writer);
+            else
+            {
+                foreach (var function in program.Functions
+                             .Where(function => GlobalScope.Functions.Contains(function.Key)))
+                {
+                    function.Key.WriteTo(writer);
+                    function.Value.WriteTo(writer);
+                }
+            }
         }
     }
 }
