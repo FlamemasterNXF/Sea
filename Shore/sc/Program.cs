@@ -7,12 +7,12 @@ namespace sc
 {
     internal static class Program
     {
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
             if (args.Length == 0)
             {
                 Console.Error.WriteLine("Invalid Script Passed to MC: <path>");
-                return;
+                return 1;
             }
 
             var paths = GetFilePaths(args);
@@ -32,13 +32,19 @@ namespace sc
                 nodeTrees.Add(nodeTree);
             }
 
-            if (hasErrors) return;
+            if (hasErrors) return 1;
             
             var compilation = new Compilation(nodeTrees.ToArray());
             var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
 
             if (!result.Diagnostics.Any() && result.Value is not null) Console.WriteLine(result.Value);
-            else Console.Error.WriteDiagnostics(result.Diagnostics);
+            else
+            {
+                Console.Error.WriteDiagnostics(result.Diagnostics);
+                return 1;
+            }
+
+            return 0;
         }
 
         private static IEnumerable<string> GetFilePaths(IEnumerable<string> paths)
