@@ -10,17 +10,17 @@ namespace Shore.CodeAnalysis
     {
         private BoundGlobalScope? _globalScope;
         public Compilation? Previous { get; }
-        public NodeTree NodeTree { get; }
+        public ImmutableArray<NodeTree> NodeTrees { get; }
 
-        public Compilation(NodeTree nodeTree)
-            : this(null, nodeTree)
+        public Compilation(params NodeTree[] nodeTrees)
+            : this(null, nodeTrees)
         {
         }
 
-        private Compilation(Compilation? previous, NodeTree nodeTree)
+        private Compilation(Compilation? previous, params NodeTree[] nodeTrees)
         {
             Previous = previous;
-            NodeTree = nodeTree;
+            NodeTrees = nodeTrees.ToImmutableArray();
         }
 
         internal BoundGlobalScope GlobalScope
@@ -29,7 +29,7 @@ namespace Shore.CodeAnalysis
             {
                 if (_globalScope == null)
                 {
-                    var globalScope = Binder.BindGlobalScope(Previous?.GlobalScope, NodeTree.Root);
+                    var globalScope = Binder.BindGlobalScope(Previous?.GlobalScope, NodeTrees);
                     Interlocked.CompareExchange(ref _globalScope, globalScope, null);
                 }
 
@@ -41,7 +41,9 @@ namespace Shore.CodeAnalysis
 
         public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
-            var diagnostics = NodeTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToImmutableArray();
+            var parseDiagnostics = NodeTrees.SelectMany(nt => nt.Diagnostics);
+
+            var diagnostics = parseDiagnostics.Concat(GlobalScope.Diagnostics).ToImmutableArray();
             if (diagnostics.Any()) return new EvaluationResult(diagnostics, null);
             
             var program = Binder.BindProgram(GlobalScope);

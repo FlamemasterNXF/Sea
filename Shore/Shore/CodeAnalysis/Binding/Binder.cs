@@ -55,17 +55,20 @@ namespace Shore.CodeAnalysis.Binding
             return parent;
         }
 
-        public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitNode node)
+        public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, ImmutableArray<NodeTree> nodeTrees)
         {
             var parentScope = CreateParentScope(previous);
             var binder = new Binder(parentScope, null);
 
-            foreach (var function in node.Members.OfType<FunctionDeclarationNode>())
-                binder.BindFunctionDeclaration(function);
+            var functionDeclarations = nodeTrees.SelectMany(nt => nt.Root.Members).OfType<FunctionDeclarationNode>();
+            
+            foreach (var function in functionDeclarations) binder.BindFunctionDeclaration(function);
 
+            var globalStatements = nodeTrees.SelectMany(nt => nt.Root.Members).OfType<GlobalStatementNode>();
+            
             var statements = ImmutableArray.CreateBuilder<BoundStatement>();
 
-            foreach (var globalStatement in node.Members.OfType<GlobalStatementNode>())
+            foreach (var globalStatement in globalStatements)
             {
                 var statement = binder.BindStatement(globalStatement.Statement);
                 statements.Add(statement);

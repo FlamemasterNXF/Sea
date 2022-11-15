@@ -15,25 +15,44 @@ namespace sc
                 return;
             }
 
-            if (args.Length > 1)
+            var paths = GetFilePaths(args);
+            var nodeTrees = new List<NodeTree>();
+            var hasErrors = false;
+
+            foreach (var path in paths)
             {
-                Console.WriteLine("Multiple File Paths are Unsupported");
-                return;
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine($"fatal: File '{(string)path}' doesn't exist");
+                    hasErrors = true;
+                    continue;
+                }
+
+                var nodeTree = NodeTree.Load(path);
+                nodeTrees.Add(nodeTree);
             }
 
-            var path = args.Single();
-            if (!File.Exists(path))
-            {
-                Console.WriteLine($"fatal: File '{path}' doesn't exist");
-                return;
-            }
-
-            var nodeTree = NodeTree.Load(path);
-            var compilation = new Compilation(nodeTree);
+            if (hasErrors) return;
+            
+            var compilation = new Compilation(nodeTrees.ToArray());
             var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
 
             if (!result.Diagnostics.Any() && result.Value is not null) Console.WriteLine(result.Value);
             else Console.Error.WriteDiagnostics(result.Diagnostics);
+        }
+
+        private static IEnumerable<string> GetFilePaths(IEnumerable<string> paths)
+        {
+            var result = new SortedSet<string>();
+
+            foreach (var path in paths)
+            {
+                if (Directory.Exists(path))
+                    result.UnionWith(Directory.EnumerateFiles(path, "*.sea", SearchOption.AllDirectories));
+                else result.Add(path);
+            }
+
+            return result;
         }
     }
 }
