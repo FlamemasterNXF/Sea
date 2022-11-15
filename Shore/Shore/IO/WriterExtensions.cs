@@ -7,10 +7,12 @@ namespace Shore.IO
 {
     public static class WriterExtensions
     {
-        private static bool IsConsoleOut(this TextWriter writer)
+        private static bool IsConsole(this TextWriter writer)
         {
-            if (writer == Console.Out) return true;
-            return writer is IndentedTextWriter itw && itw.InnerWriter.IsConsoleOut();
+            if (writer == Console.Out) return !Console.IsOutputRedirected;
+            if (writer == Console.Error) return !Console.IsErrorRedirected && !Console.IsOutputRedirected;
+            
+            return writer is IndentedTextWriter iw && iw.InnerWriter.IsConsole();
         }
 
         public static void WriteDiagnostics(this TextWriter writer, IEnumerable<Diagnostic> diagnostics)
@@ -59,12 +61,12 @@ namespace Shore.IO
 
         public static void SetForeground(this TextWriter writer, ConsoleColor color)
         {
-            if (writer.IsConsoleOut()) Console.ForegroundColor = color;
+            if (writer.IsConsole()) Console.ForegroundColor = color;
         }
         
         public static void ResetForeground(this TextWriter writer)
         {
-            if (writer.IsConsoleOut()) Console.ResetColor();
+            if (writer.IsConsole()) Console.ResetColor();
         }
         
         public static void WriteKeyword(this TextWriter writer, string text)
