@@ -4,7 +4,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
     {
         public Token Keyword { get; }
 
-        public ContinueStatementNode(Token keyword)
+        public ContinueStatementNode(NodeTree nodeTree, Token keyword)
+            : base(nodeTree)
         {
             Keyword = keyword;
         }

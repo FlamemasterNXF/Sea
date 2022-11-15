@@ -6,7 +6,9 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public Token EqualsToken { get; }
         public ExpressionNode Expression { get; }
 
-        public AssignmentExpressionNode(Token identifierToken, Token equalsToken, ExpressionNode expression)
+        public AssignmentExpressionNode(NodeTree nodeTree, Token identifierToken, Token equalsToken,
+            ExpressionNode expression)
+            : base(nodeTree)
         {
             IdentifierToken = identifierToken;
             EqualsToken = equalsToken;

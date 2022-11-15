@@ -6,20 +6,20 @@ namespace Shore.CodeAnalysis
     {
         public bool IsError { get; }
         public bool IsWarning { get; }
-        public TextSpan Span { get; }
+        public TextLocation Location { get; }
         public string Message { get; }
 
-        public Diagnostic(bool isError, TextSpan span, string message)
+        public Diagnostic(bool isError, TextLocation location, string message)
         {
             IsError = isError;
             IsWarning = !isError;
-            Span = span;
+            Location = location;
             Message = message;
         }
         
         public override string ToString() => Message;
 
-        public static Diagnostic Error(TextSpan span, string message) => new Diagnostic(true, span, message);
-        public static Diagnostic Warning(TextSpan span, string message) => new Diagnostic(false, span, message);
+        public static Diagnostic Error(TextLocation location, string message) => new Diagnostic(true, location, message);
+        public static Diagnostic Warning(TextLocation location, string message) => new Diagnostic(false, location, message);
     }
 }

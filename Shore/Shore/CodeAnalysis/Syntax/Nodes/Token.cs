@@ -11,7 +11,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public bool IsMissing => Text == null;
         public override TextSpan Span => new TextSpan(Position, Text?.Length ?? 0);
 
-        public Token(TokType type, int position, string? text, object? value)
+        public Token(NodeTree nodeTree, TokType type, int position, string? text, object? value)
+            : base(nodeTree)
         {
             Type = type;
             Position = position;

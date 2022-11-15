@@ -4,11 +4,13 @@ namespace Shore.Text
 {
     public sealed class SourceText
     {
+        public string FileName { get; }
         private readonly string _text;
         public ImmutableArray<TextLine> Lines { get;  }
 
-        private SourceText(string text)
+        private SourceText(string text, string fileName)
         {
+            FileName = fileName;
             _text = text;
             Lines = ParseLines(this, text);
         }
@@ -86,7 +88,7 @@ namespace Shore.Text
             }
         }
 
-        public static SourceText From(string text) => new SourceText(text);
+        public static SourceText From(string text, string fileName="REPL") => new SourceText(text, fileName);
         public override string ToString() => _text;
         public string ToString(int start, int length) => _text.Substring(start, length);
         public string ToString(TextSpan span) => ToString(span.Start, span.Length);

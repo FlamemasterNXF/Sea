@@ -6,7 +6,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public ExpressionNode Expression { get; }
         public Token CloseParen { get; }
 
-        public ParenthesisExpressionNode(Token openParen, ExpressionNode expression, Token closeParen)
+        public ParenthesisExpressionNode(NodeTree nodeTree, Token openParen, ExpressionNode expression, Token closeParen)
+            : base(nodeTree)
         {
             OpenParen = openParen;
             Expression = expression;

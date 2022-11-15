@@ -6,7 +6,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public Token OperatorToken { get; }
         public ExpressionNode Right { get; }
 
-        public BinaryExpressionNode(ExpressionNode left, Token operatorToken, ExpressionNode right)
+        public BinaryExpressionNode(NodeTree nodeTree, ExpressionNode left, Token operatorToken, ExpressionNode right)
+            : base(nodeTree)
         {
             Left = left;
             OperatorToken = operatorToken;

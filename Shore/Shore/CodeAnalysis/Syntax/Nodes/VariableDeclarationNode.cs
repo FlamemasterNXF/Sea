@@ -8,7 +8,9 @@
         public ExpressionNode Initializer { get; }
         public override TokType Type => TokType.VariableDeclarationStatement;
 
-        public VariableDeclarationNode(Token type, Token identifier, Token equalsToken, ExpressionNode initializer)
+        public VariableDeclarationNode(NodeTree nodeTree, Token type, Token identifier, Token equalsToken,
+            ExpressionNode initializer)
+            : base(nodeTree)
         {
             VType = type;
             Identifier = identifier;

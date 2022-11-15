@@ -9,7 +9,10 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public Token CloseBraceToken { get; }
         public override TokType Type => TokType.BlockStatement;
 
-        public BlockStatementNode(Token openBraceToken, ImmutableArray<StatementNode?> statements, Token closeBraceToken)
+        public BlockStatementNode(NodeTree nodeTree, Token openBraceToken, ImmutableArray<StatementNode?> statements,
+            Token closeBraceToken)
+            : base(nodeTree)
+
         {
             OpenBraceToken = openBraceToken;
             Statements = statements;

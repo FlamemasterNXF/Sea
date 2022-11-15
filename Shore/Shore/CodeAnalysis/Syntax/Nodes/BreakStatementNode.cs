@@ -4,7 +4,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
     {
         public Token Keyword { get; }
 
-        public BreakStatementNode(Token keyword)
+        public BreakStatementNode(NodeTree nodeTree, Token keyword)
+            : base(nodeTree)
         {
             Keyword = keyword;
         }

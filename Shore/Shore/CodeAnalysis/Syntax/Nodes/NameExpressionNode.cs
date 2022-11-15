@@ -4,7 +4,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
     {
         public Token IdentifierToken { get; }
 
-        public NameExpressionNode(Token identifierToken)
+        public NameExpressionNode(NodeTree nodeTree, Token identifierToken)
+            : base(nodeTree)
         {
             IdentifierToken = identifierToken;
         }

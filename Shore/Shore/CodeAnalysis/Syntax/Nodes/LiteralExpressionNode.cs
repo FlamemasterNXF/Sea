@@ -5,15 +5,16 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public Token LiteralToken { get; }
         public object? Value { get; }
 
-        public LiteralExpressionNode(Token literalToken, object? value)
+        public LiteralExpressionNode(NodeTree nodeTree, Token literalToken)
+            : this(nodeTree, literalToken, literalToken.Value)
+        {
+        }
+        
+        public LiteralExpressionNode(NodeTree nodeTree, Token literalToken, object? value)
+            : base(nodeTree)
         {
             LiteralToken = literalToken;
             Value = value;
-        }
-        
-        public LiteralExpressionNode(Token literalToken)
-            : this(literalToken, literalToken.Value)
-        {
         }
 
         public override TokType Type => TokType.LiteralExpression;

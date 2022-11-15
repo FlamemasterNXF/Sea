@@ -5,7 +5,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public Token OperatorToken { get; }
         public ExpressionNode Operand { get; }
 
-        public UnaryExpressionNode(Token operatorToken, ExpressionNode operand)
+        public UnaryExpressionNode(NodeTree nodeTree, Token operatorToken, ExpressionNode operand)
+            : base (nodeTree)
         {
             OperatorToken = operatorToken;
             Operand = operand;

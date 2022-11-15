@@ -6,16 +6,17 @@ namespace Shore.CodeAnalysis.Syntax
 {
     internal sealed class Parser
     {
+        private readonly NodeTree _nodeTree;
         private DiagnosticBag _diagnostics = new DiagnosticBag();
         private readonly SourceText _text;
         private readonly ImmutableArray<Token> _tokens;
         private int _position;
 
-        public Parser(SourceText text)
+        public Parser(NodeTree nodeTree)
         {
             var tokens = new List<Token>();
 
-            var lexer = new Lexer(text);
+            var lexer = new Lexer(nodeTree);
             Token token;
 
             do {
@@ -23,7 +24,8 @@ namespace Shore.CodeAnalysis.Syntax
                 if (token.Type != TokType.WhitespaceToken && token.Type != TokType.UnknownToken) tokens.Add(token);
             } while (token.Type != TokType.EndOfFileToken);
 
-            _text = text;
+            _nodeTree = nodeTree;
+            _text = nodeTree.Text;
             _tokens = tokens.ToImmutableArray();
             _diagnostics.AddRange(lexer.Diagnostics);
         }
@@ -49,8 +51,8 @@ namespace Shore.CodeAnalysis.Syntax
         {
             if (CurrentToken.Type == type) return NextToken();
             
-            _diagnostics.ReportUnexpectedToken(CurrentToken.Span, CurrentToken.Type, type);
-            return new Token(type, CurrentToken.Position, null, null);
+            _diagnostics.ReportUnexpectedToken(CurrentToken.Location, CurrentToken.Type, type);
+            return new Token(_nodeTree, type, CurrentToken.Position, null, null);
         }
         
         private ExpressionNode ParseExpression()
@@ -65,7 +67,7 @@ namespace Shore.CodeAnalysis.Syntax
                 var identifierToken = NextToken();
                 var operatorToken = NextToken();
                 var right = ParseAssignmentExpression();
-                return new AssignmentExpressionNode(identifierToken, operatorToken, right);
+                return new AssignmentExpressionNode(_nodeTree, identifierToken, operatorToken, right);
             }
 
             return ParseBinaryExpression();
@@ -79,7 +81,7 @@ namespace Shore.CodeAnalysis.Syntax
             {
                 var operatorToken = NextToken();
                 var operand = ParseBinaryExpression(unaryOperatorPrecedence);
-                left = new UnaryExpressionNode(operatorToken, operand);
+                left = new UnaryExpressionNode(_nodeTree, operatorToken, operand);
             }
             else
             {
@@ -93,7 +95,7 @@ namespace Shore.CodeAnalysis.Syntax
 
                 var operatorToken = NextToken();
                 var right = ParseBinaryExpression(precedence);
-                left = new BinaryExpressionNode(left, operatorToken, right);
+                left = new BinaryExpressionNode(_nodeTree, left, operatorToken, right);
             }
 
             return left;
@@ -103,7 +105,7 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var members = ParseMembers();
             var eof = MatchToken(TokType.EndOfFileToken);
-            return new CompilationUnitNode(members, eof);
+            return new CompilationUnitNode(_nodeTree, members, eof);
         }
 
         private ImmutableArray<MemberNode> ParseMembers()
@@ -137,7 +139,7 @@ namespace Shore.CodeAnalysis.Syntax
             var parameters = ParseParameterList();
             var closeParenToken= MatchToken(TokType.CloseParenToken);
             var body = ParseBlockStatement();
-            return new FunctionDeclarationNode(functionKeyword, type, identifier, openParenToken, parameters,
+            return new FunctionDeclarationNode(_nodeTree, functionKeyword, type, identifier, openParenToken, parameters,
                 closeParenToken, body);
         }
 
@@ -166,13 +168,13 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var type = MatchToken(CurrentToken.Type);
             var identifier = MatchToken(TokType.IdentifierToken);
-            return new ParameterNode(type, identifier);
+            return new ParameterNode(_nodeTree, type, identifier);
         }
 
         private MemberNode ParseGlobalStatement()
         {
             var statement = ParseStatement();
-            return new GlobalStatementNode(statement);
+            return new GlobalStatementNode(_nodeTree, statement);
         }
 
         private StatementNode? ParseStatement()
@@ -212,7 +214,7 @@ namespace Shore.CodeAnalysis.Syntax
 
             var closeBraceToken = MatchToken(TokType.CloseBraceToken);
 
-            return new BlockStatementNode(openBraceToken, statements.ToImmutable(), closeBraceToken);
+            return new BlockStatementNode(_nodeTree, openBraceToken, statements.ToImmutable(), closeBraceToken);
         }
 
         private StatementNode? ParseVariableDeclaration()
@@ -221,7 +223,7 @@ namespace Shore.CodeAnalysis.Syntax
             var identifier = MatchToken(TokType.IdentifierToken);
             var equals = MatchToken(TokType.EqualsToken);
             var initializer = ParseExpression();
-            return new VariableDeclarationNode(keyword, identifier, equals, initializer);
+            return new VariableDeclarationNode(_nodeTree, keyword, identifier, equals, initializer);
         }
 
         private StatementNode? ParseIfStatement()
@@ -230,7 +232,7 @@ namespace Shore.CodeAnalysis.Syntax
             var condition = ParseExpression();
             var statement = ParseStatement();
             var elseClause = ParseElseStatement();
-            return new IfStatementNode(keyword, condition, statement, elseClause);
+            return new IfStatementNode(_nodeTree, keyword, condition, statement, elseClause);
         }
 
         private ElseNode ParseElseStatement()
@@ -239,7 +241,7 @@ namespace Shore.CodeAnalysis.Syntax
 
             var keyword = NextToken();
             var statement = ParseStatement();
-            return new ElseNode(keyword, statement);
+            return new ElseNode(_nodeTree, keyword, statement);
         }
 
         private StatementNode? ParseWhileStatement()
@@ -247,7 +249,7 @@ namespace Shore.CodeAnalysis.Syntax
             var keyword = MatchToken(TokType.WhileKeyword);
             var condition = ParseExpression();
             var body = ParseStatement();
-            return new WhileStatementNode(keyword, condition, body);
+            return new WhileStatementNode(_nodeTree, keyword, condition, body);
         }
 
         private StatementNode? ParseForStatement()
@@ -259,19 +261,19 @@ namespace Shore.CodeAnalysis.Syntax
             var untilKeyword = MatchToken(TokType.UntilKeyword);
             var upperBound = ParseExpression();
             var body = ParseStatement();
-            return new ForStatementNode(keyword, identifier, equalsToken, lowerBound, untilKeyword, upperBound, body);
+            return new ForStatementNode(_nodeTree, keyword, identifier, equalsToken, lowerBound, untilKeyword, upperBound, body);
         }
 
         private StatementNode ParseBreakStatement()
         {
             var keyword = MatchToken(TokType.BreakKeyword);
-            return new BreakStatementNode(keyword);
+            return new BreakStatementNode(_nodeTree, keyword);
         }
         
         private StatementNode ParseContinueStatement()
         {
             var keyword = MatchToken(TokType.ContinueKeyword);
-            return new ContinueStatementNode(keyword);
+            return new ContinueStatementNode(_nodeTree, keyword);
         }
 
         private StatementNode ParseReturnStatement()
@@ -282,13 +284,13 @@ namespace Shore.CodeAnalysis.Syntax
             var isEof = CurrentToken.Type == TokType.EndOfFileToken;
             var sameLine = !isEof && keywordLine == currentLine;
             var expression = sameLine ? ParseExpression() : null;
-            return new ReturnStatementNode(keyword, expression);
+            return new ReturnStatementNode(_nodeTree, keyword, expression);
         }
 
         private ExpressionStatementNode? ParseExpressionStatement()
         {
             var expression = ParseExpression();
-            return new ExpressionStatementNode(expression);
+            return new ExpressionStatementNode(_nodeTree, expression);
         }
         
         private ExpressionNode ParsePrimaryExpression()
@@ -310,26 +312,26 @@ namespace Shore.CodeAnalysis.Syntax
             var left = MatchToken(TokType.OpenParenToken);
             var expression = ParseExpression();
             var right = MatchToken(TokType.CloseParenToken);
-            return new ParenthesisExpressionNode(left, expression, right);
+            return new ParenthesisExpressionNode(_nodeTree, left, expression, right);
         }
 
         private ExpressionNode ParseBooleanLiteral()
         {
             var isTrue = CurrentToken.Type == TokType.TrueKeyword;
             var keywordToken = isTrue ? MatchToken(TokType.TrueKeyword) : MatchToken(TokType.FalseKeyword);
-            return new LiteralExpressionNode(keywordToken, isTrue);
+            return new LiteralExpressionNode(_nodeTree, keywordToken, isTrue);
         }
 
         private ExpressionNode ParseNumberLiteral()
         {
             var numberToken = MatchToken(TokType.NumberToken);
-            return new LiteralExpressionNode(numberToken);
+            return new LiteralExpressionNode(_nodeTree, numberToken);
         }
         
         private ExpressionNode ParseStringLiteral()
         {
             var stringToken = MatchToken(TokType.StringToken);
-            return new LiteralExpressionNode(stringToken);
+            return new LiteralExpressionNode(_nodeTree, stringToken);
         }
 
         private ExpressionNode ParseNameOrCallExpression()
@@ -346,7 +348,7 @@ namespace Shore.CodeAnalysis.Syntax
             var openParenToken = MatchToken(TokType.OpenParenToken);
             var arguments = ParseArguments();
             var closeParenToken = MatchToken(TokType.CloseParenToken);
-            return new CallExpressionNode(identifier, openParenToken, arguments, closeParenToken);
+            return new CallExpressionNode(_nodeTree, identifier, openParenToken, arguments, closeParenToken);
         }
 
         private SeparatedNodeList<ExpressionNode> ParseArguments()
@@ -373,7 +375,7 @@ namespace Shore.CodeAnalysis.Syntax
         private ExpressionNode ParseNameExpression()
         {
             var identifierToken = MatchToken(TokType.IdentifierToken);
-            return new NameExpressionNode(identifierToken);
+            return new NameExpressionNode(_nodeTree, identifierToken);
         }
     }
 }

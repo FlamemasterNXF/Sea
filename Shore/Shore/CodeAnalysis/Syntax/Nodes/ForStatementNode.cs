@@ -11,8 +11,9 @@
         public StatementNode? Body { get; }
         public override TokType Type => TokType.ForStatement;
 
-        public ForStatementNode(Token keyword, Token identifier, Token equalsToken, ExpressionNode lowerBound,
-            Token untilToken, ExpressionNode upperBound, StatementNode? body)
+        public ForStatementNode(NodeTree nodeTree, Token keyword, Token identifier, Token equalsToken,
+            ExpressionNode lowerBound, Token untilToken, ExpressionNode upperBound, StatementNode? body)
+            : base (nodeTree)
         {
             Keyword = keyword;
             Identifier = identifier;

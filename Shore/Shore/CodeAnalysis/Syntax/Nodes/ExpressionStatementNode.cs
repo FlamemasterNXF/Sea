@@ -5,7 +5,8 @@
         public ExpressionNode Expression { get; }
         public override TokType Type => TokType.ExpressionStatement;
 
-        public ExpressionStatementNode(ExpressionNode expression)
+        public ExpressionStatementNode(NodeTree nodeTree, ExpressionNode expression)
+            : base(nodeTree)
         {
             Expression = expression;
         }

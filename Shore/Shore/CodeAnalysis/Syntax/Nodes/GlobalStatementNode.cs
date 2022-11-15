@@ -5,7 +5,8 @@
         public StatementNode? Statement { get; }
         public override TokType Type => TokType.GlobalStatement;
 
-        public GlobalStatementNode(StatementNode? statement)
+        public GlobalStatementNode(NodeTree nodeTree, StatementNode? statement)
+            : base (nodeTree)
         {
             Statement = statement;
         }

@@ -8,7 +8,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public Token EndOfFileToken { get; }
         public override TokType Type => TokType.CompilationUnit;
 
-        public CompilationUnitNode(ImmutableArray<MemberNode> members, Token endOfFileToken)
+        public CompilationUnitNode(NodeTree nodeTree, ImmutableArray<MemberNode> members, Token endOfFileToken)
+            : base(nodeTree)
         {
             Members = members;
             EndOfFileToken = endOfFileToken;

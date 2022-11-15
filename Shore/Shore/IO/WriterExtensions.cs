@@ -13,29 +13,35 @@ namespace Shore.IO
             return writer is IndentedTextWriter itw && itw.InnerWriter.IsConsoleOut();
         }
 
-        public static void WriteDiagnostics(this TextWriter writer, IEnumerable<Diagnostic> diagnostics,
-            NodeTree nodeTree)
+        public static void WriteDiagnostics(this TextWriter writer, IEnumerable<Diagnostic> diagnostics)
         {
-            foreach (var diagnostic in diagnostics.OrderBy(d => d.Span.Start).ThenBy(d => d.Span.Length))
+            foreach (var diagnostic in diagnostics.OrderBy(d => d.Location.FileName)
+                         .ThenBy(d => d.Location.Span.Start).ThenBy(d => d.Location.Span.Length))
             {
-                var lineIndex = nodeTree.Text.GetLineIndex(diagnostic.Span.Start);
-                var line = nodeTree.Text.Lines[lineIndex];
-                var lineNumber = lineIndex + 1;
-                var character = diagnostic.Span.Start - line.Start + 1;
+                var text = diagnostic.Location.Text;
+                var fileName = diagnostic.Location.FileName;
+                var startLine = diagnostic.Location.StartLine + 1;
+                var startCharacter = diagnostic.Location.StartCharacter + 1;
+                var endLine = diagnostic.Location.EndLine + 1;
+                var endCharacter = diagnostic.Location.EndCharacter + 1;
 
+                var span = diagnostic.Location.Span;
+                var lineIndex = text.GetLineIndex(span.Start);
+                var line = text.Lines[lineIndex];
+                
                 Console.WriteLine();
 
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write($"({lineNumber}, {character}): ");
+                Console.Write($"{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): ");
                 Console.WriteLine(diagnostic);
                 Console.ResetColor();
 
-                var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
-                var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
+                var prefixSpan = TextSpan.FromBounds(line.Start, span.Start);
+                var suffixSpan = TextSpan.FromBounds(span.End, line.End);
 
-                var prefix = nodeTree.Text.ToString(prefixSpan);
-                var error = nodeTree.Text.ToString(diagnostic.Span);
-                var suffix = nodeTree.Text.ToString(suffixSpan);
+                var prefix = text.ToString(prefixSpan);
+                var error = text.ToString(span);
+                var suffix = text.ToString(suffixSpan);
 
                 Console.Write("    ");
                 Console.Write(prefix);

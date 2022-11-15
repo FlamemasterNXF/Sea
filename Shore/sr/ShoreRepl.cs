@@ -97,7 +97,7 @@ namespace Shore
 
                 _previous = compilation;
             }
-            else Console.Out.WriteDiagnostics(result.Diagnostics, nodeTree);
+            else Console.Out.WriteDiagnostics(result.Diagnostics);
         }
     }
 }

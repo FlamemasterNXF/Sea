@@ -9,14 +9,32 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public ImmutableArray<Diagnostic> Diagnostics { get; }
         public CompilationUnitNode Root { get; }
 
-        private NodeTree(SourceText text)
+        private delegate void ParseHandler(NodeTree tree, out CompilationUnitNode? root,
+            out ImmutableArray<Diagnostic> diagnostics);
+
+        private NodeTree(SourceText text, ParseHandler handler)
         {
-            var parser = new Parser(text);
-            var root = parser.ParseCompilationUnit();
-            
             Text = text;
-            Diagnostics = parser.Diagnostics.ToImmutableArray();
+
+            handler(this, out var root, out var diagnostics);
+            
+            Diagnostics = diagnostics;
             Root = root;
+        }
+
+        public static NodeTree Load(string fileName)
+        {
+            var text = File.ReadAllText(fileName);
+            var sourceText = SourceText.From(text, fileName);
+            return Parse(sourceText);
+        }
+
+        private static void Parse(NodeTree nodeTree, out CompilationUnitNode root,
+            out ImmutableArray<Diagnostic> diagnostics)
+        {
+            var parser = new Parser(nodeTree);
+            root = parser.ParseCompilationUnit();
+            diagnostics = parser.Diagnostics.ToImmutableArray();
         }
 
         public static NodeTree Parse(string text)
@@ -25,7 +43,7 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
             return Parse(sourceText);
         }
 
-        private static NodeTree Parse(SourceText text) => new NodeTree(text);
+        private static NodeTree Parse(SourceText text) => new NodeTree(text, Parse);
 
         public static ImmutableArray<Token> ParseTokens(string text)
         {
@@ -43,20 +61,31 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
 
         public static ImmutableArray<Token> ParseTokens(SourceText text, out ImmutableArray<Diagnostic> diagnostics)
         {
-            IEnumerable<Token> LexTokens(Lexer lexer)
+            var tokens = new List<Token>();
+
+            void ParseTokens(NodeTree tree, out CompilationUnitNode? root, out ImmutableArray<Diagnostic> diagnostics)
             {
+                root = null;
+
+                var lexer = new Lexer(tree);
                 while (true)
                 {
                     var token = lexer.Lex();
-                    if (token.Type == TokType.EndOfFileToken) break;
-                    yield return token;
+                    if (token.Type == TokType.EndOfFileToken)
+                    {
+                        root = new CompilationUnitNode(tree, ImmutableArray<MemberNode>.Empty, token);
+                        break;
+                    }
+                    
+                    tokens.Add(token);
                 }
+
+                diagnostics = lexer.Diagnostics.ToImmutableArray();
             }
 
-            var lexer = new Lexer(text);
-            var result = LexTokens(lexer).ToImmutableArray();
-            diagnostics = lexer.Diagnostics.ToImmutableArray();
-            return result;
+            var nodeTree = new NodeTree(text, ParseTokens);
+            diagnostics = nodeTree.Diagnostics.ToImmutableArray();
+            return tokens.ToImmutableArray();
         }
     }
 }

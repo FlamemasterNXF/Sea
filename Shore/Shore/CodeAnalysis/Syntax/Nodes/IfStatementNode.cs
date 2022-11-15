@@ -8,8 +8,9 @@
         public ElseNode? ElseNode { get; }
         public override TokType Type => TokType.IfStatement;
 
-        public IfStatementNode(Token ifKeyword, ExpressionNode condition, StatementNode? thenStatement,
+        public IfStatementNode(NodeTree nodeTree, Token ifKeyword, ExpressionNode condition, StatementNode? thenStatement,
             ElseNode? elseNode)
+            : base(nodeTree)
         {
             IfKeyword = ifKeyword;
             Condition = condition;

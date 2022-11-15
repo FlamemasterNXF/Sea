@@ -6,7 +6,8 @@
         public StatementNode? ElseStatement { get; }
         public override TokType Type => TokType.ElseStatement;
 
-        public ElseNode(Token elseKeyword, StatementNode? elseStatement)
+        public ElseNode(NodeTree nodeTree, Token elseKeyword, StatementNode? elseStatement)
+            : base(nodeTree)
         {
             ElseKeyword = elseKeyword;
             ElseStatement = elseStatement;

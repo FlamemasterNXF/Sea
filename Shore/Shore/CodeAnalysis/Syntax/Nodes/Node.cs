@@ -5,7 +5,14 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
 {
     public abstract class Node
     {
+        public NodeTree NodeTree { get; }
         public abstract TokType Type { get; }
+
+        
+        protected Node(NodeTree nodeTree)
+        {
+            NodeTree = nodeTree;
+        }
 
         public virtual TextSpan Span
         {
@@ -16,6 +23,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
                 return TextSpan.FromBounds(first.Start, last.End);
             }
         }
+
+        public TextLocation Location => new TextLocation(NodeTree.Text, Span);
         
         public IEnumerable<Node> GetChildren()
         {

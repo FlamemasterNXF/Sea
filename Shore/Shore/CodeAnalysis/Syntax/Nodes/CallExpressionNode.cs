@@ -8,8 +8,9 @@
         public Token CloseParenToken { get; }
         public override TokType Type => TokType.CallExpression;
 
-        public CallExpressionNode(Token identifier, Token openParenToken, SeparatedNodeList<ExpressionNode> arguments,
-            Token closeParenToken)
+        public CallExpressionNode(NodeTree nodeTree, Token identifier, Token openParenToken,
+            SeparatedNodeList<ExpressionNode> arguments, Token closeParenToken)
+            : base(nodeTree)
         {
             Identifier = identifier;
             OpenParenToken = openParenToken;

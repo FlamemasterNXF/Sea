@@ -2,6 +2,6 @@
 {
     public abstract class StatementNode : Node
     {
-        
+        protected StatementNode(NodeTree nodeTree) : base(nodeTree) {}
     }
 }

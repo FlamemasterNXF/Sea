@@ -22,19 +22,18 @@ namespace sc
             }
 
             var path = args.Single();
-            if (path == String.Empty)
+            if (!File.Exists(path))
             {
-                Console.Error.WriteLine("Invalid Script Passed to MC: <path>");
+                Console.WriteLine($"fatal: File '{path}' doesn't exist");
                 return;
             }
-            
-            var text = File.ReadAllText(path);
-            var nodeTree = NodeTree.Parse(text);
+
+            var nodeTree = NodeTree.Load(path);
             var compilation = new Compilation(nodeTree);
             var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
 
             if (!result.Diagnostics.Any() && result.Value is not null) Console.WriteLine(result.Value);
-            else Console.Error.WriteDiagnostics(result.Diagnostics, nodeTree);
+            else Console.Error.WriteDiagnostics(result.Diagnostics);
         }
     }
 }

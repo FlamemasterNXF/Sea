@@ -5,7 +5,8 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public Token Keyword { get; }
         public ExpressionNode? Expression { get; }
 
-        public ReturnStatementNode(Token keyword, ExpressionNode? expression)
+        public ReturnStatementNode(NodeTree nodeTree, Token keyword, ExpressionNode? expression)
+            : base(nodeTree)
         {
             Keyword = keyword;
             Expression = expression;

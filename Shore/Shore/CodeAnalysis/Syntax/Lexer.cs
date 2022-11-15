@@ -7,6 +7,7 @@ namespace Shore.CodeAnalysis.Syntax
 {
     internal class Lexer
     {
+        private readonly NodeTree _nodeTree;
         private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
         private readonly SourceText _text;
         
@@ -15,9 +16,10 @@ namespace Shore.CodeAnalysis.Syntax
         private TokType _type;
         private object? _value;
 
-        public Lexer(SourceText text)
+        public Lexer(NodeTree nodeTree)
         {
-            _text = text;
+            _nodeTree = nodeTree;
+            _text = nodeTree.Text;
         }
 
         public DiagnosticBag Diagnostics => _diagnostics;
@@ -170,7 +172,9 @@ namespace Shore.CodeAnalysis.Syntax
                     else if (char.IsWhiteSpace(Current)) ReadWhiteSpace();
                     else
                     {
-                        _diagnostics.ReportUnknownCharacter(new TextSpan(_position, 1), Current);
+                        var span = new TextSpan(_position, 1);
+                        var location = new TextLocation(_text, span);
+                        _diagnostics.ReportUnknownCharacter(location, Current);
                         _position++;
                     }
                     break;
@@ -178,7 +182,7 @@ namespace Shore.CodeAnalysis.Syntax
 
             var length = _position - _start;
             var text = SyntaxFacts.GetText(_type) ?? _text.ToString(_start, length);
-            return new Token(_type, _start, text, _value);
+            return new Token(_nodeTree, _type, _start, text, _value);
         }
 
         private void ReadWhiteSpace()
@@ -200,7 +204,8 @@ namespace Shore.CodeAnalysis.Syntax
                 {
                     case '\0' or '\r' or '\n':
                         var span = new TextSpan(_start, 1);
-                        _diagnostics.ReportUnterminatedString(span);
+                        var location = new TextLocation(_text, span);
+                        _diagnostics.ReportUnterminatedString(location);
                         done = true;
                         break;
                     case '"':
@@ -231,7 +236,13 @@ namespace Shore.CodeAnalysis.Syntax
             while (char.IsDigit(Current)) _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
-            if (!int.TryParse(text, out var value)) _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, TypeSymbol.Int32);
+            if (!int.TryParse(text, out var value))
+            {
+                var span = new TextSpan(_start, length);
+                var location = new TextLocation(_text, span);
+                _diagnostics.ReportInvalidNumber(location, text, TypeSymbol.Int32);
+            }
+
             _value = value;
             _type = TokType.NumberToken;
         }

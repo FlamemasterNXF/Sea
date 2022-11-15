@@ -6,7 +6,8 @@
         public Token Identifier { get; }
         public override TokType Type => TokType.Parameter;
 
-        public ParameterNode(Token type, Token identifier)
+        public ParameterNode(NodeTree nodeTree, Token type, Token identifier)
+            : base(nodeTree)
         {
             PType = type;
             Identifier = identifier;
