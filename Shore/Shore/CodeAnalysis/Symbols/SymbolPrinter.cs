@@ -41,7 +41,6 @@ namespace Shore.CodeAnalysis.Symbols
             }
 
             writer.WritePunctuation(")");
-            writer.WriteLine();
         }
 
         private static void WriteGlobalVariableTo(GlobalVariableSymbol symbol, TextWriter writer)

@@ -11,6 +11,8 @@ namespace Shore.CodeAnalysis
         private BoundGlobalScope? _globalScope;
         public Compilation? Previous { get; }
         public ImmutableArray<NodeTree> NodeTrees { get; }
+        public ImmutableArray<FunctionSymbol> Functions => GlobalScope.Functions;
+        public ImmutableArray<VariableSymbol> Variables => GlobalScope.Variables;
 
         public Compilation(params NodeTree[] nodeTrees)
             : this(null, nodeTrees)
@@ -34,6 +36,25 @@ namespace Shore.CodeAnalysis
                 }
 
                 return _globalScope;
+            }
+        }
+        
+        public IEnumerable<Symbol> GetSymbols()
+        {
+            var submission = this;
+            var seenSymbolNames = new HashSet<string>();
+
+            while (submission != null)
+            {
+                foreach (var function in submission.Functions)
+                    if (seenSymbolNames.Add(function.Name))
+                        yield return function;
+
+                foreach (var variable in submission.Variables)
+                    if (seenSymbolNames.Add(variable.Name))
+                        yield return variable;
+
+                submission = submission.Previous;
             }
         }
 
@@ -79,6 +100,16 @@ namespace Shore.CodeAnalysis
                     function.Value.WriteTo(writer);
                 }
             }
+        }
+        
+        public void EmitTree(FunctionSymbol symbol, TextWriter writer)
+        {
+            var program = Binder.BindProgram(GlobalScope);
+            if (!program.Functions.TryGetValue(symbol, out var body)) return;
+
+            symbol.WriteTo(writer);
+            writer.WriteLine();
+            body.WriteTo(writer);
         }
     }
 }

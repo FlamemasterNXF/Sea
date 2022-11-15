@@ -43,31 +43,78 @@ namespace Shore
             }
         }
 
-        protected override void EvaluateCommand(string input)
+        [Command("cls", "Clears the screen")]
+        private void EvaluateCls() => Console.Clear();
+
+        [Command("reset", "Clears all previous submissions")]
+        private void EvaluateReset()
         {
-            switch (input)
-            {
-                case "#showTree":
-                    _showTree = !_showTree;
-                    Console.WriteLine(_showTree ? "Showing Node tree." : "Hiding Node tree.");
-                    break;
-                case "#showProgram":
-                    _showProgram = !_showProgram;
-                    Console.WriteLine(_showProgram ? "Showing Bound tree." : "Hiding Bound tree.");
-                    break;
-                case "#cls":
-                    Console.Clear();
-                    break;
-                case "#reset":
-                    _previous = null;
-                    _variables.Clear();
-                    break;
-                default:
-                    base.EvaluateCommand(input);
-                    break;
-            }
+            _previous = null;
+            _variables.Clear();
         }
 
+        [Command("showTree", "Shows the Parse tree")]
+        private void EvaluateShowTree()
+        {
+            _showTree = !_showTree;
+            Console.WriteLine(_showTree ? "Showing Parse tree." : "Hiding Parse tree.");
+        }
+
+        [Command("showProgram", "Shows the Bound tree")]
+        private void EvaluateShowProgram()
+        {
+            _showProgram = !_showProgram;
+            Console.WriteLine(_showProgram ? "Showing Bound tree." : "Hiding Bound tree.");
+        }
+        
+        [Command("load", "Loads a Script")]
+        private void EvaluateLoad(string path)
+        {
+            path = Path.GetFullPath(path);
+
+            if (!File.Exists(path))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"fatal: '{path}' does not exist.");
+                Console.ResetColor();
+                return;
+            }
+
+            var text = File.ReadAllText(path);
+            EvaluateSubmission(text);
+        }
+        
+        [Command("ls", "Lists all Symbols")]
+        private void EvaluateLs()
+        {
+            if (_previous == null)
+                return;
+
+            var symbols = _previous.GetSymbols().OrderBy(s => s.Kind).ThenBy(s => s.Name);
+            foreach (var symbol in symbols)
+            {
+                symbol.WriteTo(Console.Out);
+                Console.WriteLine();
+            }
+        }
+        
+        [Command("dump", "Shows Bound Tree of a Function")]
+        private void EvaluateDump(string functionName)
+        {
+            if (_previous == null) return;
+
+            var symbol = _previous.GetSymbols().OfType<FunctionSymbol>().SingleOrDefault(f => f.Name == functionName);
+            if (symbol == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"error: Function '{functionName}' does not exist");
+                Console.ResetColor();
+                return;
+            }
+
+            _previous.EmitTree(symbol, Console.Out);
+        }
+        
         protected override bool IsCompleteSubmission(string text)
         {
             if (string.IsNullOrEmpty(text)) return true;
