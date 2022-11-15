@@ -3,6 +3,7 @@ using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Binding.ControlFlow;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
+using ReflectionBindingFlags = System.Reflection.BindingFlags;
 
 namespace Shore.CodeAnalysis
 {
@@ -46,13 +47,18 @@ namespace Shore.CodeAnalysis
 
             while (submission != null)
             {
-                foreach (var function in submission.Functions)
-                    if (seenSymbolNames.Add(function.Name))
-                        yield return function;
+                const ReflectionBindingFlags bindingFlags = ReflectionBindingFlags.Static |
+                                                            ReflectionBindingFlags.Public |
+                                                            ReflectionBindingFlags.NonPublic;
+                
+                var builtinFunctions = typeof(BuiltinFunctions)
+                    .GetFields(bindingFlags).Where(fi => fi.FieldType == typeof(FunctionSymbol))
+                    .Select(fi => (FunctionSymbol)fi.GetValue(obj: null)!).ToList();
 
-                foreach (var variable in submission.Variables)
-                    if (seenSymbolNames.Add(variable.Name))
-                        yield return variable;
+                
+                foreach (var builtin in builtinFunctions) if (seenSymbolNames.Add(builtin.Name)) yield return builtin;
+                foreach (var function in submission.Functions) if (seenSymbolNames.Add(function.Name)) yield return function;
+                foreach (var variable in submission.Variables) if (seenSymbolNames.Add(variable.Name)) yield return variable;
 
                 submission = submission.Previous;
             }
@@ -105,10 +111,11 @@ namespace Shore.CodeAnalysis
         public void EmitTree(FunctionSymbol symbol, TextWriter writer)
         {
             var program = Binder.BindProgram(GlobalScope);
-            if (!program.Functions.TryGetValue(symbol, out var body)) return;
 
             symbol.WriteTo(writer);
             writer.WriteLine();
+            
+            if (!program.Functions.TryGetValue(symbol, out var body)) return;
             body.WriteTo(writer);
         }
     }

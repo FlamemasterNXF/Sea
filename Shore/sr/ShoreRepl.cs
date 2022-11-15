@@ -10,6 +10,7 @@ namespace Shore
     internal sealed class ShoreRepl : Repl
     {
         private static bool _loadingSubmission;
+        private static readonly Compilation emptyCompilation = new();
         private Compilation? _previous;
         private bool _showTree;
         private bool _showProgram;
@@ -49,7 +50,7 @@ namespace Shore
             }
         }
 
-        [Command("cls", "Clears the screen")]
+        [Command("cls", "Clears the Console")]
         private void EvaluateCls() => Console.Clear();
 
         [Command("reset", "Clears all previous submissions")]
@@ -94,10 +95,9 @@ namespace Shore
         [Command("ls", "Lists all Symbols")]
         private void EvaluateLs()
         {
-            if (_previous == null)
-                return;
+            var compilation = _previous ?? emptyCompilation;
+            var symbols = compilation.GetSymbols().OrderBy(s => s.Kind).ThenBy(s => s.Name);
 
-            var symbols = _previous.GetSymbols().OrderBy(s => s.Kind).ThenBy(s => s.Name);
             foreach (var symbol in symbols)
             {
                 symbol.WriteTo(Console.Out);
@@ -110,7 +110,9 @@ namespace Shore
         {
             if (_previous == null) return;
 
-            var symbol = _previous.GetSymbols().OfType<FunctionSymbol>().SingleOrDefault(f => f.Name == functionName);
+            var compilation = _previous ?? emptyCompilation;
+            var symbol = compilation.GetSymbols().OfType<FunctionSymbol>().SingleOrDefault(f => f.Name == functionName);
+            
             if (symbol == null)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -119,7 +121,7 @@ namespace Shore
                 return;
             }
 
-            _previous.EmitTree(symbol, Console.Out);
+            compilation.EmitTree(symbol, Console.Out);
         }
         
         protected override bool IsCompleteSubmission(string text)

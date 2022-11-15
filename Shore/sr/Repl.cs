@@ -22,7 +22,7 @@ namespace Shore
 
             foreach (var method in methods)
             {
-                var attribute = (CommandAttribute)method.GetCustomAttribute(typeof(CommandAttribute))!;
+                var attribute = method.GetCustomAttribute<CommandAttribute>();
                 if (attribute == null) continue;
 
                 var command = new Command(attribute.Name, attribute.Description, method);
@@ -101,7 +101,7 @@ namespace Shore
 
             if (args.Count != parameters.Length)
             {
-                var parameterNames = string.Join(", ", parameters.Select(p => $"<{p.Name}>"));
+                var parameterNames = string.Join(" ", parameters.Select(p => $"<{p.Name}>"));
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"error: invalid number of arguments");
                 Console.WriteLine($"usage: #{command.Name} {parameterNames}");
@@ -109,7 +109,8 @@ namespace Shore
                 return;
             }
 
-            command.Method.Invoke(this, args.ToArray());
+            var instance = command.Method.IsStatic ? null : this;
+            command.Method.Invoke(instance, args.ToArray());
         }
         
         private sealed class View
@@ -467,9 +468,31 @@ namespace Shore
 
             foreach (var command in _commands.OrderBy(c => c.Name))
             {
-                var paddedName = command.Name.PadRight(maxNameLength);
-                Console.Out.WritePunctuation("#");
-                Console.Out.WriteIdentifier(paddedName);
+                var commandParams = command.Method.GetParameters();
+                if (commandParams.Length == 0)
+                {
+                    var paddedName = command.Name.PadRight(maxNameLength);
+
+                    Console.Out.WritePunctuation("#");
+                    Console.Out.WriteIdentifier(paddedName);
+                }
+                else
+                {
+                    Console.Out.WritePunctuation("#");
+                    Console.Out.WriteIdentifier(command.Name);
+                    foreach (var pi in commandParams)
+                    {
+                        Console.Out.Write(" ");
+                        Console.Out.WritePunctuation("<");
+                        Console.Out.WriteIdentifier(pi.Name);
+                        Console.Out.WritePunctuation(">");
+                    }
+
+                    Console.Out.WriteLine();
+                    Console.Out.Write(" ");
+                    for (int _ = 0; _ < maxNameLength; _++) Console.Out.Write(" ");
+                }
+                
                 Console.Out.Write(" ");
                 Console.Out.Write(" ");
                 Console.Out.Write(" ");
