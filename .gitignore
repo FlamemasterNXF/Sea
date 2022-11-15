@@ -3,12 +3,18 @@
 
 /Shore/.idea
 
-/Shore/Shore/.idea
 /Shore/Shore/bin
 /Shore/Shore/obj
+/Shore/Shore/.idea
 
 /Shore/Shore.Tests/bin
 /Shore/Shore.Tests/obj
+/Shore/Shore.Tests/.idea
 
 /Shore/sr/bin
 /Shore/sr/obj
+/Shore/sr/.idea
+
+/Shore/sc/bin
+/Shore/sc/obj
+/Shore/sc/.idea
