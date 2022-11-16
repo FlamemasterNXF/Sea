@@ -174,9 +174,9 @@ namespace Shore.CodeAnalysis
             ReportError(location, message);
         }
 
-        public void ReportIllegalVariableCall(TextLocation location)
+        public void ReportInvalidReturnWithValueInGlobalStatements(TextLocation location)
         {
-            var message = $"A Variable cannot be called on the same line it was declared on.";
+            var message = "The 'return' Keyword cannot be followed by an expression in Global Statements.";
             ReportError(location, message);
         }
         

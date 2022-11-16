@@ -362,7 +362,8 @@ namespace Shore.CodeAnalysis.Binding
             if (_function == null)
             {
                 if (_isScript) expression ??= new BoundLiteralExpression("");
-                else if (expression != null) _diagnostics.ReportInvalidReturnExpression(node.Expression.Location, _function.Name);
+                else if (expression != null)
+                    _diagnostics.ReportInvalidReturnWithValueInGlobalStatements(node.Expression.Location);
             }
             else
             {
