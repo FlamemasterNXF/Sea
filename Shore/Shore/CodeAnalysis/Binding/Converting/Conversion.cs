@@ -28,8 +28,12 @@ namespace Shore.CodeAnalysis.Binding.Converting
             if ((from == TypeSymbol.Bool || from?.ParentType == TypeSymbol.Number) && to == TypeSymbol.String) 
                 return Explicit;
 
-            if (from == TypeSymbol.String && (to == TypeSymbol.Bool || to?.ParentType == TypeSymbol.Number))
+            if (from == TypeSymbol.String && (to == TypeSymbol.Bool || to?.ParentType == TypeSymbol.Number)) 
                 return Explicit;
+            
+            if (from != TypeSymbol.Void && to == TypeSymbol.Any) return Conversion.Implicit;
+
+            if (from == TypeSymbol.Any && to != TypeSymbol.Void) return Conversion.Explicit;
 
             return None;
         }

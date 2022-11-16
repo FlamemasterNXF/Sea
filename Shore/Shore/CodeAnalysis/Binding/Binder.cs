@@ -11,14 +11,16 @@ namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class Binder
     {
+        private readonly bool _isScript;
         private readonly FunctionSymbol? _function;
         private BoundScope? _scope;
         private readonly DiagnosticBag _diagnostics = new();
         private Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> _loopStack = new();
         private int _labelCounter;
 
-        private Binder(BoundScope parent, FunctionSymbol? function)
+        private Binder(bool isScript, BoundScope parent, FunctionSymbol? function)
         {
+            _isScript = isScript;
             _function = function;
             _scope = new BoundScope(parent);
 
@@ -55,63 +57,132 @@ namespace Shore.CodeAnalysis.Binding
             return parent;
         }
 
-        public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, ImmutableArray<NodeTree> nodeTrees)
+        public static BoundGlobalScope BindGlobalScope(bool isScript, BoundGlobalScope? previous,
+            ImmutableArray<NodeTree> nodeTrees)
         {
             var parentScope = CreateParentScope(previous);
-            var binder = new Binder(parentScope, null);
+            var binder = new Binder(isScript, parentScope, null);
 
             var functionDeclarations = nodeTrees.SelectMany(nt => nt.Root.Members).OfType<FunctionDeclarationNode>();
-            
+
             foreach (var function in functionDeclarations) binder.BindFunctionDeclaration(function);
 
             var globalStatements = nodeTrees.SelectMany(nt => nt.Root.Members).OfType<GlobalStatementNode>();
-            
+
             var statements = ImmutableArray.CreateBuilder<BoundStatement>();
 
             foreach (var globalStatement in globalStatements)
             {
-                var statement = binder.BindStatement(globalStatement.Statement);
+                var statement = binder.BindGlobalStatement(globalStatement.Statement);
                 statements.Add(statement);
             }
-            
-            var functions = binder._scope.GetDeclaredFunctions();
-            var variables = binder._scope.GetDeclaredVariables();
-            var diagnostics = binder.Diagnostics.ToImmutableArray();
 
+            var firstGlobalStatementPerNodeTree = nodeTrees
+                .Select(nt => nt.Root.Members.OfType<GlobalStatementNode>().FirstOrDefault()).Where(g => g != null)
+                .ToArray();
+
+            if (firstGlobalStatementPerNodeTree.Length > 1)
+                foreach (var globalStatement in firstGlobalStatementPerNodeTree)
+                    binder.Diagnostics.ReportOnlyOneFileCanHaveGlobalStatements(globalStatement.Location);
+
+            var functions = binder._scope.GetDeclaredFunctions();
+
+            FunctionSymbol? mainFunction;
+            FunctionSymbol? scriptFunction;
+
+            if (isScript)
+            {
+                mainFunction = null;
+                if (globalStatements.Any())
+                    scriptFunction = new FunctionSymbol("$eval", ImmutableArray<ParameterSymbol>.Empty, TypeSymbol.Any,
+                        null);
+                else scriptFunction = null;
+            }
+            else
+            {
+                mainFunction = functions.FirstOrDefault(f => f.Name == "main");
+                scriptFunction = null;
+
+                if (mainFunction is not null)
+                {
+                    if (mainFunction.Type != TypeSymbol.Void || mainFunction.Parameters.Any())
+                        binder.Diagnostics.ReportMainMustHaveCorrectSignature(mainFunction.Declaration.Identifier
+                            .Location);
+                }
+
+                if (globalStatements.Any())
+                {
+                    if (mainFunction is not null)
+                    {
+                        binder.Diagnostics.ReportCannotMixMainAndGlobalStatements(mainFunction.Declaration.Identifier
+                            .Location);
+
+                        foreach (var globalStatement in firstGlobalStatementPerNodeTree)
+                            if (mainFunction != null)
+                                binder.Diagnostics.ReportCannotMixMainAndGlobalStatements(globalStatement.Location);
+                    }
+                    else
+                    {
+                        mainFunction = new FunctionSymbol("main", ImmutableArray<ParameterSymbol>.Empty,
+                            TypeSymbol.Void, null);
+                    }
+                }
+            }
+
+            var diagnostics = binder.Diagnostics.ToImmutableArray();
+            var variables = binder._scope.GetDeclaredVariables();
+            
             if (previous is not null) diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
 
-            return new BoundGlobalScope(previous, diagnostics, functions, variables, statements.ToImmutable());
+            return new BoundGlobalScope(previous, diagnostics, mainFunction, scriptFunction, functions, variables,
+                statements.ToImmutable());
         }
 
-        public static BoundProgram BindProgram(BoundGlobalScope globalScope)
+        public static BoundProgram BindProgram(bool isScript, BoundProgram? previous, BoundGlobalScope globalScope)
         {
             var parentScope = CreateParentScope(globalScope);
 
             var functionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
             var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
-            var scope = globalScope;
-            while (scope is not null)
+            foreach (var function in globalScope.Functions)
             {
-                foreach (var function in scope.Functions)
+                var binder = new Binder(isScript, parentScope, function);
+                var body = binder.BindStatementDistributor(function.Declaration.Body);
+                var loweredBody = Lowerer.Lower(body);
+                
+                if (function.Type != TypeSymbol.Void && !ControlFlowGraph.AllPathsReturn(loweredBody))
+                    binder._diagnostics.ReportAllPathsMustReturn(function.Declaration.Identifier.Location);
+                
+                functionBodies.Add(function, loweredBody);
+                diagnostics.AddRange(binder.Diagnostics);
+            }
+            
+            if (globalScope.MainFunction != null && globalScope.Statements.Any())
+            {
+                var body = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
+                functionBodies.Add(globalScope.MainFunction, body);
+            }
+            else if (globalScope.ScriptFunction != null)
+            {
+                var statements = globalScope.Statements;
+                if (statements is [BoundExpressionStatement es] &&
+                    es.Expression.Type != TypeSymbol.Void)
                 {
-                    var binder = new Binder(parentScope, function);
-                    var body = binder.BindStatement(function.Declaration?.Body);
-                    var loweredBody = Lowerer.Lower(body);
-                    
-                    if (function.Type != TypeSymbol.Void && !ControlFlowGraph.AllPathsReturn(loweredBody))
-                        binder._diagnostics.ReportAllPathsMustReturn(function.Declaration.Identifier.Location);
-                    
-                    functionBodies.Add(function, loweredBody);
-
-                    diagnostics.AddRange(binder.Diagnostics);
+                    statements = statements.SetItem(0, new BoundReturnStatement(es.Expression));
+                }
+                else if (statements.Any() && statements.Last().Kind != BoundNodeKind.ReturnStatement)
+                {
+                    var nullValue = new BoundLiteralExpression("");
+                    statements = statements.Add(new BoundReturnStatement(nullValue));
                 }
 
-                scope = scope.Previous;
+                var body = Lowerer.Lower(new BoundBlockStatement(statements));
+                functionBodies.Add(globalScope.ScriptFunction, body);
             }
 
-            var statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
-            return new BoundProgram(diagnostics.ToImmutable(), functionBodies.ToImmutable(), statement);
+            return new BoundProgram(previous, diagnostics.ToImmutable(), globalScope.MainFunction, 
+                globalScope.ScriptFunction, functionBodies.ToImmutable());
         }
         
         private static BoundScope CreateRootScope()
@@ -154,7 +225,27 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(new BoundNullExpression());
         }
 
-        private BoundStatement BindStatement(StatementNode? node)
+        private BoundStatement BindGlobalStatement(StatementNode node) => BindStatement(node, true);
+
+        private BoundStatement BindStatement(StatementNode node, bool isGlobal = false)
+        {
+            var result = BindStatementDistributor(node);
+
+            if (!_isScript || !isGlobal)
+            {
+                if (result is BoundExpressionStatement e)
+                {
+                    var isAllowedExpression = e.Expression.Kind is BoundNodeKind.NullExpression
+                        or BoundNodeKind.AssignmentExpression or BoundNodeKind.CallExpression;
+                    
+                    if (!isAllowedExpression) _diagnostics.ReportInvalidExpressionStatement(node.Location);
+                }
+            }
+
+            return result;
+        }
+
+        private BoundStatement BindStatementDistributor(StatementNode? node)
         {
             return node?.Type switch
             {
@@ -178,7 +269,7 @@ namespace Shore.CodeAnalysis.Binding
 
             foreach (var statementNode in node.Statements)
             {
-                var statement = BindStatement(statementNode);
+                var statement = BindStatementDistributor(statementNode);
                 statements.Add(statement);
             }
 
@@ -201,8 +292,8 @@ namespace Shore.CodeAnalysis.Binding
         private BoundStatement BindIfStatement(IfStatementNode node)
         {
             var condition = BindExpressionDistributor(node.Condition, TypeSymbol.Bool);
-            var thenStatement = BindStatement(node.ThenStatement);
-            var elseStatement = node.ElseNode == null ? null : BindStatement(node.ElseNode.ElseStatement);
+            var thenStatement = BindStatementDistributor(node.ThenStatement);
+            var elseStatement = node.ElseNode == null ? null : BindStatementDistributor(node.ElseNode.ElseStatement);
             return new BoundIfStatement(condition, thenStatement, elseStatement);
         }
 
@@ -234,7 +325,7 @@ namespace Shore.CodeAnalysis.Binding
             continueLabel = new BoundLabel($"continue{_labelCounter}");
             
             _loopStack.Push((breakLabel, continueLabel));
-            var boundBody = BindStatement(body);
+            var boundBody = BindStatementDistributor(body);
             _loopStack.Pop();
 
             return boundBody;
@@ -267,8 +358,12 @@ namespace Shore.CodeAnalysis.Binding
         private BoundStatement BindReturnStatement(ReturnStatementNode node)
         {
             var expression = node.Expression == null ? null : BindExpression(node.Expression);
-            
-            if (_function == null) _diagnostics.ReportInvalidReturn(node.Keyword.Location);
+
+            if (_function == null)
+            {
+                if (_isScript) expression ??= new BoundLiteralExpression("");
+                else if (expression != null) _diagnostics.ReportInvalidReturnExpression(node.Expression.Location, _function.Name);
+            }
             else
             {
                 if (_function.Type == TypeSymbol.Void && expression != null) 

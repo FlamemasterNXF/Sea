@@ -64,19 +64,19 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("\"test\" != \"test\"", false)]
         [InlineData("\"test\" == \"abc\"", false)]
         [InlineData("\"test\" != \"abc\"", true)]
-        [InlineData("int a = 10", 10)]
-        [InlineData("{ int b = 0 (b = 10) * b}", 100)]
-        [InlineData("{ int a = 0 if a == 0 a = 10 a }", 10)]
-        [InlineData("{ int a = 0 if a == 4 a = 10 a }", 0)]
-        [InlineData("{ int a = 0 if a == 0 a = 10 else a = 5 a }", 10)]
-        [InlineData("{ int a = 0 if a == 4 a = 10 else a = 5 a }", 5)]
-        [InlineData("{ int i = 10 int result = 0 while i > 0 { result = result + i i = i -1 } result }", 55)]
-        [InlineData("{ int result = 0 for i = 1 until 10 { result = result + i } result }", 55)]
-        [InlineData("{ int result = 0 for i = 1 until 10 { if i == 5 break result = result + i } result }", 10)]
-        [InlineData("{ int result = 0 for i = 1 until 10 { if result == 1 { result = 2 continue } result = result + i } result }", 54)]
-        [InlineData("{ int a = 10 for i = 1 until (a = a - 1) { } a }", 9)]
-        [InlineData("function void tester(){ 1 } tester()", 1)]
-        [InlineData("function void tester(int num, int numTwo){ num + numTwo } tester(1,1)", 2)]
+        [InlineData("int a = 10 return a", 10)]
+        [InlineData("{ int b = 0 return (b = 10) * b}", 100)]
+        [InlineData("{ int a = 0 if a == 0 a = 10 return a }", 10)]
+        [InlineData("{ int a = 0 if a == 4 a = 10 return a }", 0)]
+        [InlineData("{ int a = 0 if a == 0 a = 10 else a = 5 return a }", 10)]
+        [InlineData("{ int a = 0 if a == 4 a = 10 else a = 5 return a }", 5)]
+        [InlineData("{ int i = 10 int result = 0 while i > 0 { result = result + i i = i -1 } return result }", 55)]
+        [InlineData("{ int result = 0 for i = 1 until 10 { result = result + i } return result }", 55)]
+        [InlineData("{ int result = 0 for i = 1 until 10 { if i == 5 break result = result + i } return result }", 10)]
+        [InlineData("{ int result = 0 for i = 1 until 10 { if result == 1 { result = 2 continue } result = result + i } return result }", 54)]
+        [InlineData("{ int a = 10 for i = 1 until (a = a - 1) { } return a }", 9)]
+        [InlineData("function void tester(){ 1 } tester()", "")]
+        [InlineData("function int tester(int num, int numTwo){ return num + numTwo } tester(1,1)", 2)]
         [InlineData("function string tester(){ return \"hello\" } tester()", "hello")]
         [InlineData("function string tester(string str){ return str } tester(\"hi\")", "hi")]
         public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
@@ -84,6 +84,16 @@ namespace Shore.Tests.CodeAnalysis
             AssertValue(text, expectedValue);
         }
 
+        [Fact]
+        public void Evaluator_Script_Return()
+        {
+            var text = @"
+                return
+            ";
+
+            AssertValue(text, "");
+        }
+        
         [Fact]
         public void Evaluator_Reports_Void_Return()
         {
@@ -369,7 +379,7 @@ namespace Shore.Tests.CodeAnalysis
         private static void AssertValue(string text, object expectedValue)
         {
             var nodeTree = NodeTree.Parse(text);
-            var compilation = new Compilation(nodeTree);
+            var compilation = Compilation.CreateScript(null, nodeTree);
             var variables = new Dictionary<VariableSymbol?, object>();
             var result = compilation.Evaluate(variables);
             
@@ -381,7 +391,7 @@ namespace Shore.Tests.CodeAnalysis
         {
             var annotatedText = AnnotatedText.Parse(text);
             var syntaxTree = NodeTree.Parse(annotatedText.Text);
-            var compilation = new Compilation(syntaxTree);
+            var compilation = Compilation.CreateScript(null, syntaxTree);
             var result = compilation.Evaluate(new Dictionary<VariableSymbol?, object>());
 
             var expectedDiagnostics = AnnotatedText.UnindentLines(diagnosticText);

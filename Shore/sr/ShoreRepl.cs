@@ -10,11 +10,11 @@ namespace Shore
     internal sealed class ShoreRepl : Repl
     {
         private static bool _loadingSubmission;
-        private static readonly Compilation emptyCompilation = new();
+        private static readonly Compilation emptyCompilation = Compilation.CreateScript(null);
         private Compilation? _previous;
         private bool _showTree;
         private bool _showProgram;
-        private readonly Dictionary<VariableSymbol, object> _variables = new();
+        private readonly Dictionary<VariableSymbol, object?> _variables = new();
 
         public ShoreRepl()
         {
@@ -135,7 +135,7 @@ namespace Shore
         protected override void EvaluateSubmission(string text)
         {
             var nodeTree = NodeTree.Parse(text);
-            var compilation = _previous == null ? new Compilation(nodeTree) : _previous.ContinueWith(nodeTree);
+            var compilation = Compilation.CreateScript(_previous, nodeTree);
 
             if (_showTree) nodeTree.Root.WriteTo(Console.Out);
             if (_showProgram) compilation.EmitTree(Console.Out);
@@ -188,7 +188,11 @@ namespace Shore
             _loadingSubmission = false;
         }
 
-        private static void ClearSubmissions() => Directory.Delete(GetSubmissionsDirectory(), recursive: true);
+        private static void ClearSubmissions()
+        {
+            var dir = GetSubmissionsDirectory();
+            if (Directory.Exists(dir)) Directory.Delete(dir, recursive: true);
+        }
 
         private static void SaveSubmission(string text)
         {

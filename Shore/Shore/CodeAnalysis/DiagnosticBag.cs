@@ -167,5 +167,35 @@ namespace Shore.CodeAnalysis
             var message = "Not all code paths return a value.";
             ReportError(location, message);
         }
+        
+        public void ReportInvalidExpressionStatement(TextLocation location)
+        {
+            var message = $"Only Assignment and Call Expressions can be used as a Statement.";
+            ReportError(location, message);
+        }
+
+        public void ReportIllegalVariableCall(TextLocation location)
+        {
+            var message = $"A Variable cannot be called on the same line it was declared on.";
+            ReportError(location, message);
+        }
+        
+        public void ReportOnlyOneFileCanHaveGlobalStatements(TextLocation location)
+        {
+            var message = $"At most one File can have Global Statements.";
+            ReportError(location, message);
+        }
+
+        public void ReportMainMustHaveCorrectSignature(TextLocation location)
+        {
+            var message = $"'Main' must not take Arguments and not Return anything.";
+            ReportError(location, message);
+        }
+
+        public void ReportCannotMixMainAndGlobalStatements(TextLocation location)
+        {
+            var message = $"Cannot declare 'Main' Function when Global Statements are used.";
+            ReportError(location, message);
+        }
     }
 }
