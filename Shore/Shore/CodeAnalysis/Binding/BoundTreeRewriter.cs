@@ -52,7 +52,7 @@ namespace Shore.CodeAnalysis.Binding
             var initializer = RewriteExpression(node.Initializer);
             if (initializer == node.Initializer) return node;
 
-            return new BoundVariableDeclaration(node.Variable, initializer);
+            return new BoundVariableDeclaration(node.Variable, initializer!);
         }
 
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)

@@ -7,7 +7,7 @@ namespace Shore.CodeAnalysis.Binding
 {
     internal static class BoundNodePrinter
     {
-        public static void WriteTo(this BoundNode? node, TextWriter writer)
+        public static void WriteTo(this BoundNode node, TextWriter writer)
         {
             if (writer is IndentedTextWriter iw)
                 WriteTo(node, iw);
@@ -15,7 +15,7 @@ namespace Shore.CodeAnalysis.Binding
                 WriteTo(node, new IndentedTextWriter(writer));
         }
 
-        public static void WriteTo(this BoundNode? node, IndentedTextWriter writer)
+        public static void WriteTo(this BoundNode node, IndentedTextWriter writer)
         {
             switch (node.Kind)
             {

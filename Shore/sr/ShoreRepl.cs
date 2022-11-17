@@ -14,7 +14,7 @@ namespace Shore
         private Compilation? _previous;
         private bool _showTree;
         private bool _showProgram;
-        private readonly Dictionary<VariableSymbol, object?> _variables = new();
+        private readonly Dictionary<VariableSymbol?, object?> _variables = new();
 
         public ShoreRepl()
         {

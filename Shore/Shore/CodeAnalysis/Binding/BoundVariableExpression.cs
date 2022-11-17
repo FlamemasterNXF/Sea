@@ -12,6 +12,6 @@ namespace Shore.CodeAnalysis.Binding
         }
 
         public override BoundNodeKind Kind => BoundNodeKind.VariableExpression;
-        public override TypeSymbol? Type => Variable?.Type;
+        public override TypeSymbol Type => Variable.Type;
     }
 }

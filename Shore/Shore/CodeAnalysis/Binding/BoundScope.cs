@@ -13,30 +13,30 @@ namespace Shore.CodeAnalysis.Binding
             Parent = parent;
         }
         
-        public bool TryDeclareVariable(VariableSymbol variable) => TryDeclareSymbol(variable);
+        public bool TryDeclareVariable(VariableSymbol? variable) => TryDeclareSymbol(variable);
 
-        public bool TryDeclareFunction(FunctionSymbol function) => TryDeclareSymbol(function);
+        public bool TryDeclareFunction(FunctionSymbol? function) => TryDeclareSymbol(function);
 
         private bool TryDeclareSymbol<TSymbol>(TSymbol symbol)
-            where TSymbol : Symbol
+            where TSymbol : Symbol?
         {
             if (_symbols == null) _symbols = new Dictionary<string, Symbol>();
-            else if (_symbols.ContainsKey(symbol.Name)) return false;
+            else if (_symbols.ContainsKey(symbol?.Name!)) return false;
 
-            _symbols.Add(symbol.Name, symbol);
+            _symbols.Add(symbol?.Name!, symbol!);
             return true;
         }
         
-        public bool TryLookupVariable(string name, out VariableSymbol? variable) => TryLookupSymbol(name, out variable);
+        public bool TryLookupVariable(string? name, out VariableSymbol? variable) => TryLookupSymbol(name, out variable);
 
-        public bool TryLookupFunction(string name, out FunctionSymbol? function) => TryLookupSymbol(name, out function);
+        public bool TryLookupFunction(string? name, out FunctionSymbol? function) => TryLookupSymbol(name, out function);
 
-        private bool TryLookupSymbol<TSymbol>(string name, out TSymbol? symbol)
+        private bool TryLookupSymbol<TSymbol>(string? name, out TSymbol? symbol)
             where TSymbol : Symbol
         {
             symbol = null;
 
-            if (_symbols != null && _symbols.TryGetValue(name, out var declaredSymbol))
+            if (_symbols != null && _symbols.TryGetValue(name!, out var declaredSymbol))
             {
                 if (declaredSymbol is TSymbol matchingSymbol)
                 {
@@ -50,9 +50,9 @@ namespace Shore.CodeAnalysis.Binding
             return Parent != null && Parent.TryLookupSymbol(name, out symbol);
         }
 
-        public ImmutableArray<VariableSymbol> GetDeclaredVariables() => GetDeclaredSymbols<VariableSymbol>();
+        public ImmutableArray<VariableSymbol?> GetDeclaredVariables() => GetDeclaredSymbols<VariableSymbol>();
 
-        public ImmutableArray<FunctionSymbol> GetDeclaredFunctions() => GetDeclaredSymbols<FunctionSymbol>();
+        public ImmutableArray<FunctionSymbol?> GetDeclaredFunctions() => GetDeclaredSymbols<FunctionSymbol>();
 
         private ImmutableArray<TSymbol> GetDeclaredSymbols<TSymbol>()
             where TSymbol : Symbol

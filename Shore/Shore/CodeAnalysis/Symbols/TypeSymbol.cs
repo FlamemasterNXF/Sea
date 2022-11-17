@@ -26,11 +26,11 @@
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
             actual == required || actual.ParentType == required;
 
-        public static List<TypeSymbol?>? GetChildrenTypes(TypeSymbol parent)
+        public static List<TypeSymbol>? GetChildrenTypes(TypeSymbol parent)
         {
             if (parent == Bool) return null;
             if (parent == String) return null;
-            return parent == Number ? new List<TypeSymbol?>() { Int8, Int16, Int32, Int64 } : null;
+            return parent == Number ? new List<TypeSymbol>() { Int8, Int16, Int32, Int64 } : null;
         }
     }
 }

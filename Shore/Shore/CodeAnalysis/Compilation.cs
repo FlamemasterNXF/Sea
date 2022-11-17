@@ -14,8 +14,8 @@ namespace Shore.CodeAnalysis
         public Compilation? Previous { get; }
         public ImmutableArray<NodeTree> NodeTrees { get; }
         public FunctionSymbol MainFunction => GlobalScope.MainFunction;
-        public ImmutableArray<FunctionSymbol> Functions => GlobalScope.Functions;
-        public ImmutableArray<VariableSymbol> Variables => GlobalScope.Variables;
+        public ImmutableArray<FunctionSymbol?> Functions => GlobalScope.Functions;
+        public ImmutableArray<VariableSymbol?> Variables => GlobalScope.Variables;
 
         private Compilation(bool isScript, Compilation? previous, params NodeTree[] nodeTrees)
         {
@@ -43,7 +43,7 @@ namespace Shore.CodeAnalysis
             }
         }
         
-        public IEnumerable<Symbol> GetSymbols()
+        public IEnumerable<Symbol?> GetSymbols()
         {
             var submission = this;
             var seenSymbolNames = new HashSet<string>();
@@ -66,7 +66,7 @@ namespace Shore.CodeAnalysis
             return Binder.BindProgram(IsScript, previous, GlobalScope);
         }
 
-        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object?> variables)
+        public EvaluationResult Evaluate(Dictionary<VariableSymbol?, object?> variables)
         {
             var parseDiagnostics = NodeTrees.SelectMany(nt => nt.Diagnostics);
 
@@ -100,7 +100,7 @@ namespace Shore.CodeAnalysis
             else if (GlobalScope.ScriptFunction is not null) EmitTree(GlobalScope.ScriptFunction, writer);
         }
         
-        public void EmitTree(FunctionSymbol symbol, TextWriter writer)
+        public void EmitTree(FunctionSymbol? symbol, TextWriter writer)
         {
             var program = GetProgram();
 

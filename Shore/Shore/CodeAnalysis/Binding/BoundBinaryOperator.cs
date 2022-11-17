@@ -9,17 +9,17 @@ namespace Shore.CodeAnalysis.Binding
     {
         public TokType TokType { get; }
         public BoundBinaryOperatorKind Kind { get; }
-        public TypeSymbol? LeftType { get; }
-        public TypeSymbol? RightType { get; }
-        public TypeSymbol? ResultType { get; }
+        public TypeSymbol LeftType { get; }
+        public TypeSymbol RightType { get; }
+        public TypeSymbol ResultType { get; }
 
-        private BoundBinaryOperator(TokType tokType, BoundBinaryOperatorKind kind, TypeSymbol? type)
+        private BoundBinaryOperator(TokType tokType, BoundBinaryOperatorKind kind, TypeSymbol type)
             : this(tokType, kind, type, type, type){}
         
-        private BoundBinaryOperator(TokType tokType, BoundBinaryOperatorKind kind, TypeSymbol? operandType, TypeSymbol? resultType)
+        private BoundBinaryOperator(TokType tokType, BoundBinaryOperatorKind kind, TypeSymbol operandType, TypeSymbol resultType)
             : this(tokType, kind, operandType, operandType, resultType){}
 
-        private BoundBinaryOperator(TokType tokType, BoundBinaryOperatorKind kind, TypeSymbol? leftType, TypeSymbol? rightType, TypeSymbol? resultType)
+        private BoundBinaryOperator(TokType tokType, BoundBinaryOperatorKind kind, TypeSymbol leftType, TypeSymbol rightType, TypeSymbol resultType)
         {
             TokType = tokType;
             Kind = kind;
@@ -70,7 +70,7 @@ namespace Shore.CodeAnalysis.Binding
             return operators.ToArray();
         }
 
-        public static BoundBinaryOperator? Bind(TokType tokType, TypeSymbol? leftType, TypeSymbol? rightType)
+        public static BoundBinaryOperator? Bind(TokType tokType, TypeSymbol leftType, TypeSymbol rightType)
         {
             foreach (var op in Operators())
             {

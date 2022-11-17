@@ -24,7 +24,7 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
             }
         }
 
-        public TextLocation Location => new TextLocation(NodeTree.Text, Span);
+        public TextLocation Location => new (NodeTree.Text, Span);
         
         public IEnumerable<Node> GetChildren()
         {

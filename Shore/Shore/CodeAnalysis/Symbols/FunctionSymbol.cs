@@ -5,7 +5,7 @@ namespace Shore.CodeAnalysis.Symbols
 {
     public sealed class FunctionSymbol : Symbol
     {
-        public ImmutableArray<ParameterSymbol> Parameters { get; }
+        public ImmutableArray<ParameterSymbol?> Parameters { get; }
         public TypeSymbol Type { get; }
         public FunctionDeclarationNode? Declaration { get; }
         public override SymbolKind Kind => SymbolKind.Function;

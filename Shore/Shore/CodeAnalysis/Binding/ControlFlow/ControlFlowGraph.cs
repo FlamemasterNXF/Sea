@@ -199,7 +199,7 @@ namespace Shore.CodeAnalysis.Binding.ControlFlow
             {
                 if (condition is BoundLiteralExpression l)
                 {
-                    var value = (bool)l.Value!;
+                    var value = (bool)l.Value;
                     if (value) condition = null;
                     else return;
                 }
@@ -231,12 +231,12 @@ namespace Shore.CodeAnalysis.Binding.ControlFlow
             {
                 if (condition is BoundLiteralExpression literal)
                 {
-                    var value = (bool)literal.Value!;
+                    var value = (bool)literal.Value;
                     return new BoundLiteralExpression(!value);
                 }
 
                 var op = BoundUnaryOperator.Bind(TokType.BangToken, TypeSymbol.Bool);
-                return new BoundUnaryExpression(op, condition);
+                return new BoundUnaryExpression(op!, condition!);
             }
         }
 

@@ -4,10 +4,10 @@
     {
         public Token WhileKeyword { get; }
         public ExpressionNode Condition { get; }
-        public StatementNode? Body { get; }
+        public StatementNode Body { get; }
         public override TokType Type => TokType.WhileStatement;
 
-        public WhileStatementNode(NodeTree nodeTree, Token whileKeyword, ExpressionNode condition, StatementNode? body)
+        public WhileStatementNode(NodeTree nodeTree, Token whileKeyword, ExpressionNode condition, StatementNode body)
             : base(nodeTree)
         {
             WhileKeyword = whileKeyword;

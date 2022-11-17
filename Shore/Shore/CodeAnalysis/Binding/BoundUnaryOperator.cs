@@ -7,15 +7,15 @@ namespace Shore.CodeAnalysis.Binding
     {
         public TokType TokType { get; }
         public BoundUnaryOperatorKind Kind { get; }
-        public TypeSymbol? OperandType { get; }
-        public TypeSymbol? ResultType { get; }
+        public TypeSymbol OperandType { get; }
+        public TypeSymbol ResultType { get; }
 
-        private BoundUnaryOperator(TokType tokType, BoundUnaryOperatorKind kind, TypeSymbol? operandType)
+        private BoundUnaryOperator(TokType tokType, BoundUnaryOperatorKind kind, TypeSymbol operandType)
             : this(tokType, kind, operandType, operandType)
         {
         }
 
-        private BoundUnaryOperator(TokType tokType, BoundUnaryOperatorKind kind, TypeSymbol? operandType, TypeSymbol? resultType)
+        private BoundUnaryOperator(TokType tokType, BoundUnaryOperatorKind kind, TypeSymbol operandType, TypeSymbol resultType)
         {
             TokType = tokType;
             Kind = kind;
@@ -23,7 +23,7 @@ namespace Shore.CodeAnalysis.Binding
             ResultType = resultType;
         }
         
-        private static readonly List<BoundUnaryOperator> FixedOperators = new List<BoundUnaryOperator>()
+        private static readonly List<BoundUnaryOperator> FixedOperators = new()
         {
             new (TokType.TildeToken, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.Int32),
             

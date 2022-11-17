@@ -15,10 +15,10 @@ namespace Shore.CodeAnalysis.Binding
         private readonly FunctionSymbol? _function;
         private BoundScope? _scope;
         private readonly DiagnosticBag _diagnostics = new();
-        private Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> _loopStack = new();
+        private readonly Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> _loopStack = new();
         private int _labelCounter;
 
-        private Binder(bool isScript, BoundScope parent, FunctionSymbol? function)
+        private Binder(bool isScript, BoundScope? parent, FunctionSymbol? function)
         {
             _isScript = isScript;
             _function = function;
@@ -30,7 +30,7 @@ namespace Shore.CodeAnalysis.Binding
             }
         }
 
-        public DiagnosticBag Diagnostics => _diagnostics;
+        private DiagnosticBag Diagnostics => _diagnostics;
         
         private static BoundScope CreateParentScope(BoundGlobalScope? previous)
         {
@@ -71,7 +71,8 @@ namespace Shore.CodeAnalysis.Binding
 
             var statements = ImmutableArray.CreateBuilder<BoundStatement>();
 
-            foreach (var globalStatement in globalStatements)
+            var globalStatementNodes = globalStatements as GlobalStatementNode[] ?? globalStatements.ToArray();
+            foreach (var globalStatement in globalStatementNodes)
             {
                 var statement = binder.BindGlobalStatement(globalStatement.Statement);
                 statements.Add(statement);
@@ -83,9 +84,9 @@ namespace Shore.CodeAnalysis.Binding
 
             if (firstGlobalStatementPerNodeTree.Length > 1)
                 foreach (var globalStatement in firstGlobalStatementPerNodeTree)
-                    binder.Diagnostics.ReportOnlyOneFileCanHaveGlobalStatements(globalStatement.Location);
+                    binder.Diagnostics.ReportOnlyOneFileCanHaveGlobalStatements(globalStatement!.Location);
 
-            var functions = binder._scope.GetDeclaredFunctions();
+            var functions = binder._scope!.GetDeclaredFunctions();
 
             FunctionSymbol? mainFunction;
             FunctionSymbol? scriptFunction;
@@ -93,38 +94,37 @@ namespace Shore.CodeAnalysis.Binding
             if (isScript)
             {
                 mainFunction = null;
-                if (globalStatements.Any())
-                    scriptFunction = new FunctionSymbol("$eval", ImmutableArray<ParameterSymbol>.Empty, TypeSymbol.Any,
-                        null);
-                else scriptFunction = null;
+                scriptFunction = globalStatementNodes.Any()
+                    ? new FunctionSymbol("$eval", ImmutableArray<ParameterSymbol>.Empty, TypeSymbol.Any)
+                    : null;
             }
             else
             {
-                mainFunction = functions.FirstOrDefault(f => f.Name == "main");
+                mainFunction = functions.FirstOrDefault(f => f?.Name == "main");
                 scriptFunction = null;
 
                 if (mainFunction is not null)
                 {
                     if (mainFunction.Type != TypeSymbol.Void || mainFunction.Parameters.Any())
-                        binder.Diagnostics.ReportMainMustHaveCorrectSignature(mainFunction.Declaration.Identifier
+                        binder.Diagnostics.ReportMainMustHaveCorrectSignature(mainFunction.Declaration!.Identifier
                             .Location);
                 }
 
-                if (globalStatements.Any())
+                if (globalStatementNodes.Any())
                 {
                     if (mainFunction is not null)
                     {
-                        binder.Diagnostics.ReportCannotMixMainAndGlobalStatements(mainFunction.Declaration.Identifier
+                        binder.Diagnostics.ReportCannotMixMainAndGlobalStatements(mainFunction.Declaration!.Identifier
                             .Location);
 
                         foreach (var globalStatement in firstGlobalStatementPerNodeTree)
                             if (mainFunction != null)
-                                binder.Diagnostics.ReportCannotMixMainAndGlobalStatements(globalStatement.Location);
+                                binder.Diagnostics.ReportCannotMixMainAndGlobalStatements(globalStatement!.Location);
                     }
                     else
                     {
                         mainFunction = new FunctionSymbol("main", ImmutableArray<ParameterSymbol>.Empty,
-                            TypeSymbol.Void, null);
+                            TypeSymbol.Void);
                     }
                 }
             }
@@ -142,19 +142,19 @@ namespace Shore.CodeAnalysis.Binding
         {
             var parentScope = CreateParentScope(globalScope);
 
-            var functionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
+            ImmutableDictionary<FunctionSymbol, BoundBlockStatement>.Builder functionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
             var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
             foreach (var function in globalScope.Functions)
             {
                 var binder = new Binder(isScript, parentScope, function);
-                var body = binder.BindStatementDistributor(function.Declaration.Body);
+                var body = binder.BindStatementDistributor(function?.Declaration?.Body);
                 var loweredBody = Lowerer.Lower(body);
                 
-                if (function.Type != TypeSymbol.Void && !ControlFlowGraph.AllPathsReturn(loweredBody))
-                    binder._diagnostics.ReportAllPathsMustReturn(function.Declaration.Identifier.Location);
+                if (function?.Type != TypeSymbol.Void && !ControlFlowGraph.AllPathsReturn(loweredBody))
+                    binder._diagnostics.ReportAllPathsMustReturn(function!.Declaration!.Identifier.Location);
                 
-                functionBodies.Add(function, loweredBody);
+                functionBodies.Add(function!, loweredBody);
                 diagnostics.AddRange(binder.Diagnostics);
             }
             
@@ -194,9 +194,9 @@ namespace Shore.CodeAnalysis.Binding
 
         private void BindFunctionDeclaration(FunctionDeclarationNode node)
         {
-            var parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
+            ImmutableArray<ParameterSymbol>.Builder parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
 
-            var seenParameterNames = new HashSet<string>();
+            var seenParameterNames = new HashSet<string?>();
 
             foreach (var parameterNode in node.Parameters)
             {
@@ -208,14 +208,14 @@ namespace Shore.CodeAnalysis.Binding
                 }
                 else
                 {
-                    var parameter = new ParameterSymbol(parameterName, parameterType);
+                    var parameter = new ParameterSymbol(parameterName!, parameterType!);
                     parameters.Add(parameter);
                 }
             }
 
             var type = LookupType(node.FType.Text) ?? TypeSymbol.Void;
             
-            var function = new FunctionSymbol(node.Identifier.Text, parameters.ToImmutable(), type, node);
+            var function = new FunctionSymbol(node.Identifier.Text!, parameters.ToImmutable(), type, node);
             if (!_scope!.TryDeclareFunction(function))
                 _diagnostics.ReportSymbolAlreadyDeclared(node.Identifier.Location, function.Name);
         }
@@ -363,16 +363,16 @@ namespace Shore.CodeAnalysis.Binding
             {
                 if (_isScript) expression ??= new BoundLiteralExpression("");
                 else if (expression != null)
-                    _diagnostics.ReportInvalidReturnWithValueInGlobalStatements(node.Expression.Location);
+                    _diagnostics.ReportInvalidReturnWithValueInGlobalStatements(node.Expression!.Location);
             }
             else
             {
                 if (_function.Type == TypeSymbol.Void && expression != null) 
-                    _diagnostics.ReportInvalidReturnExpression(node.Expression.Location, _function.Name);
+                    _diagnostics.ReportInvalidReturnExpression(node.Expression!.Location, _function.Name);
                 else
                 {
                     if (expression == null) _diagnostics.ReportMissingReturnExpression(node.Keyword.Location, _function.Type);
-                    else expression = BindConversion(node.Expression.Location, expression, _function.Type);
+                    else expression = BindConversion(node.Expression!.Location, expression, _function.Type);
                 }
             }
 
@@ -385,12 +385,12 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundExpression? BindExpression(ExpressionNode node, TypeSymbol? targetType)
+        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType)
         {
             return BindConversion(node, targetType);
         }
 
-        private BoundExpression? BindExpression(ExpressionNode node, bool canBeVoid = false)
+        private BoundExpression BindExpression(ExpressionNode node, bool canBeVoid = false)
         {
             var result = BindExpressionDistributor(node);
             if (!canBeVoid && result.Type == TypeSymbol.Void)
@@ -402,7 +402,7 @@ namespace Shore.CodeAnalysis.Binding
             return result;
         }
 
-        private BoundExpression? BindExpressionDistributor(ExpressionNode node, TypeSymbol? targetType)
+        private BoundExpression BindExpressionDistributor(ExpressionNode node, TypeSymbol? targetType)
         {
             var result = BindExpressionDistributor(node);
             if (targetType != TypeSymbol.Null && result.Type != TypeSymbol.Null && result.Type != targetType)
@@ -410,7 +410,7 @@ namespace Shore.CodeAnalysis.Binding
             return result;
         }
 
-        private BoundExpression? BindExpressionDistributor(ExpressionNode node)
+        private BoundExpression BindExpressionDistributor(ExpressionNode node)
         {
             return node.Type switch
             {
@@ -425,7 +425,7 @@ namespace Shore.CodeAnalysis.Binding
             };
         }
 
-        private BoundExpression? BindNameExpression(NameExpressionNode node)
+        private BoundExpression BindNameExpression(NameExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
 
@@ -444,7 +444,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundVariableExpression(variable);
         }
 
-        private BoundExpression? BindAssignmentExpression(AssignmentExpressionNode node)
+        private BoundExpression BindAssignmentExpression(AssignmentExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpressionDistributor(node.Expression);
@@ -461,13 +461,13 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundAssignmentExpression(variable, convertedExpression);
         }
 
-        private BoundExpression? BindLiteralExpression(LiteralExpressionNode? node)
+        private BoundExpression BindLiteralExpression(LiteralExpressionNode? node)
         {
             var value = node?.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 
-        private BoundExpression? BindUnaryExpression(UnaryExpressionNode node)
+        private BoundExpression BindUnaryExpression(UnaryExpressionNode node)
         {
             var boundOperand = BindExpressionDistributor(node.Operand);
             var boundOperator = BoundUnaryOperator.Bind(node.OperatorToken.Type, boundOperand.Type);
@@ -484,7 +484,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundUnaryExpression(boundOperator, boundOperand);
         }
 
-        private BoundExpression? BindBinaryExpression(BinaryExpressionNode node)
+        private BoundExpression BindBinaryExpression(BinaryExpressionNode node)
         {
             var boundLeft = BindExpressionDistributor(node.Left);
             var boundRight = BindExpressionDistributor(node.Right);
@@ -496,7 +496,7 @@ namespace Shore.CodeAnalysis.Binding
 
             if (boundOperator is null)
             {
-                _diagnostics.ReportUndefinedBinaryOperator(node.OperatorToken.Location, node.OperatorToken.Text,
+                _diagnostics.ReportUndefinedBinaryOperator(node.OperatorToken.Location, node.OperatorToken.Text!,
                     boundLeft.Type, boundRight.Type);
                 return new BoundNullExpression();
             }
@@ -504,12 +504,12 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
         }
 
-        private BoundExpression? BindCallExpression(CallExpressionNode node)
+        private BoundExpression BindCallExpression(CallExpressionNode node)
         {
             if (node.Arguments.Count == 1 && LookupType(node.Identifier.Text) is TypeSymbol type)
                 return BindConversion(node.Arguments[0], type, allowExplicit: true);
 
-            ImmutableArray<BoundExpression?>.Builder boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
+            ImmutableArray<BoundExpression>.Builder boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
             foreach (var argument in node.Arguments)
             {
@@ -517,13 +517,13 @@ namespace Shore.CodeAnalysis.Binding
                 boundArguments.Add(boundArgument);
             }
 
-            if (!_scope.TryLookupFunction(node.Identifier.Text, out var function))
+            if (!_scope!.TryLookupFunction(node.Identifier.Text, out var function))
             {
                 _diagnostics.ReportUndefinedFunction(node.Identifier.Location, node.Identifier.Text);
                 return new BoundNullExpression();
             }
 
-            if (node.Arguments.Count != function.Parameters.Length)
+            if (node.Arguments.Count != function!.Parameters.Length)
             {
                 _diagnostics.ReportWrongArgumentCount(node.Location, function.Name, function.Parameters.Length, node.Arguments.Count);
                 return new BoundNullExpression();
@@ -534,9 +534,9 @@ namespace Shore.CodeAnalysis.Binding
                 var argument = boundArguments[i];
                 var parameter = function.Parameters[i];
 
-                if (argument.Type != parameter.Type)
+                if (argument.Type != parameter?.Type)
                 {
-                    _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter.Name, parameter.Type, argument.Type);
+                    _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter?.Name, parameter?.Type, argument.Type);
                     return new BoundNullExpression();
                 }
             }
@@ -544,14 +544,14 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundCallExpression(function, boundArguments.ToImmutable());
         }
 
-        private BoundExpression? BindConversion(ExpressionNode node, TypeSymbol? type, bool allowExplicit = false)
+        private BoundExpression BindConversion(ExpressionNode node, TypeSymbol type, bool allowExplicit = false)
         {
             var expression = BindExpression(node);
             return BindConversion(node.Location, expression, type, allowExplicit);
 
         }
 
-        private BoundExpression? BindConversion(TextLocation diagnosticLocation, BoundExpression? expression, TypeSymbol? type, 
+        private BoundExpression BindConversion(TextLocation diagnosticLocation, BoundExpression expression, TypeSymbol type, 
             bool allowExplicit = false)
         {
             var conversion = Conversion.Classify(expression.Type, type);
@@ -570,7 +570,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundConversionExpression(type, expression);
         }
 
-        private VariableSymbol BindVariable(Token identifier, bool isReadOnly, TypeSymbol? type)
+        private VariableSymbol BindVariable(Token identifier, bool isReadOnly, TypeSymbol type)
         {
             var name = identifier.Text ?? "?";
             var declare = !identifier.IsMissing;
@@ -584,7 +584,7 @@ namespace Shore.CodeAnalysis.Binding
             return variable;
         }
 
-        private TypeSymbol? LookupType(string name)
+        private TypeSymbol? LookupType(string? name)
         {
             return name switch
             {

@@ -6,18 +6,18 @@ namespace Shore.CodeAnalysis
     internal sealed class Evaluator
     {
         private readonly BoundProgram _program;
-        private readonly Dictionary<VariableSymbol, object?> _globals;
-        private readonly Dictionary<FunctionSymbol, BoundBlockStatement> _functions = new();
-        private readonly Stack<Dictionary<VariableSymbol, object?>> _locals = new();
+        private readonly Dictionary<VariableSymbol?, object?> _globals;
+        private readonly Dictionary<FunctionSymbol?, BoundBlockStatement> _functions = new();
+        private readonly Stack<Dictionary<VariableSymbol?, object?>> _locals = new();
         private Random _random;
 
         private object? _lastValue;
 
-        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object?> variables)
+        public Evaluator(BoundProgram program, Dictionary<VariableSymbol?, object?> variables)
         {
             _program = program;
             _globals = variables;
-            _locals.Push(new Dictionary<VariableSymbol, object?>());
+            _locals.Push(new Dictionary<VariableSymbol?, object?>());
 
             var current = program;
             while (current != null)
@@ -208,7 +208,7 @@ namespace Shore.CodeAnalysis
                 return null;
             }
 
-            var locals = new Dictionary<VariableSymbol, object?>();
+            var locals = new Dictionary<VariableSymbol?, object?>();
             for (int i = 0; i < node.Arguments.Length; i++)
             {
                 var parameter = node.Function.Parameters[i];
@@ -236,7 +236,7 @@ namespace Shore.CodeAnalysis
             throw new Exception($"Unexpected type {node.Type}");
         }
 
-        private void Assign(VariableSymbol variable, object? value)
+        private void Assign(VariableSymbol? variable, object? value)
         {
             if (variable.Kind == SymbolKind.GlobalVariable) _globals[variable] = value;
             else
