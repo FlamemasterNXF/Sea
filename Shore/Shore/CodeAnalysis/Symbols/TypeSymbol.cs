@@ -11,7 +11,7 @@
         }
         
         public static readonly TypeSymbol Null = new("null", null);
-        public static readonly TypeSymbol Any = new TypeSymbol("any", null); //Internal usage ONLY.
+        public static readonly TypeSymbol Any = new ("any", null); //Internal usage ONLY.
         public static readonly TypeSymbol Bool = new ("bool", null);
         public static readonly TypeSymbol String = new ("string", null);
         public static readonly TypeSymbol Number = new("Number", null);

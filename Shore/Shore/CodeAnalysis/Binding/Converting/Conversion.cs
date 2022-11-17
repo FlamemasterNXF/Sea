@@ -16,10 +16,10 @@ namespace Shore.CodeAnalysis.Binding.Converting
             IsImplicit = isImplicit;
         }
 
-        public static readonly Conversion None = new Conversion(false, false, false);
-        public static readonly Conversion Identity = new Conversion(true, true, true);
-        public static readonly Conversion Implicit = new Conversion(true, false, true);
-        public static readonly Conversion Explicit = new Conversion(true, false, false);
+        public static readonly Conversion None = new(false, false, false);
+        public static readonly Conversion Identity = new(true, true, true);
+        public static readonly Conversion Implicit = new(true, false, true);
+        public static readonly Conversion Explicit = new(true, false, false);
 
         public static Conversion Classify(TypeSymbol? from, TypeSymbol? to)
         {
@@ -28,12 +28,12 @@ namespace Shore.CodeAnalysis.Binding.Converting
             if ((from == TypeSymbol.Bool || from?.ParentType == TypeSymbol.Number) && to == TypeSymbol.String) 
                 return Explicit;
 
-            if (from == TypeSymbol.String && (to == TypeSymbol.Bool || to?.ParentType == TypeSymbol.Number)) 
+            if (from == TypeSymbol.String && (to == TypeSymbol.Bool || to.ParentType == TypeSymbol.Number)) 
                 return Explicit;
             
-            if (from != TypeSymbol.Void && to == TypeSymbol.Any) return Conversion.Implicit;
+            if (from != TypeSymbol.Void && to == TypeSymbol.Any) return Implicit;
 
-            if (from == TypeSymbol.Any && to != TypeSymbol.Void) return Conversion.Explicit;
+            if (from == TypeSymbol.Any && to != TypeSymbol.Void) return Explicit;
 
             return None;
         }
