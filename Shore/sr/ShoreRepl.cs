@@ -124,6 +124,12 @@ namespace Shore
             compilation.EmitTree(symbol, Console.Out);
         }
         
+        [Command("exit", "Exits the REPL")]
+        private void EvaluateExit()
+        {
+            Environment.Exit(0);
+        }
+        
         protected override bool IsCompleteSubmission(string text)
         {
             if (string.IsNullOrEmpty(text)) return true;

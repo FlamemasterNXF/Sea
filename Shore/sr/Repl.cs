@@ -140,21 +140,13 @@ namespace Shore
 
                 foreach (var line in _document)
                 {
-                    /*if (_cursorTop + lineCount >= Console.WindowHeight)
-                    {
-                        Console.SetCursorPosition(0, Console.WindowHeight - 1);
-                        Console.WriteLine();
-                        if (_cursorTop > 0) _cursorTop--;
-                    }
-                    */
-                    
                     Console.SetCursorPosition(0, _cursorTop + lineCount);
                     Console.ForegroundColor = ConsoleColor.Green;
 
                     Console.Write(lineCount == 0 ? "» " : "· ");
                     Console.ResetColor();
                     _lineRenderer(line);
-                    Console.Write(new string(' ', Console.WindowWidth - line.Length /*- 2*/));
+                    Console.Write(new string(' ', Console.WindowWidth - line.Length));
                     lineCount++;
                 }
                 
