@@ -77,6 +77,7 @@ namespace Shore.CodeAnalysis.Syntax
         BreakKeyword,
         ContinueKeyword,
         ReturnStatement,
-        ReturnKeyword
+        ReturnKeyword,
+        NullToken
     }
 }

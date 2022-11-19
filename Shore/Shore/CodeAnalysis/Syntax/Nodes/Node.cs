@@ -54,7 +54,9 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         {
             if (this is Token token) return token;
 
-            return GetChildren().Last().GetLastToken();
+            return GetChildren().LastOrDefault()?.GetChildren() == null
+                ? new Token(NodeTree, TokType.NullToken, 1, "@", null)
+                : GetChildren().LastOrDefault().GetLastToken();
         }
 
         public void WriteTo(TextWriter writer)
@@ -93,7 +95,7 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
             }
         }
 
-        public override string? ToString()
+        public override string ToString()
         {
             using var writer = new StringWriter();
             WriteTo(writer);

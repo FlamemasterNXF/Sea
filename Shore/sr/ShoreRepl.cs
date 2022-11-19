@@ -1,16 +1,16 @@
-﻿using Shore.CodeAnalysis;
+﻿using Shore;
+using Shore.CodeAnalysis;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.IO;
-using Shore.Text;
 
-namespace Shore
+namespace sr
 {
     internal sealed class ShoreRepl : Repl
     {
         private static bool _loadingSubmission;
-        private static readonly Compilation emptyCompilation = Compilation.CreateScript(null);
+        private static readonly Compilation EmptyCompilation = Compilation.CreateScript(null);
         private Compilation? _previous;
         private bool _showTree;
         private bool _showProgram;
@@ -95,7 +95,7 @@ namespace Shore
         [Command("ls", "Lists all Symbols")]
         private void EvaluateLs()
         {
-            var compilation = _previous ?? emptyCompilation;
+            var compilation = _previous ?? EmptyCompilation;
             var symbols = compilation.GetSymbols().OrderBy(s => s.Kind).ThenBy(s => s.Name);
 
             foreach (var symbol in symbols)
@@ -110,7 +110,7 @@ namespace Shore
         {
             if (_previous == null) return;
 
-            var compilation = _previous ?? emptyCompilation;
+            var compilation = _previous ?? EmptyCompilation;
             var symbol = compilation.GetSymbols().OfType<FunctionSymbol>().SingleOrDefault(f => f.Name == functionName);
             
             if (symbol == null)
@@ -134,8 +134,9 @@ namespace Shore
         {
             if (string.IsNullOrEmpty(text)) return true;
             var nodeTree = NodeTree.Parse(text);
-            
-            return !(nodeTree.Root.Members.Last().GetLastToken().IsMissing);
+
+            if (nodeTree.Root.Members.LastOrDefault().GetLastToken() == null) return true;
+            return !nodeTree.Root.Members.LastOrDefault().GetLastToken().IsMissing;
         }
 
         protected override void EvaluateSubmission(string text)

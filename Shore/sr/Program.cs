@@ -1,4 +1,6 @@
-﻿namespace Shore
+﻿using sr;
+
+namespace Shore
 {
     internal static class Program
     {
