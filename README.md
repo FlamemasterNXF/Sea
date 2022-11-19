@@ -7,7 +7,8 @@ Sea should be able to run just fine as long as you have .NET7 installed.<br>
 Note that Sea may be able to work with older versions of .NET, but they have not been tested.<br>
 
 ## Documentation 
-This repository contains [documentation](./Docs/Reference.md) for all the features of Sea!<br>
+This repository contains [documentation](./Docs/Reference.md) for all the features of Sea.<br>
+You can follow the [Getting Started Guide](./Docs/GettingStarted.md) if you don't know where to start!<br>
 
 ## Contribution 
 I will accept Pull Requests purely based on my own discretion. I may deny Pull Requests implementing features I'd like to make myself. I appreciate all contributions to my projects, but I'd also like to continue making Sea based off own my ideas and plans.<br>
