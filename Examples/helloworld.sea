@@ -1,0 +1,4 @@
+function void main(){
+    string name = getName()
+    print("Hello " + name + "!")
+}
