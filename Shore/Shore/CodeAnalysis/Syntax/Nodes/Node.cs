@@ -55,7 +55,7 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
             if (this is Token token) return token;
 
             return GetChildren().LastOrDefault()?.GetChildren() == null
-                ? new Token(NodeTree, TokType.NullToken, 1, "@", null)
+                ? new Token(NodeTree, TokType.CloseBraceToken, 1, "}", null)
                 : GetChildren().LastOrDefault().GetLastToken();
         }
 
