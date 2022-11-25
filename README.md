@@ -3,8 +3,7 @@ Welcome to Sea!<br>
 Sea is a homemade compiled programming language made in C#.<br>
 
 ## Dependencies
-Sea should be able to run just fine as long as you have .NET7 or .NET6* installed. Sea will not work with older versions of .NET.<br>
-\* If you'd like to use .NET6 you must change the all `--framework` values in the [Build File](./Shore/build.cmd), the [SR File](./Shore/sr.cmd), and the [SC File](./Shore/sc.cmd) to `net6.0`
+Sea should be able to run just fine as long as you have .NET7 installed. Sea will not work with older versions of .NET.<br>
 
 ## Documentation 
 This repository contains [documentation](./Docs/Reference.md) for all the features of Sea.<br>
