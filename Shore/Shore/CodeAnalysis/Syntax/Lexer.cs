@@ -260,7 +260,7 @@ namespace Shore.CodeAnalysis.Syntax
 
         private void ReadIdentifierOrKeyword()
         {
-            while (char.IsLetter(Current)) _position++;
+            while (char.IsLetter(Current) || char.IsNumber(Current)) _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
             _type = text.GetKeywordType();

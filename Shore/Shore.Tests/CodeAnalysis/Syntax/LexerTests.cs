@@ -139,6 +139,7 @@ namespace Shore.Tests.CodeAnalysis.Syntax
             var twoIsKeyword = type2.ToString().EndsWith("Keyword");
 
             if (type1 == TokType.IdentifierToken && type2 == TokType.IdentifierToken) return true;
+            if (type1 == TokType.NumberToken || type2 == TokType.NumberToken) return true;
             
             switch (oneIsKeyword)
             {
