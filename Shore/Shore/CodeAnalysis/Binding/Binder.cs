@@ -306,12 +306,13 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundStatement BindForStatement(ForStatementNode node)
         {
-            var lowerBound = BindExpressionDistributor(node.LowerBound, TypeSymbol.Int32);
-            var upperBound = BindExpressionDistributor(node.UpperBound, TypeSymbol.Int32);
+            //TODO: There is no need for these to be Floats. Figure out a way to make them Ints.
+            var lowerBound = BindExpressionDistributor(node.LowerBound, TypeSymbol.Float32);
+            var upperBound = BindExpressionDistributor(node.UpperBound, TypeSymbol.Float32);
 
             _scope = new BoundScope(_scope);
 
-            var variable = BindVariable(node.Identifier, true, TypeSymbol.Int32);
+            var variable = BindVariable(node.Identifier, true, TypeSymbol.Float32);
             var body = BindLoopBody(node.Body, out var breakLabel, out var continueLabel);
 
             _scope = _scope.Parent;

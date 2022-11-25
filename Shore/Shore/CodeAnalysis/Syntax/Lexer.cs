@@ -241,7 +241,7 @@ namespace Shore.CodeAnalysis.Syntax
             while (char.IsDigit(Current)) _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
-            if (!int.TryParse(text, out var value))
+            if (!float.TryParse(text, out var value))
             {
                 var span = new TextSpan(_start, length);
                 var location = new TextLocation(_text, span);
