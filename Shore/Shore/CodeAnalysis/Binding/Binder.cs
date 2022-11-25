@@ -464,7 +464,7 @@ namespace Shore.CodeAnalysis.Binding
         private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
         {
             var value = node.Value ?? 0;
-            if (node.Value is float)
+            if (node.Value is float && !node.IsFloat)
             {
                 value = Math.Abs((float)node.Value % 1) <= (Double.Epsilon * 100)
                     ? Convert.ToInt32(node.Value)

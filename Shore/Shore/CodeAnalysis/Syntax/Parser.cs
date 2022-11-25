@@ -55,37 +55,37 @@ namespace Shore.CodeAnalysis.Syntax
             return new Token(_nodeTree, type, CurrentToken.Position, null, null);
         }
         
-        private ExpressionNode ParseExpression()
+        private ExpressionNode ParseExpression(bool isFloat = false)
         {
-            return ParseAssignmentExpression();
+            return ParseAssignmentExpression(isFloat);
         }
         
-        private ExpressionNode ParseAssignmentExpression()
+        private ExpressionNode ParseAssignmentExpression(bool forceFloat = false)
         {
             if (CurrentToken.Type == TokType.IdentifierToken && PeekToken(1).Type == TokType.EqualsToken)
             {
                 var identifierToken = NextToken();
                 var operatorToken = NextToken();
-                var right = ParseAssignmentExpression();
+                var right = ParseAssignmentExpression(forceFloat);
                 return new AssignmentExpressionNode(_nodeTree, identifierToken, operatorToken, right);
             }
 
-            return ParseBinaryExpression();
+            return ParseBinaryExpression(forceFloat);
         }
         
-        private ExpressionNode ParseBinaryExpression(int parentPrecedence = 0)
+        private ExpressionNode ParseBinaryExpression(bool forceFloat, int parentPrecedence = 0)
         {
             ExpressionNode left;
             var unaryOperatorPrecedence = CurrentToken.Type.GetUnaryOperatorPrecedence();
             if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
             {
                 var operatorToken = NextToken();
-                var operand = ParseBinaryExpression(unaryOperatorPrecedence);
+                var operand = ParseBinaryExpression(forceFloat, unaryOperatorPrecedence);
                 left = new UnaryExpressionNode(_nodeTree, operatorToken, operand);
             }
             else
             {
-                left = ParsePrimaryExpression();
+                left = ParsePrimaryExpression(forceFloat);
             }
 
             while (true) 
@@ -94,7 +94,7 @@ namespace Shore.CodeAnalysis.Syntax
                 if (precedence == 0 || precedence <= parentPrecedence) break;
 
                 var operatorToken = NextToken();
-                var right = ParseBinaryExpression(precedence);
+                var right = ParseBinaryExpression(forceFloat, precedence);
                 left = new BinaryExpressionNode(_nodeTree, left, operatorToken, right);
             }
 
@@ -184,7 +184,8 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.OpenBraceToken => ParseBlockStatement(),
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
                 TokType.BoolKeyword or TokType.StringKeyword or TokType.Int8Keyword or TokType.Int16Keyword or 
-                    TokType.Int32Keyword or TokType.Int64Keyword => ParseVariableDeclaration(),
+                    TokType.Int32Keyword or TokType.Int64Keyword or TokType.Float32Keyword or TokType.Float64Keyword 
+                    => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
                 TokType.ForKeyword => ParseForStatement(),
@@ -220,9 +221,10 @@ namespace Shore.CodeAnalysis.Syntax
         private StatementNode? ParseVariableDeclaration()
         {
             var keyword = MatchToken(CurrentToken.Type);
+            var isFloat = keyword.Text == "float";
             var identifier = MatchToken(TokType.IdentifierToken);
             var equals = MatchToken(TokType.EqualsToken);
-            var initializer = ParseExpression();
+            var initializer = ParseExpression(isFloat);
             return new VariableDeclarationNode(_nodeTree, keyword, identifier, equals, initializer);
         }
 
@@ -293,14 +295,14 @@ namespace Shore.CodeAnalysis.Syntax
             return new ExpressionStatementNode(_nodeTree, expression);
         }
         
-        private ExpressionNode ParsePrimaryExpression()
+        private ExpressionNode ParsePrimaryExpression(bool forceFloat)
         {
             return CurrentToken.Type switch
             {
                 TokType.OpenParenToken => ParseParenthesisExpression(),
                 TokType.TrueKeyword => ParseBooleanLiteral(),
                 TokType.FalseKeyword => ParseBooleanLiteral(),
-                TokType.NumberToken => ParseNumberLiteral(),
+                TokType.NumberToken => ParseNumberLiteral(forceFloat),
                 TokType.StringToken => ParseStringLiteral(),
                 TokType.IdentifierToken => ParseNameOrCallExpression(),
                 _ => ParseNameExpression()
@@ -319,13 +321,14 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var isTrue = CurrentToken.Type == TokType.TrueKeyword;
             var keywordToken = isTrue ? MatchToken(TokType.TrueKeyword) : MatchToken(TokType.FalseKeyword);
-            return new LiteralExpressionNode(_nodeTree, keywordToken, isTrue);
+            return new LiteralExpressionNode(_nodeTree, keywordToken, isTrue, false);
         }
 
-        private ExpressionNode ParseNumberLiteral()
+        private ExpressionNode ParseNumberLiteral(bool forceFloat)
         {
             var numberToken = MatchToken(TokType.NumberToken);
-            return new LiteralExpressionNode(_nodeTree, numberToken);
+            var isFloat = numberToken.Text.Contains('.') || forceFloat;
+            return new LiteralExpressionNode(_nodeTree, numberToken, isFloat);
         }
         
         private ExpressionNode ParseStringLiteral()

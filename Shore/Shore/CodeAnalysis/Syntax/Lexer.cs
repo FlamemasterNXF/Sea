@@ -238,14 +238,20 @@ namespace Shore.CodeAnalysis.Syntax
         
         private void ReadNumberToken()
         {
-            while (char.IsDigit(Current)) _position++;
+            var hasDecimal = false;
+            while (char.IsDigit(Current) || (Current == '.' && !hasDecimal))
+            {
+                if (Current == '.') hasDecimal = true;
+                _position++;
+            }
+
             var length = _position - _start;
             var text = _text.ToString(_start, length);
             if (!float.TryParse(text, out var value))
             {
                 var span = new TextSpan(_start, length);
                 var location = new TextLocation(_text, span);
-                _diagnostics.ReportInvalidNumber(location, text, TypeSymbol.Int32);
+                _diagnostics.ReportInvalidNumber(location, text);
             }
 
             _value = value;

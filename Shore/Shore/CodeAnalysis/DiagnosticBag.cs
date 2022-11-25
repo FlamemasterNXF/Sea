@@ -26,9 +26,9 @@ namespace Shore.CodeAnalysis
             _diagnostics.Add(diagnostic);
         }
 
-        public void ReportInvalidNumber(TextLocation location, string text, TypeSymbol? type)
+        public void ReportInvalidNumber(TextLocation location, string text)
         {
-            var message = $"The number {text} isn't a valid {type}.";
+            var message = $"The number {text} isn't a valid Number.";
             ReportError(location, message);
         }
 
