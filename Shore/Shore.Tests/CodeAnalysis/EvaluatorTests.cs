@@ -18,6 +18,7 @@ namespace Shore.Tests.CodeAnalysis
         [InlineData("96 - 3", 93)]
         [InlineData("9 * 10", 90)]
         [InlineData("18 / 9", 2)]
+        [InlineData("3 ** 3", 27)]
         [InlineData("(1 + 2) * 3", 9)]
         [InlineData("3 < 4", true)]
         [InlineData("5 < 4", false)]

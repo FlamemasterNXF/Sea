@@ -162,6 +162,7 @@ namespace Shore.CodeAnalysis
                 case BoundBinaryOperatorKind.Subtraction: return (int)left! - (int)right!;
                 case BoundBinaryOperatorKind.Multiplication: return (int)left! * (int)right!;
                 case BoundBinaryOperatorKind.Division: return (int)left! / (int)right!;
+                case BoundBinaryOperatorKind.Exponentiation: return (int)Math.Pow((int)left!, (int)right!);
                 case BoundBinaryOperatorKind.BitwiseAnd:
                     if (b.Type!.ParentType == TypeSymbol.Number) return (int)left! & (int)right!;
                     return (bool)left! & (bool)right!;
