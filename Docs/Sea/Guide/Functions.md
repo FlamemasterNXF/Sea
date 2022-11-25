@@ -19,3 +19,8 @@ You can declare arguments for any given Function with the `<type> <name>, <type2
 The Main Function is an optional Function which you can declare at the top of your Sea file. If a Sea File uses this Function Global Statements (Statements outside of Functions) are no longer allowed. This Function will be evaluated and ran at runtime in place of the Globals. The Main Functions must always be of Type Void and must have zero arguments.<br>
 Learn more about the [Void Type](./Types/Void.md)<br>
 Learn more about [Global Statements](./GlobalStatements.md)<br>
+
+## Built-In Functions
+Sea includes two built-in functions that come packaged with the language.<br>
+- `print(<string>)`: Prints a String input to the console
+- `input()`: Stops program execution and asks the user for an input of the String Type. Resumes program execution when the input is given.
