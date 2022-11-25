@@ -461,9 +461,16 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundAssignmentExpression(variable, convertedExpression);
         }
 
-        private BoundExpression BindLiteralExpression(LiteralExpressionNode? node)
+        private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
         {
-            var value = node?.Value ?? 0;
+            var value = node.Value ?? 0;
+            if (node.Value is float && !node.IsFloat)
+            {
+                value = Math.Abs((float)node.Value % 1) <= (Double.Epsilon * 100)
+                    ? Convert.ToInt32(node.Value)
+                    : node.Value;
+            }
+
             return new BoundLiteralExpression(value);
         }
 

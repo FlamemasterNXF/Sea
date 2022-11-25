@@ -18,6 +18,8 @@ namespace Shore.CodeAnalysis.Binding
                 short => TypeSymbol.Int16,
                 int => TypeSymbol.Int32,
                 long => TypeSymbol.Int64,
+                float => TypeSymbol.Float32,
+                double => TypeSymbol.Float64,
                 _ => throw new Exception($"Unexpected Literal '{value}' of Type {value.GetType()}")
             };
         }

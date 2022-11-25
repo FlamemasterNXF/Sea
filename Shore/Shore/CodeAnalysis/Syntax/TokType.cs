@@ -78,6 +78,8 @@ namespace Shore.CodeAnalysis.Syntax
         ContinueKeyword,
         ReturnStatement,
         ReturnKeyword,
-        DoubleStarToken
+        DoubleStarToken,
+        Float64Keyword,
+        Float32Keyword
     }
 }

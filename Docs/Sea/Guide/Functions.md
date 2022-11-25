@@ -24,3 +24,6 @@ Learn more about [Global Statements](./GlobalStatements.md)<br>
 Sea includes two built-in functions that come packaged with the language.<br>
 - `print(<string>)`: Prints a String input to the console
 - `input()`: Stops program execution and asks the user for an input of the String Type. Resumes program execution when the input is given.
+- `round(<float>)`: Rounds a Floating Point Number to the nearest Integral Number.
+- `ceil(<float>)`: Returns the smallest Integral Value that is greater than a given Floating Point Number.
+- `floor(<float>)`: Returns the largest Integral Value that is less than a given Floating Point Number.
