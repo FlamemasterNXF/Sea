@@ -6,18 +6,18 @@ namespace Shore.CodeAnalysis
     internal sealed class Evaluator
     {
         private readonly BoundProgram _program;
-        private readonly Dictionary<VariableSymbol?, object?> _globals;
-        private readonly Dictionary<FunctionSymbol?, BoundBlockStatement> _functions = new();
-        private readonly Stack<Dictionary<VariableSymbol?, object?>> _locals = new();
+        private readonly Dictionary<VariableSymbol, object> _globals;
+        private readonly Dictionary<FunctionSymbol, BoundBlockStatement> _functions = new();
+        private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
         private Random _random;
 
         private object? _lastValue;
 
-        public Evaluator(BoundProgram program, Dictionary<VariableSymbol?, object?> variables)
+        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object> variables)
         {
             _program = program;
             _globals = variables;
-            _locals.Push(new Dictionary<VariableSymbol?, object?>());
+            _locals.Push(new Dictionary<VariableSymbol, object>());
 
             var current = program;
             while (current != null)
@@ -118,7 +118,7 @@ namespace Shore.CodeAnalysis
 
         private static object EvaluateLiteralExpression(BoundLiteralExpression n) => n.Value;
 
-        private object? EvaluateVariableExpression(BoundVariableExpression v)
+        private object EvaluateVariableExpression(BoundVariableExpression v)
         {
             if (v.Variable!.Kind == SymbolKind.GlobalVariable) return _globals[v.Variable];
             else
@@ -212,16 +212,34 @@ namespace Shore.CodeAnalysis
 
         private object? EvaluateCallExpression(BoundCallExpression node)
         {
-            if (node.Function == BuiltinFunctions.Input)
-            {
-                return Console.ReadLine();
-            }
+            if (node.Function == BuiltinFunctions.Input) return Console.ReadLine();
 
             if (node.Function == BuiltinFunctions.Print)
             {
                 var value = EvaluateExpression(node.Arguments[0])!;
                 Console.WriteLine(value);
                 return null;
+            }
+
+            if (node.Function == BuiltinFunctions.Round)
+            {
+                var value = EvaluateExpression(node.Arguments[0]);
+                var round = Math.Round((float)value);
+                return round;
+            }
+            
+            if (node.Function == BuiltinFunctions.Floor)
+            {
+                var value = EvaluateExpression(node.Arguments[0]);
+                var round = Math.Floor((float)value);
+                return round;
+            }
+            
+            if (node.Function == BuiltinFunctions.Ceil)
+            {
+                var value = EvaluateExpression(node.Arguments[0]);
+                var round = Math.Ceiling((float)value);
+                return round;
             }
 
             var locals = new Dictionary<VariableSymbol?, object?>();
