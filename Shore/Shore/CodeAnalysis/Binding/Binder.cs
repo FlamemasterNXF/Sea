@@ -601,6 +601,8 @@ namespace Shore.CodeAnalysis.Binding
                 "int16" or "short" => TypeSymbol.Int16,
                 "int32" or "int" => TypeSymbol.Int32,
                 "int64" or "long" => TypeSymbol.Int64,
+                "float32" or "float" => TypeSymbol.Float32,
+                "float64" or "double" => TypeSymbol.Float64,
                 _ => null
             };
         }
