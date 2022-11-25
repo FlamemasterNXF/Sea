@@ -142,7 +142,7 @@ namespace Shore.CodeAnalysis
             return u.Op.Kind switch
             {
                 BoundUnaryOperatorKind.Identity => operand,
-                BoundUnaryOperatorKind.Negation => u.Operand.Type.ParentType == TypeSymbol.Int32 ? 
+                BoundUnaryOperatorKind.Negation => u.Operand.Type == TypeSymbol.Int32 ? 
                     -Convert.ToInt32(operand) : -Convert.ToSingle(operand),
                 BoundUnaryOperatorKind.LogicalNegation => !(bool)operand,
                 BoundUnaryOperatorKind.OnesComplement => ~Convert.ToInt32(operand),
@@ -172,16 +172,16 @@ namespace Shore.CodeAnalysis
                     if (useFloat) return Convert.ToSingle(left) / Convert.ToSingle(right);
                     return Convert.ToInt32(left) / Convert.ToInt32(right);
                 case BoundBinaryOperatorKind.Exponentiation: 
-                    if (useFloat) return Math.Pow(Convert.ToSingle(left), Convert.ToSingle(right));
-                    return Math.Pow(Convert.ToInt32(left), Convert.ToInt32(right));
+                    if (useFloat) return (float)Math.Pow(Convert.ToSingle(left), Convert.ToSingle(right));
+                    return (int)Math.Pow(Convert.ToInt32(left), Convert.ToInt32(right));
                 case BoundBinaryOperatorKind.BitwiseAnd:
-                    if (b.Type!.ParentType == TypeSymbol.Number) return Convert.ToInt32(left) & Convert.ToInt32(right);
+                    if (b.Type!.ParentType == TypeSymbol.Integer) return (int)left & (int)right;
                     return (bool)left! & (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseOr:
-                    if (b.Type!.ParentType == TypeSymbol.Number) return Convert.ToInt32(left) | Convert.ToInt32(right);
+                    if (b.Type!.ParentType == TypeSymbol.Integer) return (int)left | (int)right;
                     return (bool)left! | (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseXor:
-                    if (b.Type!.ParentType == TypeSymbol.Number) return Convert.ToInt32(left) ^ Convert.ToInt32(right);
+                    if (b.Type!.ParentType == TypeSymbol.Integer) return (int)left ^ (int)right;
                     return (bool)left! ^ (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseLeftShift: return Convert.ToInt32(left) << Convert.ToInt32(right);
                 case BoundBinaryOperatorKind.BitwiseRightShift: return Convert.ToInt32(left) >> Convert.ToInt32(right);

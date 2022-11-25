@@ -306,13 +306,12 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundStatement BindForStatement(ForStatementNode node)
         {
-            //TODO: There is no need for these to be Floats. Figure out a way to make them Ints.
-            var lowerBound = BindExpressionDistributor(node.LowerBound, TypeSymbol.Float32);
-            var upperBound = BindExpressionDistributor(node.UpperBound, TypeSymbol.Float32);
+            var lowerBound = BindExpressionDistributor(node.LowerBound, TypeSymbol.Int32);
+            var upperBound = BindExpressionDistributor(node.UpperBound, TypeSymbol.Int32);
 
             _scope = new BoundScope(_scope);
 
-            var variable = BindVariable(node.Identifier, true, TypeSymbol.Float32);
+            var variable = BindVariable(node.Identifier, true, TypeSymbol.Int32);
             var body = BindLoopBody(node.Body, out var breakLabel, out var continueLabel);
 
             _scope = _scope.Parent;
@@ -462,9 +461,16 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundAssignmentExpression(variable, convertedExpression);
         }
 
-        private BoundExpression BindLiteralExpression(LiteralExpressionNode? node)
+        private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
         {
-            var value = node?.Value ?? 0;
+            var value = node.Value ?? 0;
+            if (node.Value is float)
+            {
+                value = Math.Abs((float)node.Value % 1) <= (Double.Epsilon * 100)
+                    ? Convert.ToInt32(node.Value)
+                    : node.Value;
+            }
+
             return new BoundLiteralExpression(value);
         }
 

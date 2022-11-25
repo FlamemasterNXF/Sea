@@ -51,6 +51,7 @@ namespace Shore.CodeAnalysis.Binding
 
         private static BoundBinaryOperator[] Operators()
         {
+            //TODO: Floats made this a mess. Optimization?
             List<BoundBinaryOperator> dynamicOperators = new List<BoundBinaryOperator>();
             foreach (var type in TypeSymbol.GetChildrenTypes(TypeSymbol.Integer))
             {
@@ -99,6 +100,22 @@ namespace Shore.CodeAnalysis.Binding
                 dynamicOperators.Add(new BoundBinaryOperator(LessThanToken, LessThan, TypeSymbol.Float32, TypeSymbol.Int32, TypeSymbol.Bool));
                 dynamicOperators.Add(new BoundBinaryOperator(LessThanOrEqualToken, LessThanOrEqual, TypeSymbol.Float32, TypeSymbol.Int32, TypeSymbol.Bool));
             }
+            dynamicOperators.Add(new BoundBinaryOperator(PlusToken, Addition, TypeSymbol.Int32, TypeSymbol.Float32,
+                TypeSymbol.Float32));
+            dynamicOperators.Add(new BoundBinaryOperator(DashToken, Subtraction, TypeSymbol.Int32, TypeSymbol.Float32,
+                TypeSymbol.Float32));
+            dynamicOperators.Add(new BoundBinaryOperator(StarToken, Multiplication, TypeSymbol.Int32, TypeSymbol.Float32,
+                TypeSymbol.Float32));
+            dynamicOperators.Add(new BoundBinaryOperator(SlashToken, Division, TypeSymbol.Int32, TypeSymbol.Float32,
+                TypeSymbol.Float32));
+            dynamicOperators.Add(new BoundBinaryOperator(DoubleStarToken, Exponentiation, TypeSymbol.Int32, TypeSymbol.Float32,
+                TypeSymbol.Float32));
+            dynamicOperators.Add(new BoundBinaryOperator(DoubleEqualsToken, LogicalEquals, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(BangEqualsToken, LogicalNotEquals, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(GreaterThanToken, GreaterThan, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(GreaterThanOrEqualToken, GreaterThanOrEqual, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(LessThanToken, LessThan, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(LessThanOrEqualToken, LessThanOrEqual, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
             
             var operators = dynamicOperators.Concat(FixedOperators);
             return operators.ToArray();
@@ -107,8 +124,7 @@ namespace Shore.CodeAnalysis.Binding
         public static BoundBinaryOperator? Bind(TokType tokType, TypeSymbol leftType, TypeSymbol rightType)
         {
             return Operators().FirstOrDefault(op =>
-                op.TokType == tokType && (op.LeftType == leftType || op.LeftType == rightType) &&
-                (op.RightType == leftType || op.RightType == rightType));
+                op.TokType == tokType && op.LeftType == leftType && op.RightType == rightType);
         }
     }
 }

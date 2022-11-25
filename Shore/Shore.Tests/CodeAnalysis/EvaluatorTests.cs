@@ -11,7 +11,7 @@ namespace Shore.Tests.CodeAnalysis
         [Theory]
         [InlineData("1", 1)]
         [InlineData("+1", 1)]
-        [InlineData("-1", -1)]
+        [InlineData("-1", (float)-1)]
         [InlineData("~1", -2)]
         [InlineData("(1)", 1)]
         [InlineData("13 + 14", 27)]
@@ -117,7 +117,7 @@ namespace Shore.Tests.CodeAnalysis
             ";
 
             var diagnostics = @"
-                Cannot convert Type 'int32' to 'string'. An explicit conversion exists (are you missing a cast?).
+                Cannot Convert Type 'int32' to Type 'string'.
             ";
             
             AssertDiagnostics(text, diagnostics);
@@ -131,7 +131,7 @@ namespace Shore.Tests.CodeAnalysis
             ";
 
             var diagnostics = @"
-                Cannot convert Type 'int32' to 'string'. An explicit conversion exists (are you missing a cast?).
+                Cannot Convert Type 'int32' to Type 'string'.
             ";
             
             AssertDiagnostics(text, diagnostics);

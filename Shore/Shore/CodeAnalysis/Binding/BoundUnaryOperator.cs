@@ -33,7 +33,12 @@ namespace Shore.CodeAnalysis.Binding
         private static BoundUnaryOperator[] Operators()
         {
             List<BoundUnaryOperator> dynamicOperators = new List<BoundUnaryOperator>();
-            foreach (var type in TypeSymbol.GetChildrenTypes(TypeSymbol.Number)!)
+            foreach (var type in TypeSymbol.GetChildrenTypes(TypeSymbol.Integer))
+            {
+                dynamicOperators.Add(new BoundUnaryOperator(TokType.PlusToken, BoundUnaryOperatorKind.Identity, type));
+                dynamicOperators.Add(new BoundUnaryOperator(TokType.DashToken, BoundUnaryOperatorKind.Negation, type));
+            }
+            foreach (var type in TypeSymbol.GetChildrenTypes(TypeSymbol.Float))
             {
                 dynamicOperators.Add(new BoundUnaryOperator(TokType.PlusToken, BoundUnaryOperatorKind.Identity, type));
                 dynamicOperators.Add(new BoundUnaryOperator(TokType.DashToken, BoundUnaryOperatorKind.Negation, type));
