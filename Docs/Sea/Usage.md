@@ -6,9 +6,9 @@ Note: This usage of both the Compiler and the REPL is currently *command-line ba
 Using [Shore](../../Shore/sc/README.md), the Sea Compiler, is the best way to run Sea files! <br>
 To start, ensure you have cloned this repository to your local machine (or just the /Shore folder).<br>
 Once you have the files, simply open a command window and move into the `/Shore` directory.<br>
-After you're in that directory simply run `./sc <path>` with the `<path>` being the path to your Sea file or a directory containing Sea files.<br>
+After you're in that directory simply run `sc <path>` with the `<path>` being the path to your Sea file or a directory containing Sea files.<br>
 Be sure to include the file extension in the file path.<br><br>
-Example: `./sc ../Examples`
+Example: `sc ../Examples`
 
 ## Using the REPL
 Using the [Shore REPL](../../Shore/sr/README.md) is an easy way to quickly test Sea scripts.<br>
