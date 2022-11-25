@@ -170,6 +170,8 @@ namespace Shore.Tests.CodeAnalysis.Syntax
                 case TokType.BangToken when type2 == TokType.DoubleEqualsToken:
                 case TokType.EqualsToken when type2 == TokType.EqualsToken:
                 case TokType.EqualsToken when type2 == TokType.DoubleEqualsToken:
+                case TokType.StarToken when type2 == TokType.DoubleStarToken:
+                case TokType.StarToken when type2 == TokType.StarToken:
                 case TokType.NumberToken when type2 == TokType.NumberToken:
                 case TokType.StringToken when type2 == TokType.StringToken:
                     return true;

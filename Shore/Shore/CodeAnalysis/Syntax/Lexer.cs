@@ -53,9 +53,14 @@ namespace Shore.CodeAnalysis.Syntax
                     _position++;
                     break;              
                 case '*':
-                    _type = TokType.StarToken;
                     _position++;
-                    break;              
+                    if (Current != '*') _type = TokType.StarToken;
+                    else
+                    {
+                        _type = TokType.DoubleStarToken;
+                        _position++;
+                    }
+                    break;
                 case '/':
                     _type = TokType.SlashToken;
                     _position++;
