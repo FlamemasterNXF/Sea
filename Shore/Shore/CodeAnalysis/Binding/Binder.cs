@@ -306,12 +306,12 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundStatement BindForStatement(ForStatementNode node)
         {
-            var lowerBound = BindExpressionDistributor(node.LowerBound, TypeSymbol.Int32);
-            var upperBound = BindExpressionDistributor(node.UpperBound, TypeSymbol.Int32);
+            var lowerBound = BindExpressionDistributor(node.LowerBound, TypeSymbol.Int64);
+            var upperBound = BindExpressionDistributor(node.UpperBound, TypeSymbol.Int64);
 
             _scope = new BoundScope(_scope);
 
-            var variable = BindVariable(node.Identifier, true, TypeSymbol.Int32);
+            var variable = BindVariable(node.Identifier, true, TypeSymbol.Int64);
             var body = BindLoopBody(node.Body, out var breakLabel, out var continueLabel);
 
             _scope = _scope.Parent;
@@ -463,12 +463,12 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
         {
-            var value = node.Value ?? 0;
-            if (node.Value is float && !node.IsFloat)
+            var value = node.Value ?? (long)0;
+            if (node.Value is double && !node.IsFloat)
             {
-                value = Math.Abs((float)node.Value % 1) <= (Double.Epsilon * 100)
-                    ? Convert.ToInt32(node.Value)
-                    : node.Value;
+                value = Math.Abs((double)node.Value % 1) <= (Double.Epsilon * 100)
+                    ? Convert.ToInt64(node.Value)
+                    : (node.Value);
             }
 
             return new BoundLiteralExpression(value);
@@ -597,12 +597,12 @@ namespace Shore.CodeAnalysis.Binding
             {
                 "bool" => TypeSymbol.Bool,
                 "string" => TypeSymbol.String,
-                "int8" or "byte" => TypeSymbol.Int8,
-                "int16" or "short" => TypeSymbol.Int16,
-                "int32" or "int" => TypeSymbol.Int32,
-                "int64" or "long" => TypeSymbol.Int64,
-                "float32" or "float" => TypeSymbol.Float32,
-                "float64" or "double" => TypeSymbol.Float64,
+                //"int8" or "byte" => TypeSymbol.Int8,
+                //"int16" or "short" => TypeSymbol.Int16,
+                //"int32" or "int" => TypeSymbol.Int32,
+                "int64" or "int" => TypeSymbol.Int64,
+                //"float32" or "float" => TypeSymbol.Float32,
+                "float64" or "float" => TypeSymbol.Float64,
                 _ => null
             };
         }

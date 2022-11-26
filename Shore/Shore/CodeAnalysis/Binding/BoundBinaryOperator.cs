@@ -30,11 +30,11 @@ namespace Shore.CodeAnalysis.Binding
         
         private static readonly List<BoundBinaryOperator> FixedOperators = new()
         {
-            new BoundBinaryOperator(CaratToken, BitwiseXor, TypeSymbol.Int32),
-            new BoundBinaryOperator(AmpersandToken, BitwiseAnd, TypeSymbol.Int32),
-            new BoundBinaryOperator(PipeToken, BitwiseOr, TypeSymbol.Int32),
-            new BoundBinaryOperator(RightShiftToken, BitwiseRightShift, TypeSymbol.Int32),
-            new BoundBinaryOperator(LeftShiftToken, BitwiseLeftShift, TypeSymbol.Int32),
+            new BoundBinaryOperator(CaratToken, BitwiseXor, TypeSymbol.Int64),
+            new BoundBinaryOperator(AmpersandToken, BitwiseAnd, TypeSymbol.Int64),
+            new BoundBinaryOperator(PipeToken, BitwiseOr, TypeSymbol.Int64),
+            new BoundBinaryOperator(RightShiftToken, BitwiseRightShift, TypeSymbol.Int64),
+            new BoundBinaryOperator(LeftShiftToken, BitwiseLeftShift, TypeSymbol.Int64),
             
             new BoundBinaryOperator(CaratToken, BitwiseXor, TypeSymbol.Bool),
             new BoundBinaryOperator(AmpersandToken, BitwiseAnd, TypeSymbol.Bool),
@@ -83,39 +83,39 @@ namespace Shore.CodeAnalysis.Binding
             }
             foreach (var type in TypeSymbol.GetChildrenTypes(TypeSymbol.Number))
             {
-                dynamicOperators.Add(new BoundBinaryOperator(PlusToken, Addition, TypeSymbol.Float32, TypeSymbol.Int32,
-                    TypeSymbol.Float32));
-                dynamicOperators.Add(new BoundBinaryOperator(DashToken, Subtraction, TypeSymbol.Float32, TypeSymbol.Int32,
-                    TypeSymbol.Float32));
-                dynamicOperators.Add(new BoundBinaryOperator(StarToken, Multiplication, TypeSymbol.Float32, TypeSymbol.Int32,
-                    TypeSymbol.Float32));
-                dynamicOperators.Add(new BoundBinaryOperator(SlashToken, Division, TypeSymbol.Float32, TypeSymbol.Int32,
-                    TypeSymbol.Float32));
-                dynamicOperators.Add(new BoundBinaryOperator(DoubleStarToken, Exponentiation, TypeSymbol.Float32, TypeSymbol.Int32,
-                    TypeSymbol.Float32));
-                dynamicOperators.Add(new BoundBinaryOperator(DoubleEqualsToken, LogicalEquals, TypeSymbol.Float32, TypeSymbol.Int32, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(BangEqualsToken, LogicalNotEquals, TypeSymbol.Float32, TypeSymbol.Int32, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(GreaterThanToken, GreaterThan, TypeSymbol.Float32, TypeSymbol.Int32, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(GreaterThanOrEqualToken, GreaterThanOrEqual, TypeSymbol.Float32, TypeSymbol.Int32, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(LessThanToken, LessThan, TypeSymbol.Float32, TypeSymbol.Int32, TypeSymbol.Bool));
-                dynamicOperators.Add(new BoundBinaryOperator(LessThanOrEqualToken, LessThanOrEqual, TypeSymbol.Float32, TypeSymbol.Int32, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(PlusToken, Addition, TypeSymbol.Float64, TypeSymbol.Int64,
+                    TypeSymbol.Float64));
+                dynamicOperators.Add(new BoundBinaryOperator(DashToken, Subtraction, TypeSymbol.Float64, TypeSymbol.Int64,
+                    TypeSymbol.Float64));
+                dynamicOperators.Add(new BoundBinaryOperator(StarToken, Multiplication, TypeSymbol.Float64, TypeSymbol.Int64,
+                    TypeSymbol.Float64));
+                dynamicOperators.Add(new BoundBinaryOperator(SlashToken, Division, TypeSymbol.Float64, TypeSymbol.Int64,
+                    TypeSymbol.Float64));
+                dynamicOperators.Add(new BoundBinaryOperator(DoubleStarToken, Exponentiation, TypeSymbol.Float64, TypeSymbol.Int64,
+                    TypeSymbol.Float64));
+                dynamicOperators.Add(new BoundBinaryOperator(DoubleEqualsToken, LogicalEquals, TypeSymbol.Float64, TypeSymbol.Int64, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(BangEqualsToken, LogicalNotEquals, TypeSymbol.Float64, TypeSymbol.Int64, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(GreaterThanToken, GreaterThan, TypeSymbol.Float64, TypeSymbol.Int64, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(GreaterThanOrEqualToken, GreaterThanOrEqual, TypeSymbol.Float64, TypeSymbol.Int64, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(LessThanToken, LessThan, TypeSymbol.Float64, TypeSymbol.Int64, TypeSymbol.Bool));
+                dynamicOperators.Add(new BoundBinaryOperator(LessThanOrEqualToken, LessThanOrEqual, TypeSymbol.Float64, TypeSymbol.Int64, TypeSymbol.Bool));
             }
-            dynamicOperators.Add(new BoundBinaryOperator(PlusToken, Addition, TypeSymbol.Int32, TypeSymbol.Float32,
-                TypeSymbol.Float32));
-            dynamicOperators.Add(new BoundBinaryOperator(DashToken, Subtraction, TypeSymbol.Int32, TypeSymbol.Float32,
-                TypeSymbol.Float32));
-            dynamicOperators.Add(new BoundBinaryOperator(StarToken, Multiplication, TypeSymbol.Int32, TypeSymbol.Float32,
-                TypeSymbol.Float32));
-            dynamicOperators.Add(new BoundBinaryOperator(SlashToken, Division, TypeSymbol.Int32, TypeSymbol.Float32,
-                TypeSymbol.Float32));
-            dynamicOperators.Add(new BoundBinaryOperator(DoubleStarToken, Exponentiation, TypeSymbol.Int32, TypeSymbol.Float32,
-                TypeSymbol.Float32));
-            dynamicOperators.Add(new BoundBinaryOperator(DoubleEqualsToken, LogicalEquals, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
-            dynamicOperators.Add(new BoundBinaryOperator(BangEqualsToken, LogicalNotEquals, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
-            dynamicOperators.Add(new BoundBinaryOperator(GreaterThanToken, GreaterThan, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
-            dynamicOperators.Add(new BoundBinaryOperator(GreaterThanOrEqualToken, GreaterThanOrEqual, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
-            dynamicOperators.Add(new BoundBinaryOperator(LessThanToken, LessThan, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
-            dynamicOperators.Add(new BoundBinaryOperator(LessThanOrEqualToken, LessThanOrEqual, TypeSymbol.Int32, TypeSymbol.Float32, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(PlusToken, Addition, TypeSymbol.Int64, TypeSymbol.Float64,
+                TypeSymbol.Float64));
+            dynamicOperators.Add(new BoundBinaryOperator(DashToken, Subtraction, TypeSymbol.Int64, TypeSymbol.Float64,
+                TypeSymbol.Float64));
+            dynamicOperators.Add(new BoundBinaryOperator(StarToken, Multiplication, TypeSymbol.Int64, TypeSymbol.Float64,
+                TypeSymbol.Float64));
+            dynamicOperators.Add(new BoundBinaryOperator(SlashToken, Division, TypeSymbol.Int64, TypeSymbol.Float64,
+                TypeSymbol.Float64));
+            dynamicOperators.Add(new BoundBinaryOperator(DoubleStarToken, Exponentiation, TypeSymbol.Int64, TypeSymbol.Float64,
+                TypeSymbol.Float64));
+            dynamicOperators.Add(new BoundBinaryOperator(DoubleEqualsToken, LogicalEquals, TypeSymbol.Int64, TypeSymbol.Float64, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(BangEqualsToken, LogicalNotEquals, TypeSymbol.Int64, TypeSymbol.Float64, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(GreaterThanToken, GreaterThan, TypeSymbol.Int64, TypeSymbol.Float64, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(GreaterThanOrEqualToken, GreaterThanOrEqual, TypeSymbol.Int64, TypeSymbol.Float64, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(LessThanToken, LessThan, TypeSymbol.Int64, TypeSymbol.Float64, TypeSymbol.Bool));
+            dynamicOperators.Add(new BoundBinaryOperator(LessThanOrEqualToken, LessThanOrEqual, TypeSymbol.Int64, TypeSymbol.Float64, TypeSymbol.Bool));
             
             var operators = dynamicOperators.Concat(FixedOperators);
             return operators.ToArray();

@@ -25,7 +25,7 @@ namespace Shore.CodeAnalysis.Binding
         
         private static readonly List<BoundUnaryOperator> FixedOperators = new()
         {
-            new (TokType.TildeToken, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.Int32),
+            new (TokType.TildeToken, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.Int64),
             
             new (TokType.BangToken, BoundUnaryOperatorKind.LogicalNegation, TypeSymbol.Bool),
         };

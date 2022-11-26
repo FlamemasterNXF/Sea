@@ -183,8 +183,7 @@ namespace Shore.CodeAnalysis.Syntax
             {
                 TokType.OpenBraceToken => ParseBlockStatement(),
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
-                TokType.BoolKeyword or TokType.StringKeyword or TokType.Int8Keyword or TokType.Int16Keyword or 
-                    TokType.Int32Keyword or TokType.Int64Keyword or TokType.Float32Keyword or TokType.Float64Keyword 
+                TokType.BoolKeyword or TokType.StringKeyword or TokType.Int64Keyword or TokType.Float64Keyword 
                     => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),

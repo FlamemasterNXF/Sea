@@ -33,7 +33,8 @@ namespace Shore.CodeAnalysis.Binding.Converting
             
             if (from != TypeSymbol.Void && to == TypeSymbol.Any) return Implicit;
             
-            if (from == TypeSymbol.Float32 && to == TypeSymbol.Int32) return Implicit;
+            //if (from == TypeSymbol.Float32 && to == TypeSymbol.Int32) return Implicit;
+            if (from == TypeSymbol.Float64 && to == TypeSymbol.Int64) return Implicit;
             
             if (from == TypeSymbol.Any && to != TypeSymbol.Void) return Explicit;
 

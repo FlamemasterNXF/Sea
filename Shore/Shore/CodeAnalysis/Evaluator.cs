@@ -142,10 +142,10 @@ namespace Shore.CodeAnalysis
             return u.Op.Kind switch
             {
                 BoundUnaryOperatorKind.Identity => operand,
-                BoundUnaryOperatorKind.Negation => u.Operand.Type == TypeSymbol.Int32 ? 
-                    -Convert.ToInt32(operand) : -Convert.ToSingle(operand),
+                BoundUnaryOperatorKind.Negation => u.Operand.Type == TypeSymbol.Int64 ? 
+                    -Convert.ToInt64(operand) : -Convert.ToDouble(operand),
                 BoundUnaryOperatorKind.LogicalNegation => !(bool)operand,
-                BoundUnaryOperatorKind.OnesComplement => ~Convert.ToInt32(operand),
+                BoundUnaryOperatorKind.OnesComplement => ~Convert.ToInt64(operand),
                 _ => throw new Exception($"Unexpected unary operator {u.Op}")
             };
         }
@@ -159,21 +159,21 @@ namespace Shore.CodeAnalysis
             switch (b.Op.Kind)
             {
                 case BoundBinaryOperatorKind.Addition:
-                    if (useFloat) return Convert.ToSingle(left) + Convert.ToSingle(right);
-                    if (b.Type.ParentType == TypeSymbol.Integer) return Convert.ToInt32(left) + Convert.ToInt32(right);
+                    if (useFloat) return Convert.ToDouble(left) + Convert.ToDouble(right);
+                    if (b.Type.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) + Convert.ToInt64(right);
                     return (string)left! + (string)right!;
                 case BoundBinaryOperatorKind.Subtraction: 
-                    if (useFloat) return Convert.ToSingle(left) - Convert.ToSingle(right);
-                    return Convert.ToInt32(left) - Convert.ToInt32(right);
+                    if (useFloat) return Convert.ToDouble(left) - Convert.ToDouble(right);
+                    return Convert.ToInt64(left) - Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.Multiplication: 
-                    if (useFloat) return Convert.ToSingle(left) * Convert.ToSingle(right);
-                    return Convert.ToInt32(left) * Convert.ToInt32(right);
+                    if (useFloat) return Convert.ToDouble(left) * Convert.ToDouble(right);
+                    return Convert.ToInt64(left) * Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.Division: 
-                    if (useFloat) return Convert.ToSingle(left) / Convert.ToSingle(right);
-                    return Convert.ToInt32(left) / Convert.ToInt32(right);
+                    if (useFloat) return Convert.ToDouble(left) / Convert.ToDouble(right);
+                    return Convert.ToInt64(left) / Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.Exponentiation: 
-                    if (useFloat) return (float)Math.Pow(Convert.ToSingle(left), Convert.ToSingle(right));
-                    return (int)Math.Pow(Convert.ToInt32(left), Convert.ToInt32(right));
+                    if (useFloat) return (double)Math.Pow(Convert.ToDouble(left), Convert.ToDouble(right));
+                    return (long)Math.Pow(Convert.ToInt64(left), Convert.ToInt64(right));
                 case BoundBinaryOperatorKind.BitwiseAnd:
                     if (b.Type!.ParentType == TypeSymbol.Integer) return (int)left & (int)right;
                     return (bool)left! & (bool)right!;
@@ -194,17 +194,17 @@ namespace Shore.CodeAnalysis
                 case BoundBinaryOperatorKind.LogicalNotEquals:
                     return !Equals(left, right);
                 case BoundBinaryOperatorKind.LessThan:
-                    if (useFloat) return Convert.ToSingle(left) < Convert.ToSingle(right);
-                    return Convert.ToInt32(left) < Convert.ToInt32(right);
+                    if (useFloat) return Convert.ToDouble(left) < Convert.ToDouble(right);
+                    return Convert.ToInt64(left) < Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.LessThanOrEqual:
-                    if (useFloat) return Convert.ToSingle(left) <= Convert.ToSingle(right);
-                    return Convert.ToInt32(left) <= Convert.ToInt32(right);
+                    if (useFloat) return Convert.ToDouble(left) <= Convert.ToDouble(right);
+                    return Convert.ToInt64(left) <= Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.GreaterThan:
-                    if (useFloat) return Convert.ToSingle(left) > Convert.ToSingle(right);
-                    return Convert.ToInt32(left) > Convert.ToInt32(right);
+                    if (useFloat) return Convert.ToDouble(left) > Convert.ToDouble(right);
+                    return Convert.ToInt64(left) > Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.GreaterThanOrEqual:
-                    if (useFloat) return Convert.ToSingle(left) >= Convert.ToSingle(right);
-                    return Convert.ToInt32(left) >= Convert.ToInt32(right);
+                    if (useFloat) return Convert.ToDouble(left) >= Convert.ToDouble(right);
+                    return Convert.ToInt64(left) >= Convert.ToInt64(right);
                 default:
                     throw new Exception($"Unexpected Binary Operator {b.Op}");
             }
@@ -224,21 +224,21 @@ namespace Shore.CodeAnalysis
             if (node.Function == BuiltinFunctions.Round)
             {
                 var value = EvaluateExpression(node.Arguments[0]);
-                var round = Math.Round((float)value);
+                var round = Math.Round((double)value);
                 return round;
             }
             
             if (node.Function == BuiltinFunctions.Floor)
             {
                 var value = EvaluateExpression(node.Arguments[0]);
-                var round = Math.Floor((float)value);
+                var round = Math.Floor((double)value);
                 return round;
             }
             
             if (node.Function == BuiltinFunctions.Ceil)
             {
                 var value = EvaluateExpression(node.Arguments[0]);
-                var round = Math.Ceiling((float)value);
+                var round = Math.Ceiling((double)value);
                 return round;
             }
 
@@ -265,8 +265,8 @@ namespace Shore.CodeAnalysis
             var value = EvaluateExpression(node.Expression);
             if (node.Type == TypeSymbol.Any) return value;
             if (node.Type == TypeSymbol.Bool) return Convert.ToBoolean(value);
-            if (node.Type == TypeSymbol.Float32) return Convert.ToSingle(value);
-            if (node.Type == TypeSymbol.Int32) return Convert.ToInt32(value);
+            if (node.Type == TypeSymbol.Float64) return Convert.ToDouble(value);
+            if (node.Type == TypeSymbol.Int64) return Convert.ToInt64(value);
             if (node.Type == TypeSymbol.String) return Convert.ToString(value);
             throw new Exception($"Unexpected type {node.Type}");
         }

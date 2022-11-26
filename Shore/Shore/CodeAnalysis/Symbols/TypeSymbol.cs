@@ -20,11 +20,11 @@
         public static readonly TypeSymbol Void = new("void", null);
 
         
-        public static readonly TypeSymbol Int8 = new ("int8", Integer);
-        public static readonly TypeSymbol Int16 = new ("int16", Integer);
-        public static readonly TypeSymbol Int32 = new ("int32", Integer);
+        //public static readonly TypeSymbol Int8 = new ("int8", Integer);
+        //public static readonly TypeSymbol Int16 = new ("int16", Integer);
+        //public static readonly TypeSymbol Int32 = new ("int32", Integer);
         public static readonly TypeSymbol Int64 = new ("int64", Integer);
-        public static readonly TypeSymbol Float32 = new ("float32", Float);
+        //public static readonly TypeSymbol Float32 = new ("float32", Float);
         public static readonly TypeSymbol Float64 = new ("float64", Float);
 
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
@@ -34,9 +34,9 @@
         {
             if (parent == Bool) return null;
             if (parent == String) return null;
-            if (parent == Integer) return new List<TypeSymbol>() { Int8, Int16, Int32, Int64 };
-            if (parent == Float) return new List<TypeSymbol>() { Float32, Float64 };
-            return parent == Number ? new List<TypeSymbol>() { Int8, Int16, Int32, Int64, Float32, Float64 } : null;
+            if (parent == Integer) return new List<TypeSymbol>() { Int64 };
+            if (parent == Float) return new List<TypeSymbol>() { Float64 };
+            return parent == Number ? new List<TypeSymbol>() { Int64, Float64 } : null;
         }
     }
 }
