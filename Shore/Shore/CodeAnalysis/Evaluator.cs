@@ -225,21 +225,21 @@ namespace Shore.CodeAnalysis
             {
                 var value = EvaluateExpression(node.Arguments[0]);
                 var round = Math.Round((double)value);
-                return round;
+                return Convert.ToInt64(round);
             }
             
             if (node.Function == BuiltinFunctions.Floor)
             {
                 var value = EvaluateExpression(node.Arguments[0]);
                 var round = Math.Floor((double)value);
-                return round;
+                return Convert.ToInt64(round);
             }
             
             if (node.Function == BuiltinFunctions.Ceil)
             {
                 var value = EvaluateExpression(node.Arguments[0]);
                 var round = Math.Ceiling((double)value);
-                return round;
+                return Convert.ToInt64(round);
             }
 
             var locals = new Dictionary<VariableSymbol?, object?>();

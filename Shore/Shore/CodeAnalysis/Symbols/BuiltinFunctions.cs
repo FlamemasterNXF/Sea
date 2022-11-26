@@ -12,13 +12,13 @@ namespace Shore.CodeAnalysis.Symbols
             TypeSymbol.String);
 
         public static readonly FunctionSymbol Round = new("round",
-            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Float64);
+            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Int64);
         
         public static readonly FunctionSymbol Floor = new("floor",
-            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Float64);
+            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Int64);
         
         public static readonly FunctionSymbol Ceil = new("ceil",
-            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Float64);
+            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Int64);
         
         internal static IEnumerable<FunctionSymbol?> GetAll() => typeof(BuiltinFunctions)
             .GetFields(BindingFlags.Public | BindingFlags.Static)
