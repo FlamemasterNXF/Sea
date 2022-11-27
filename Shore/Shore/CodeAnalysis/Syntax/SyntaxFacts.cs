@@ -47,6 +47,8 @@ namespace Shore.CodeAnalysis.Syntax
             };
         }
 
+        public static bool IsComment(this TokType type) => type is TokType.SingleLineCommentToken or TokType.MultiLineCommentToken;
+
         public static TokType GetKeywordType(this string text)
         {
             return text switch

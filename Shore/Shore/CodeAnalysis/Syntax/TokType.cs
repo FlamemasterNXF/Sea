@@ -81,6 +81,7 @@ namespace Shore.CodeAnalysis.Syntax
         DoubleStarToken,
         Float64Keyword,
         //Float32Keyword
-        SingleLineCommentToken
+        SingleLineCommentToken,
+        MultiLineCommentToken
     }
 }

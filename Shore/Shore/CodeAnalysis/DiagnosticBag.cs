@@ -197,5 +197,11 @@ namespace Shore.CodeAnalysis
             var message = $"Cannot declare 'Main' Function when Global Statements are used.";
             ReportError(location, message);
         }
+
+        public void ReportUnterminatedMultiLineComment(TextLocation location)
+        {
+            var message = $"Unterminated Multi-Line Comment.";
+            ReportError(location, message);
+        }
     }
 }

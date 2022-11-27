@@ -62,9 +62,13 @@ namespace Shore.CodeAnalysis.Syntax
                     }
                     break;
                 case '/':
-                    _position++;
-                    if (Current != '/') _type = TokType.SlashToken;
-                    else ReadSingleLineComment();
+                    if (Lookahead == '/') ReadSingleLineComment();
+                    else if (Lookahead == '*') ReadMultiLineComment();
+                    else
+                    {
+                        _type = TokType.SlashToken;
+                        _position++;
+                    }
                     break;              
                 case '(':
                     _type = TokType.OpenParenToken;
@@ -286,6 +290,38 @@ namespace Shore.CodeAnalysis.Syntax
             }
 
             _type = TokType.SingleLineCommentToken;
+        }
+
+        private void ReadMultiLineComment()
+        {
+            _position += 2;
+            var done = false;
+
+            while (!done)
+            {
+                switch (Current)
+                {
+                    case '\0':
+                        var span = new TextSpan(_start, 2);
+                        var location = new TextLocation(_text, span);
+                        _diagnostics.ReportUnterminatedMultiLineComment(location);
+                        done = true;
+                        break;
+                    case '*':
+                        if (Lookahead == '/')
+                        {
+                            _position++;
+                            done = true;
+                        }
+                        _position++;
+                        break;
+                    default:
+                        _position++;
+                        break;
+                }
+
+                _type = TokType.MultiLineCommentToken;
+            }
         }
     }
 }

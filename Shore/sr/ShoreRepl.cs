@@ -27,7 +27,7 @@ namespace sr
                 var isNumber = token.Type == TokType.NumberToken;
                 var isString = token.Type == TokType.StringToken;
                 var isIdentifier = token.Type == TokType.IdentifierToken;
-                var isComment = token.Type == TokType.SingleLineCommentToken;
+                var isComment = token.Type is TokType.SingleLineCommentToken or TokType.MultiLineCommentToken;
 
                 if (isKeyword) Console.ForegroundColor = ConsoleColor.Blue;
                 else if (isIdentifier) Console.ForegroundColor = ConsoleColor.DarkYellow;
