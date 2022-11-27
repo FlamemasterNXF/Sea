@@ -62,8 +62,13 @@ namespace Shore.CodeAnalysis.Syntax
                     }
                     break;
                 case '/':
-                    _type = TokType.SlashToken;
-                    _position++;
+                    if (Lookahead == '/') ReadSingleLineComment();
+                    else if (Lookahead == '*') ReadMultiLineComment();
+                    else
+                    {
+                        _type = TokType.SlashToken;
+                        _position++;
+                    }
                     break;              
                 case '(':
                     _type = TokType.OpenParenToken;
@@ -264,6 +269,59 @@ namespace Shore.CodeAnalysis.Syntax
             var length = _position - _start;
             var text = _text.ToString(_start, length);
             _type = text.GetKeywordType();
+        }
+
+        private void ReadSingleLineComment()
+        {
+            _position += 2;
+            var done = false;
+
+            while (!done)
+            {
+                switch (Current)
+                {
+                    case '\r' or '\n' or '\0':
+                        done = true;
+                        break;
+                    default:
+                        _position++;
+                        break;
+                }
+            }
+
+            _type = TokType.SingleLineCommentToken;
+        }
+
+        private void ReadMultiLineComment()
+        {
+            _position += 2;
+            var done = false;
+
+            while (!done)
+            {
+                switch (Current)
+                {
+                    case '\0':
+                        var span = new TextSpan(_start, 2);
+                        var location = new TextLocation(_text, span);
+                        _diagnostics.ReportUnterminatedMultiLineComment(location);
+                        done = true;
+                        break;
+                    case '*':
+                        if (Lookahead == '/')
+                        {
+                            _position++;
+                            done = true;
+                        }
+                        _position++;
+                        break;
+                    default:
+                        _position++;
+                        break;
+                }
+
+                _type = TokType.MultiLineCommentToken;
+            }
         }
     }
 }

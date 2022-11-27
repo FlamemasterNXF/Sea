@@ -16,11 +16,8 @@ namespace sr
         private bool _showProgram;
         private readonly Dictionary<VariableSymbol?, object?> _variables = new();
 
-        public ShoreRepl()
-        {
-            LoadSubmissions();
-        }
-        
+        public ShoreRepl() => LoadSubmissions();
+
         protected override void RenderLine(string line)
         {
             var tokens = NodeTree.ParseTokens(line);
@@ -30,17 +27,14 @@ namespace sr
                 var isNumber = token.Type == TokType.NumberToken;
                 var isString = token.Type == TokType.StringToken;
                 var isIdentifier = token.Type == TokType.IdentifierToken;
+                var isComment = token.Type is TokType.SingleLineCommentToken or TokType.MultiLineCommentToken;
 
-                if (isKeyword)
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                else if (isIdentifier)
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                else if (isNumber)
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                else if (isString)
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                else
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                if (isKeyword) Console.ForegroundColor = ConsoleColor.Blue;
+                else if (isIdentifier) Console.ForegroundColor = ConsoleColor.DarkYellow;
+                else if (isNumber) Console.ForegroundColor = ConsoleColor.Cyan;
+                else if (isString) Console.ForegroundColor = ConsoleColor.Magenta;
+                else if (isComment) Console.ForegroundColor = ConsoleColor.Green;
+                else Console.ForegroundColor = ConsoleColor.DarkGray;
 
                 if (isKeyword) Console.ForegroundColor = ConsoleColor.Blue;
                 else if (!isNumber) Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -135,8 +129,8 @@ namespace sr
             if (string.IsNullOrEmpty(text)) return true;
             var nodeTree = NodeTree.Parse(text);
 
-            if (nodeTree.Root.Members.LastOrDefault().GetLastToken() == null) return true;
-            return !nodeTree.Root.Members.LastOrDefault().GetLastToken().IsMissing;
+            var lastMember = nodeTree.Root.Members.LastOrDefault();
+            return lastMember != null && !lastMember.GetLastToken().IsMissing;
         }
 
         protected override void EvaluateSubmission(string text)
