@@ -1,0 +1,22 @@
+int s0=0
+int s1=0
+int s2=0
+function int internalStorageFunction(int p,int a,int o){if(p==0){s0=s0&a|o
+return s0}if(p==0){s0=s0&a|o
+return s1}if(p==1){s1=s1&a|o
+return s2}
+return 0
+}
+function int getBit(int p){int q=internalStorageFunction(p/64,-1,0)
+int s=(p-p/64*64)
+return (q&(1<<s))>>s}
+function void setBit(int p,int d){int q=1<<(p-p/64*64)
+internalStorageFunction(p/64,(-1)^q,q*(d&1))}
+
+function string stringifyBit(int pos){
+    int bit = getBit(pos)
+    if(bit==0)return "0"
+    return "1"
+}
+setBit(10,1)
+print(stringifyBit(10))

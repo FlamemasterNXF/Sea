@@ -1,0 +1,169 @@
+function int abs(int num){
+ if(num<0)return num*-1
+ return num
+}
+
+function string digitToString(int num){
+    if(abs(num)>9)return intToString(num)
+    string digit = ""
+    if(num<0)digit="-"
+    int anum = abs(num)
+    if(anum==0)digit=digit+"0"
+    if(anum==1)digit=digit+"1"
+    if(anum==2)digit=digit+"2"
+    if(anum==3)digit=digit+"3"
+    if(anum==4)digit=digit+"4"
+    if(anum==5)digit=digit+"5"
+    if(anum==6)digit=digit+"6"
+    if(anum==7)digit=digit+"7"
+    if(anum==8)digit=digit+"8"
+    if(anum==9)digit=digit+"9"
+    return digit
+}
+
+function int getDigits(int num,int base){
+    int digits = 0
+    int n = abs(num)
+    if(n==0)n=1
+    while(n>0){
+        n=n/base
+        digits=digits+1
+    }
+    return digits
+}
+
+function string baseConverterIndex(int num,int base){
+    if(abs(num)>base-1)return intToBase(num,base)
+    string digit = ""
+    if(num<0)digit="-"
+    int anum = abs(num)
+    if(anum==0)digit=digit+"0"
+    if(anum==1)digit=digit+"1"
+    if(anum==2)digit=digit+"2"
+    if(anum==3)digit=digit+"3"
+    if(anum==4)digit=digit+"4"
+    if(anum==5)digit=digit+"5"
+    if(anum==6)digit=digit+"6"
+    if(anum==7)digit=digit+"7"
+    if(anum==8)digit=digit+"8"
+    if(anum==9)digit=digit+"9"
+    if(anum==10)digit=digit+"a"
+    if(anum==11)digit=digit+"b"
+    if(anum==12)digit=digit+"c"
+    if(anum==13)digit=digit+"d"
+    if(anum==14)digit=digit+"e"
+    if(anum==15)digit=digit+"f"
+    if(anum==16)digit=digit+"g"
+    if(anum==17)digit=digit+"h"
+    if(anum==18)digit=digit+"i"
+    if(anum==19)digit=digit+"j"
+    if(anum==20)digit=digit+"k"
+    if(anum==21)digit=digit+"l"
+    if(anum==22)digit=digit+"m"
+    if(anum==23)digit=digit+"n"
+    if(anum==24)digit=digit+"o"
+    if(anum==25)digit=digit+"p"
+    if(anum==26)digit=digit+"q"
+    if(anum==27)digit=digit+"r"
+    if(anum==28)digit=digit+"s"
+    if(anum==29)digit=digit+"t"
+    if(anum==30)digit=digit+"u"
+    if(anum==31)digit=digit+"v"
+    if(anum==32)digit=digit+"w"
+    if(anum==33)digit=digit+"x"
+    if(anum==34)digit=digit+"y"
+    if(anum==35)digit=digit+"z"
+    if(anum==36)digit=digit+"A"
+    if(anum==37)digit=digit+"B"
+    if(anum==38)digit=digit+"C"
+    if(anum==39)digit=digit+"D"
+    if(anum==40)digit=digit+"E"
+    if(anum==41)digit=digit+"F"
+    if(anum==42)digit=digit+"G"
+    if(anum==43)digit=digit+"H"
+    if(anum==44)digit=digit+"I"
+    if(anum==45)digit=digit+"J"
+    if(anum==46)digit=digit+"K"
+    if(anum==47)digit=digit+"L"
+    if(anum==48)digit=digit+"M"
+    if(anum==49)digit=digit+"N"
+    if(anum==50)digit=digit+"O"
+    if(anum==51)digit=digit+"P"
+    if(anum==52)digit=digit+"Q"
+    if(anum==53)digit=digit+"R"
+    if(anum==54)digit=digit+"S"
+    if(anum==55)digit=digit+"T"
+    if(anum==56)digit=digit+"U"
+    if(anum==57)digit=digit+"V"
+    if(anum==58)digit=digit+"W"
+    if(anum==59)digit=digit+"X"
+    if(anum==60)digit=digit+"Y"
+    if(anum==61)digit=digit+"Z"
+    return digit
+}
+
+function string intToBase(int num,int base){
+    int ab = abs(num)
+    if(ab<=base-1)return baseConverterIndex(num,base)
+    string str = ""
+    int digits = getDigits(num,base)
+    int n = 0
+    for i=1 until digits{
+        int tip = base**i
+        int ti = tip/base
+        int a = ab-(ab/tip)*tip-n
+        str=baseConverterIndex(a/ti,base)+str
+        n=n+a
+    }
+    if(num<0)return "-"+str
+    return str
+}
+
+function string intToString(int num){return intToBase(num,10)}
+
+function string idify(int num){
+    string str = intToBase(num/50,62)
+    int n = num/50*50
+    int m = num-n+9
+    if(m>=10)m=m+1
+    if(m>=24)m=m+1
+    string str2 = intToBase(m,62)
+    if(num==n)return "Z"+str
+    if(str!="0")return str2+str
+    return str2
+}
+
+function void main(){
+    int storageIn64Ints = 256
+    
+    for i=1 until storageIn64Ints{
+        print("int "+idify(i)+"=0")
+    }
+
+    print("function int gstoreBase(int p,int a,int o){if(p==0){b=b&a|o")
+    for i=0 until (storageIn64Ints-2){
+        string str = intToString(i)
+        string id = idify(i+1)
+        string id2 = idify(i)
+        print("return "+id2+"}if(p=="+str+"){"+id+"="+id+"&a|o")
+    }
+    print("return "+idify(storageIn64Ints-1)+"}")
+    print("return 0")
+    print("}")
+
+    print("function int gstoreGetBit(int p){int q=gstoreBase(p/64,-1,0)")
+    print("int s=(p-p/64*64)")
+    print("return (q&(1<<s))>>s}")
+
+    print("function void gstoreSetBit(int p,int d){int q=1<<(p-p/64*64)")
+    print("gstoreBase(p/64,(-1)^q,q*(d&1))}")
+
+    print("function int gstoreGetInt(int p){return gstoreBase(p,-1,0)}")
+
+    print("function void gstoreSetInt(int p,int d){gstoreBase(p,0,d)}")
+
+    print("function int gstoreGetBits(int p,int l){int q = gstoreBase(p/64,-1,0)")
+
+    print("function void gstoreSetBits(int p,int l,int d){")
+}
+main()
