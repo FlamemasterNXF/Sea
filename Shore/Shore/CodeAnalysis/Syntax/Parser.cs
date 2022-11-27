@@ -21,7 +21,9 @@ namespace Shore.CodeAnalysis.Syntax
 
             do {
                 token = lexer.Lex();
-                if (token.Type != TokType.WhitespaceToken && token.Type != TokType.UnknownToken) tokens.Add(token);
+                if (token.Type != TokType.WhitespaceToken && token.Type != TokType.SingleLineCommentToken &&
+                    token.Type != TokType.MultiLineCommentToken && token.Type != TokType.UnknownToken) 
+                    tokens.Add(token);
             } while (token.Type != TokType.EndOfFileToken);
 
             _nodeTree = nodeTree;
