@@ -251,15 +251,30 @@ namespace Shore.CodeAnalysis.Syntax
             }
 
             var length = _position - _start;
-            var text = _text.ToString(_start, length);
-            if (!double.TryParse(text, out var value))
+            var text = _text.ToString(_start, length); 
+            
+            double.TryParse(text, out var temp);
+            if (!text.Contains('.') && (Math.Abs(temp % 1)) <= (Double.Epsilon * 100))
             {
-                var span = new TextSpan(_start, length);
-                var location = new TextLocation(_text, span);
-                _diagnostics.ReportInvalidNumber(location, text);
+                if (!long.TryParse(text, out var value))
+                {
+                    var span = new TextSpan(_start, length);
+                    var location = new TextLocation(_text, span);
+                    _diagnostics.ReportInvalidNumber(location, text);
+                }
+                _value = value;
             }
-
-            _value = value;
+            else
+            {
+                if (!double.TryParse(text, out var value))
+                {
+                    var span = new TextSpan(_start, length);
+                    var location = new TextLocation(_text, span);
+                    _diagnostics.ReportInvalidNumber(location, text);
+                }   
+                _value = value;
+            }
+            
             _type = TokType.NumberToken;
         }
 
