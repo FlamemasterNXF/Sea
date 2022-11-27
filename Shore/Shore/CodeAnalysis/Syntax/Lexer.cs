@@ -62,8 +62,9 @@ namespace Shore.CodeAnalysis.Syntax
                     }
                     break;
                 case '/':
-                    _type = TokType.SlashToken;
                     _position++;
+                    if (Current != '/') _type = TokType.SlashToken;
+                    else ReadSingleLineComment();
                     break;              
                 case '(':
                     _type = TokType.OpenParenToken;
@@ -264,6 +265,27 @@ namespace Shore.CodeAnalysis.Syntax
             var length = _position - _start;
             var text = _text.ToString(_start, length);
             _type = text.GetKeywordType();
+        }
+
+        private void ReadSingleLineComment()
+        {
+            _position += 2;
+            var done = false;
+
+            while (!done)
+            {
+                switch (Current)
+                {
+                    case '\r' or '\n' or '\0':
+                        done = true;
+                        break;
+                    default:
+                        _position++;
+                        break;
+                }
+            }
+
+            _type = TokType.SingleLineCommentToken;
         }
     }
 }
