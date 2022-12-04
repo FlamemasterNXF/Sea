@@ -72,8 +72,8 @@ namespace Shore.CodeAnalysis.Binding.ControlFlow
 
         public sealed class BasicBlockBuilder
         {
-            private List<BoundStatement> _statements = new List<BoundStatement>();
-            private List<BasicBlock> _blocks = new List<BasicBlock>();
+            private List<BoundStatement> _statements = new();
+            private List<BasicBlock> _blocks = new();
 
             public List<BasicBlock> Build(BoundBlockStatement block)
             {
@@ -92,6 +92,7 @@ namespace Shore.CodeAnalysis.Binding.ControlFlow
                             StartBlock();
                             break;
                         case BoundNodeKind.VariableDeclaration:
+                        case BoundNodeKind.ArrayDeclaration:
                         case BoundNodeKind.ExpressionStatement:
                             _statements.Add(statement);
                             break;
@@ -169,6 +170,7 @@ namespace Shore.CodeAnalysis.Binding.ControlFlow
                                 Connect(current, _end);
                                 break;
                             case BoundNodeKind.VariableDeclaration:
+                            case BoundNodeKind.ArrayDeclaration:
                             case BoundNodeKind.LabelStatement:
                             case BoundNodeKind.ExpressionStatement:
                                 if (isLastStatementInBlock) Connect(current, next);

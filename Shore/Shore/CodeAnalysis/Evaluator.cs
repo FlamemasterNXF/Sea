@@ -154,7 +154,7 @@ namespace Shore.CodeAnalysis
                 }
                 
                 var localArrays = _localArrays.Peek();
-                for (int i = 0; i < localArrays.Count; i++) sb.Append($"{i}, ");
+                foreach (var value in localArrays.SelectMany(value => value.Value)) sb.Append($"{value}, ");
                 return getLength ? localArrays[v.Variable].Length : $"[{sb.Remove(sb.Length-2, 2)}]";   
             }
             if (v.Variable!.Kind == SymbolKind.GlobalVariable) return _globals[v.Variable];
