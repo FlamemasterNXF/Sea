@@ -58,6 +58,23 @@ namespace Shore.CodeAnalysis.Syntax
             return new Token(_nodeTree, type, CurrentToken.Position, null, null);
         }
         
+        private readonly List<TokType> _variableTypes = new()
+        {
+            TokType.BoolKeyword, TokType.StringKeyword, TokType.Int64Keyword, TokType.Float64Keyword,
+            TokType.BoolArrayKeyword, TokType.StringArrayKeyword, TokType.IntArrayKeyword, TokType.FloatArrayKeyword,
+            TokType.BoolListKeyword, TokType.StringListKeyword, TokType.IntListKeyword, TokType.FloatListKeyword
+        };
+        
+        private readonly List<TokType> _arrayTypes = new()
+        {
+            TokType.BoolArrayKeyword, TokType.StringArrayKeyword, TokType.IntArrayKeyword, TokType.FloatArrayKeyword
+        };
+        
+        private readonly List<TokType> _listTypes = new()
+        {
+            TokType.BoolListKeyword, TokType.StringListKeyword, TokType.IntListKeyword, TokType.FloatListKeyword
+        };
+
         private ExpressionNode ParseExpression(bool isFloat = false)
         {
             return ParseAssignmentExpression(isFloat);
@@ -182,13 +199,11 @@ namespace Shore.CodeAnalysis.Syntax
 
         private StatementNode ParseStatement()
         {
+            if (_variableTypes.Contains(CurrentToken.Type)) return ParseVariableDeclaration();
             return CurrentToken.Type switch
             {
                 TokType.OpenBraceToken => ParseBlockStatement(),
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
-                TokType.BoolKeyword or TokType.StringKeyword or TokType.Int64Keyword or TokType.Float64Keyword or 
-                    TokType.StringArrayKeyword or TokType.BoolArrayKeyword or TokType.IntArrayKeyword or TokType.FloatArrayKeyword
-                    => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
                 TokType.ForKeyword => ParseForStatement(),
@@ -225,8 +240,8 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var keyword = MatchToken(CurrentToken.Type);
 
-            if (keyword.Type is TokType.IntArrayKeyword or TokType.FloatArrayKeyword or TokType.BoolArrayKeyword
-                or TokType.StringArrayKeyword) return ParseArrayDeclaration(keyword);
+            if (_arrayTypes.Contains(keyword.Type)) return ParseArrayDeclaration(keyword);
+            if (_listTypes.Contains(keyword.Type)) return ParseListDeclaration(keyword);
 
             var isFloat = keyword.Text == "float";
             var identifier = MatchToken(TokType.IdentifierToken);
@@ -245,7 +260,38 @@ namespace Shore.CodeAnalysis.Syntax
             return new ArrayDeclarationNode(_nodeTree, keyword, identifier, equals, openBrace, members, closeBrace);
         }
         
+        private StatementNode ParseListDeclaration(Token keyword)
+        {
+            var identifier = MatchToken(TokType.IdentifierToken);
+            var equals = MatchToken(TokType.EqualsToken);
+            var openBrace = MatchToken(TokType.OpenBracketToken);
+            var members = ParseListMembers();
+            var closeBrace = MatchToken(TokType.CloseBracketToken);
+            return new ListDeclarationNode(_nodeTree, keyword, identifier, equals, openBrace, members, closeBrace);
+        }
+        
         private SeparatedNodeList<LiteralExpressionNode> ParseArrayMembers()
+        {
+            var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
+
+            var parseNextArgument = true;
+            while (parseNextArgument && CurrentToken.Type != TokType.CloseBracketToken && CurrentToken.Type != TokType.EndOfFileToken)
+            {
+                var expression = ParseExpression();
+                nodesAndSeparators.Add(expression);
+
+                if (CurrentToken.Type == TokType.CommaToken)
+                {
+                    var comma = MatchToken(TokType.CommaToken);
+                    nodesAndSeparators.Add(comma);
+                }
+                else parseNextArgument = false;
+            }
+
+            return new SeparatedNodeList<LiteralExpressionNode>(nodesAndSeparators.ToImmutable());
+        }
+        
+        private SeparatedNodeList<LiteralExpressionNode> ParseListMembers()
         {
             var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
 

@@ -144,6 +144,11 @@ namespace Shore.CodeAnalysis.Syntax
                     break;
                 case '<':
                     _position++;
+                    if (char.IsLetter(Current))
+                    {
+                        _type = TokType.LeftArrowToken;
+                        break;
+                    }
                     switch (Current)
                     {
                         case '=':
@@ -161,6 +166,11 @@ namespace Shore.CodeAnalysis.Syntax
                     break;
                 case '>':
                     _position++;
+                    if (char.IsLetter(Current))
+                    {
+                        _type = TokType.RightArrowToken;
+                        break;
+                    }
                     switch (Current)
                     {
                         case '=':
@@ -288,16 +298,21 @@ namespace Shore.CodeAnalysis.Syntax
 
         private void ReadIdentifierOrKeyword()
         {
-            while (char.IsLetter(Current) || char.IsNumber(Current)) _position++;
+            while (char.IsLetter(Current) || char.IsNumber(Current) || Current is '<' or '>') _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
-            if ((text is "int" or "float" or "bool" or "string") && Current == '[')
+            switch (text)
             {
-                _position++;
-                if (Current == ']')
+                case "int" or "float" or "bool" or "string" when Current == '[':
                 {
                     _position++;
-                    text += "[]";
+                    if (Current == ']')
+                    {
+                        _position++;
+                        text += "[]";
+                    }
+
+                    break;
                 }
             }
             _type = text.GetKeywordType();

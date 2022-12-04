@@ -72,6 +72,10 @@ namespace Shore.CodeAnalysis
                         EvaluateArrayDeclaration((BoundArrayDeclaration)s);
                         index++;
                         break;
+                    case BoundNodeKind.ListDeclaration:
+                        EvaluateListDeclaration((BoundListDeclaration)s);
+                        index++;
+                        break;
                     case BoundNodeKind.ExpressionStatement:
                         EvaluateExpressionStatement((BoundExpressionStatement)s);
                         index++;
@@ -110,6 +114,23 @@ namespace Shore.CodeAnalysis
 
         private void EvaluateArrayDeclaration(BoundArrayDeclaration node) =>
             AssignArray(node.Array, node.Members.Select(EvaluateExpression).ToArray());
+
+        private void EvaluateListDeclaration(BoundListDeclaration node)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var value in node.Members) sb.Append($"{value}, ");
+            var str = $"[{sb.Remove(sb.Length - 2, 2)}]".ToString();
+
+            if (node.List.Kind == SymbolKind.GlobalVariable) _globals[node.List] = str;
+            else
+            {
+                var locals = _locals.Peek();
+                locals[node.List] = str;
+            }
+            
+            for (var i = 0; i < node.Members.Length; i++) Assign(node.Members[i], node.Values[i]);
+        }
 
         private void EvaluateExpressionStatement(BoundExpressionStatement node) => _lastValue = EvaluateExpression(node.Expression);
 
@@ -311,6 +332,8 @@ namespace Shore.CodeAnalysis
             if (node.Type == TypeSymbol.Bool) return Convert.ToBoolean(value);
             if (node.Type == TypeSymbol.Float64) return Convert.ToDouble(value);
             if (node.Type == TypeSymbol.Int64) return Convert.ToInt64(value);
+            if (node.Type == TypeSymbol.Float64List) return Convert.ToDouble(value);
+            if (node.Type == TypeSymbol.Int64List) return Convert.ToInt64(value);
             if (node.Type == TypeSymbol.String) return Convert.ToString(value);
             throw new Exception($"Unexpected type {node.Type}");
         }

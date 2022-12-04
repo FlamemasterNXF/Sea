@@ -1,4 +1,6 @@
-﻿namespace Shore.CodeAnalysis.Symbols
+﻿using System.Collections.Immutable;
+
+namespace Shore.CodeAnalysis.Symbols
 {
     public sealed class TypeSymbol : Symbol
     {
@@ -32,22 +34,26 @@
         public static readonly TypeSymbol StringArr = new ("string[]", StringAndArray, Array);
         public static readonly TypeSymbol Int64Arr = new ("int64[]", StringAndArray, Array);
         public static readonly TypeSymbol Float64Arr = new ("float64[]", StringAndArray, Array);
+        
+        public static readonly TypeSymbol List = new("<>");
+        public static readonly TypeSymbol BoolList = new ("bool<>", List);
+        public static readonly TypeSymbol StringList = new ("string<>", List);
+        public static readonly TypeSymbol Int64List = new ("int<>", List);
+        public static readonly TypeSymbol Float64List = new ("float<>", List);
 
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
             actual == required || actual.ParentType == required;
 
-        public static List<TypeSymbol>? GetChildrenTypes(TypeSymbol parent)
-        {
-            //if (parent == NumberArr) return new List<TypeSymbol>() { Int64Arr, Float64Arr };
-            return parent == Number ? new List<TypeSymbol>() { Int64, Float64 } : null;
-        }
+        public static List<TypeSymbol>? GetChildrenTypes(TypeSymbol parent) =>
+            parent == Number ? new List<TypeSymbol>() { Int64, Float64 } : null;
 
         public static TypeSymbol? GetAcceptedType(TypeSymbol arrType)
         {
-            if (arrType == BoolArr) return Bool;
-            if (arrType == StringArr) return String;
-            if (arrType == Int64Arr) return Int64;
-            return arrType == Float64Arr ? Float64 : null;
+            if (arrType == BoolArr || arrType == BoolList) return Bool;
+            if (arrType == StringArr || arrType == StringList) return String;
+            if (arrType == Int64Arr || arrType == Int64List) return Int64;
+            if (arrType == Float64Arr || arrType == Float64List) return Float64;
+            return null;
         }
     }
 }
