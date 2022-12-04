@@ -7,6 +7,7 @@
         Function,
         Parameter,
         GlobalVariable,
-        LocalVariable
+        LocalVariable,
+        Array
     }
 }

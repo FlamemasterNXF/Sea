@@ -66,7 +66,7 @@ namespace Shore.CodeAnalysis
             return Binder.BindProgram(IsScript, previous, GlobalScope);
         }
 
-        public EvaluationResult Evaluate(Dictionary<VariableSymbol?, object?> variables)
+        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables, Dictionary<VariableSymbol, object[]> arrays)
         {
             var parseDiagnostics = NodeTrees.SelectMany(nt => nt.Diagnostics);
 
@@ -89,7 +89,7 @@ namespace Shore.CodeAnalysis
             if (program.Diagnostics.Any()) return new EvaluationResult(program.Diagnostics.ToImmutableArray(), null);
             
 
-            var evaluator = new Evaluator(program, variables);
+            var evaluator = new Evaluator(program, variables, arrays);
             var value = evaluator.Evaluate();
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }

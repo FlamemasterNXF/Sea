@@ -10,6 +10,7 @@ namespace Shore.CodeAnalysis.Binding
             {
                 BoundNodeKind.BlockStatement => RewriteBlockStatement((BoundBlockStatement)node),
                 BoundNodeKind.VariableDeclaration => RewriteVariableDeclaration((BoundVariableDeclaration)node),
+                BoundNodeKind.ArrayDeclaration => RewriteArrayDeclaration((BoundArrayDeclaration)node),
                 BoundNodeKind.IfStatement => RewriteIfStatement((BoundIfStatement)node),
                 BoundNodeKind.WhileStatement => RewriteWhileStatement((BoundWhileStatement)node),
                 BoundNodeKind.ForStatement => RewriteForStatement((BoundForStatement)node),
@@ -54,6 +55,9 @@ namespace Shore.CodeAnalysis.Binding
 
             return new BoundVariableDeclaration(node.Variable, initializer!);
         }
+
+        protected virtual BoundStatement RewriteArrayDeclaration(BoundArrayDeclaration node) =>
+            new BoundArrayDeclaration(node.Array, node.Members);
 
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)
         {
