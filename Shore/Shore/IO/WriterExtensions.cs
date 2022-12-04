@@ -33,7 +33,7 @@ namespace Shore.IO
                 
                 writer.WriteLine();
 
-                writer.SetForeground(ConsoleColor.DarkRed);
+                writer.SetForeground(diagnostic.IsError?ConsoleColor.DarkRed:ConsoleColor.Yellow);
                 writer.Write($"{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): ");
                 writer.WriteLine(diagnostic);
                 writer.ResetForeground();
@@ -48,7 +48,7 @@ namespace Shore.IO
                 writer.Write("    ");
                 writer.Write(prefix);
 
-                writer.SetForeground(ConsoleColor.DarkRed);
+                writer.SetForeground(diagnostic.IsError?ConsoleColor.DarkRed:ConsoleColor.Yellow);                
                 writer.Write(error);
                 writer.ResetForeground();
 

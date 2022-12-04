@@ -82,6 +82,14 @@ namespace Shore.CodeAnalysis.Syntax
         Float64Keyword,
         //Float32Keyword
         SingleLineCommentToken,
-        MultiLineCommentToken
+        MultiLineCommentToken,
+        CloseBracketToken,
+        OpenBracketToken,
+        FloatArrayKeyword,
+        IntArrayKeyword,
+        ArrayDeclarationStatement,
+        ArrayAccessExpression,
+        StringArrayKeyword,
+        BoolArrayKeyword
     }
 }

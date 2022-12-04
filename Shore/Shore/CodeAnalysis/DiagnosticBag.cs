@@ -203,5 +203,17 @@ namespace Shore.CodeAnalysis
             var message = $"Unterminated Multi-Line Comment.";
             ReportError(location, message);
         }
+
+        public void ReportEmptyArray(TextLocation location, string name)
+        {
+            var message = $"Array '{name}' is empty.";
+            ReportWarning(location, message);
+        }
+
+        public void ReportAccessArrayNoIndex(TextLocation location, string name)
+        {
+            var message = $"'{name}' cannot be accessed as a non-array value.";
+            ReportError(location, message);
+        }
     }
 }

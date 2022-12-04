@@ -20,6 +20,9 @@ namespace Shore.CodeAnalysis.Symbols
         public static readonly FunctionSymbol Ceil = new("ceil",
             ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Int64);
         
+        public static readonly FunctionSymbol Length = new("length",
+            ImmutableArray.Create(new ParameterSymbol("array", TypeSymbol.Array)), TypeSymbol.Int64);
+        
         internal static IEnumerable<FunctionSymbol?> GetAll() => typeof(BuiltinFunctions)
             .GetFields(BindingFlags.Public | BindingFlags.Static)
             .Where(f => f.FieldType == typeof(FunctionSymbol))

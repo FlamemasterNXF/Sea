@@ -5,4 +5,4 @@ The String Type is a type which represents a string of characters.
 You can declare a variable of the String Type by using the `string <name> = "<text>"` syntax.
 
 ## Operator Usage
-The String Type supports the comparison operators and the addition operator.
+The String Type supports the comparison operators, the addition operator, and the divison operator.
