@@ -3,31 +3,27 @@
     public sealed class TypeSymbol : Symbol
     {
         public TypeSymbol? ParentType { get; }
+        public TypeSymbol HeadType { get; }
         public override SymbolKind Kind => SymbolKind.Type;
-        
-        private TypeSymbol(string name, TypeSymbol? parentType) : base(name)
+
+        private TypeSymbol(string name) : this(name, Any, Any){}
+        private TypeSymbol(string name, TypeSymbol parentType) : this(name, parentType, Any){}
+        private TypeSymbol(string name, TypeSymbol? parentType, TypeSymbol headType) : base(name)
         {
             ParentType = parentType;
+            HeadType = headType;
         }
         
-        public static readonly TypeSymbol Null = new("null", null);
-        public static readonly TypeSymbol Any = new ("any", null); //Internal usage ONLY.
-        public static readonly TypeSymbol Bool = new ("bool", null);
-        public static readonly TypeSymbol String = new ("string", null);
-        public static readonly TypeSymbol Number = new("Number", null);
-        public static readonly TypeSymbol Integer = new("integer", null);
-        public static readonly TypeSymbol Float = new("float", null);
-        public static readonly TypeSymbol Void = new("void", null);
-
+        public static readonly TypeSymbol Null = new("null", null, null);
+        public static readonly TypeSymbol Any = new ("any", null, null); //Internal usage ONLY.
+        public static readonly TypeSymbol Bool = new ("bool");
+        public static readonly TypeSymbol String = new ("string");
+        public static readonly TypeSymbol Number = new("number");
+        public static readonly TypeSymbol Int64 = new ("int64", Number);
+        public static readonly TypeSymbol Float64 = new ("float64", Number);
+        public static readonly TypeSymbol Void = new("void");
         
-        //public static readonly TypeSymbol Int8 = new ("int8", Integer);
-        //public static readonly TypeSymbol Int16 = new ("int16", Integer);
-        //public static readonly TypeSymbol Int32 = new ("int32", Integer);
-        public static readonly TypeSymbol Int64 = new ("int64", Integer);
-        //public static readonly TypeSymbol Float32 = new ("float32", Float);
-        public static readonly TypeSymbol Float64 = new ("float64", Float);
-
-        public static readonly TypeSymbol Array = new("[]", null);
+        public static readonly TypeSymbol Array = new("[]");
         public static readonly TypeSymbol BoolArr = new ("bool", Array);
         public static readonly TypeSymbol StringArr = new ("string[]", Array);
         public static readonly TypeSymbol NumberArr = new("number[]", Array);
@@ -40,8 +36,6 @@
         public static List<TypeSymbol>? GetChildrenTypes(TypeSymbol parent)
         {
             if (parent == NumberArr) return new List<TypeSymbol>() { Int64Arr, Float64Arr };
-            if (parent == Integer) return new List<TypeSymbol>() { Int64 };
-            if (parent == Float) return new List<TypeSymbol>() { Float64 };
             return parent == Number ? new List<TypeSymbol>() { Int64, Float64 } : null;
         }
 

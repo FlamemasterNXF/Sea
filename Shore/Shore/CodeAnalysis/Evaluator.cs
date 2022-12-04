@@ -1,7 +1,6 @@
 using System.Text;
 using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Symbols;
-using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore.CodeAnalysis
 {
@@ -108,19 +107,9 @@ namespace Shore.CodeAnalysis
             _lastValue = value;
             Assign(node.Variable, value);
         }
-        
-        private void EvaluateArrayDeclaration(BoundArrayDeclaration node)
-        {
-            var values = new List<object>();
-            
-            for (int i = 0; i < node.Members.Length; i++)
-            {
-                var value = EvaluateExpression(node.Members[i]);
-                values.Add(value);
-            }
 
-            AssignArray(node.Array, values.ToArray());
-        }
+        private void EvaluateArrayDeclaration(BoundArrayDeclaration node) =>
+            AssignArray(node.Array, node.Members.Select(EvaluateExpression).ToArray());
 
         private void EvaluateExpressionStatement(BoundExpressionStatement node) => _lastValue = EvaluateExpression(node.Expression);
 
@@ -196,7 +185,7 @@ namespace Shore.CodeAnalysis
 
         private object? EvaluateBinaryExpression(BoundBinaryExpression b)
         {
-            var useFloat = b.Left.Type.ParentType == TypeSymbol.Float || b.Right.Type.ParentType == TypeSymbol.Float;
+            var useFloat = b.Left.Type == TypeSymbol.Float64 || b.Right.Type == TypeSymbol.Float64;
                 var left = EvaluateExpression(b.Left);
             var right = EvaluateExpression(b.Right);
 
@@ -204,7 +193,7 @@ namespace Shore.CodeAnalysis
             {
                 case BoundBinaryOperatorKind.Addition:
                     if (useFloat) return Convert.ToDouble(left) + Convert.ToDouble(right);
-                    if (b.Type.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) + Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) + Convert.ToInt64(right);
                     return (string)left! + (string)right!;
                 case BoundBinaryOperatorKind.Subtraction: 
                     if (useFloat) return Convert.ToDouble(left) - Convert.ToDouble(right);
@@ -214,19 +203,19 @@ namespace Shore.CodeAnalysis
                     return Convert.ToInt64(left) * Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.Division: 
                     if (useFloat) return Convert.ToDouble(left) / Convert.ToDouble(right);
-                    if (b.Type.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) / Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) / Convert.ToInt64(right);
                     return left.ToString()[Convert.ToInt32(right)].ToString();
                 case BoundBinaryOperatorKind.Exponentiation: 
-                    if (useFloat) return (double)Math.Pow(Convert.ToDouble(left), Convert.ToDouble(right));
+                    if (useFloat) return Math.Pow(Convert.ToDouble(left), Convert.ToDouble(right));
                     return (long)Math.Pow(Convert.ToInt64(left), Convert.ToInt64(right));
                 case BoundBinaryOperatorKind.BitwiseAnd:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) & Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Float64) return Convert.ToInt64(left) & Convert.ToInt64(right);
                     return (bool)left! & (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseOr:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) | Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) | Convert.ToInt64(right);
                     return (bool)left! | (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseXor:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) ^ Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) ^ Convert.ToInt64(right);
                     return (bool)left! ^ (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseLeftShift: return Convert.ToInt64(left) << Convert.ToInt32(right);
                 case BoundBinaryOperatorKind.BitwiseRightShift: return Convert.ToInt64(left) >> Convert.ToInt32(right);

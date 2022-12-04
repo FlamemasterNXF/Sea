@@ -580,7 +580,7 @@ namespace Shore.CodeAnalysis.Binding
                 var argument = boundArguments[i];
                 var parameter = function.Parameters[i];
 
-                if ((argument.Type != parameter.Type) && (argument.Type.ParentType != parameter.Type))
+                if ((argument.Type != parameter.Type) && (argument.Type.ParentType != parameter.Type) && (argument.Type.HeadType != parameter.Type))
                 {
                     _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter?.Name, parameter?.Type, argument.Type);
                     return new BoundNullExpression();
@@ -651,11 +651,7 @@ namespace Shore.CodeAnalysis.Binding
             {
                 "bool" => TypeSymbol.Bool,
                 "string" => TypeSymbol.String,
-                //"int8" or "byte" => TypeSymbol.Int8,
-                //"int16" or "short" => TypeSymbol.Int16,
-                //"int32" or "int" => TypeSymbol.Int32,
                 "int64" or "int" => TypeSymbol.Int64,
-                //"float32" or "float" => TypeSymbol.Float32,
                 "float64" or "float" => TypeSymbol.Float64,
                 "bool[]" => TypeSymbol.BoolArr,
                 "string[]" => TypeSymbol.StringArr,
