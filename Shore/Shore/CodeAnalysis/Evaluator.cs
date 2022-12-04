@@ -214,7 +214,8 @@ namespace Shore.CodeAnalysis
                     return Convert.ToInt64(left) * Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.Division: 
                     if (useFloat) return Convert.ToDouble(left) / Convert.ToDouble(right);
-                    return Convert.ToInt64(left) / Convert.ToInt64(right);
+                    if (b.Type.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) / Convert.ToInt64(right);
+                    return left.ToString()[Convert.ToInt32(right)];
                 case BoundBinaryOperatorKind.Exponentiation: 
                     if (useFloat) return (double)Math.Pow(Convert.ToDouble(left), Convert.ToDouble(right));
                     return (long)Math.Pow(Convert.ToInt64(left), Convert.ToInt64(right));
