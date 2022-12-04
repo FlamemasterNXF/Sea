@@ -144,11 +144,6 @@ namespace Shore.CodeAnalysis.Syntax
                     break;
                 case '<':
                     _position++;
-                    if (char.IsLetter(Current))
-                    {
-                        _type = TokType.LeftArrowToken;
-                        break;
-                    }
                     switch (Current)
                     {
                         case '=':
@@ -166,11 +161,6 @@ namespace Shore.CodeAnalysis.Syntax
                     break;
                 case '>':
                     _position++;
-                    if (char.IsLetter(Current))
-                    {
-                        _type = TokType.RightArrowToken;
-                        break;
-                    }
                     switch (Current)
                     {
                         case '=':
