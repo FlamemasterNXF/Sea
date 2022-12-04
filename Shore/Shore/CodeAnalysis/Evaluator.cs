@@ -142,13 +142,20 @@ namespace Shore.CodeAnalysis
 
         private static object EvaluateLiteralExpression(BoundLiteralExpression n) => n.Value;
 
-        private object EvaluateVariableExpression(BoundVariableExpression v)
+        private object EvaluateVariableExpression(BoundVariableExpression v, bool getLength = false)
         {
             if (v.Type.ParentType == TypeSymbol.NumberArr || v.Type.ParentType == TypeSymbol.Array)
             {
                 var sb = new StringBuilder();
-                foreach(var value in _globalArrays[v.Variable]) sb.Append($"{value}, ");
-                return $"[{sb.Remove(sb.Length-2, 2)}]";
+                if (v.Variable.Kind == SymbolKind.GlobalVariable)
+                {
+                    foreach(var value in _globalArrays[v.Variable]) sb.Append($"{value}, ");
+                    return getLength? _globalArrays[v.Variable].Length : $"[{sb.Remove(sb.Length-2, 2)}]";   
+                }
+                
+                var localArrays = _localArrays.Peek();
+                for (int i = 0; i < localArrays.Count; i++) sb.Append($"{i}, ");
+                return getLength ? localArrays[v.Variable].Length : $"[{sb.Remove(sb.Length-2, 2)}]";   
             }
             if (v.Variable!.Kind == SymbolKind.GlobalVariable) return _globals[v.Variable];
             
@@ -277,6 +284,11 @@ namespace Shore.CodeAnalysis
                 var value = EvaluateExpression(node.Arguments[0]);
                 var round = Math.Ceiling((double)value);
                 return Convert.ToInt64(round);
+            }
+
+            if (node.Function == BuiltinFunctions.Length)
+            {
+                return EvaluateVariableExpression((BoundVariableExpression)node.Arguments[0], true);
             }
 
             var locals = new Dictionary<VariableSymbol?, object?>();

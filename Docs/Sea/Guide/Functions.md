@@ -27,3 +27,4 @@ Sea includes two built-in functions that come packaged with the language.<br>
 - `round(<float>)`: Rounds a Floating Point Number to the nearest Integral Number.
 - `ceil(<float>)`: Returns the smallest Integral Value that is greater than a given Floating Point Number.
 - `floor(<float>)`: Returns the largest Integral Value that is less than a given Floating Point Number.
+- `length(<array>)`: Returns the length of an Array as an integer.
