@@ -443,6 +443,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.CallExpression => BindCallExpression((CallExpressionNode)node),
                 TokType.ParenthesisExpression => BindExpressionDistributor(((ParenthesisExpressionNode)node).Expression),
                 TokType.NameExpression => BindNameExpression((NameExpressionNode)node),
+                TokType.ArrayAccessExpression => BindArrayAccessExpression((ArrayAccessExpressionNode)node),
                 TokType.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionNode)node),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
@@ -464,7 +465,28 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
+
             return new BoundVariableExpression(variable);
+        }
+        
+        private BoundExpression BindArrayAccessExpression(ArrayAccessExpressionNode node)
+        {
+            var name = node.Identifier.Text;
+            var accessor = BindExpression(node.Accessor);
+
+            if (string.IsNullOrEmpty(name))
+            {
+                // This ensures that 'Token Fabrication' does not cause an Error.
+                return new BoundNullExpression();
+            }
+
+            if (!_scope!.TryLookupVariable(name, out var variable))
+            {
+                _diagnostics.ReportUndefinedName(node.Identifier.Location, name);
+                return new BoundNullExpression();
+            }
+            
+            return new BoundArrayExpression(variable, accessor);
         }
 
         private BoundExpression BindAssignmentExpression(AssignmentExpressionNode node)

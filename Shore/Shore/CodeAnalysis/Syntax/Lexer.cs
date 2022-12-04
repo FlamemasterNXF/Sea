@@ -288,9 +288,18 @@ namespace Shore.CodeAnalysis.Syntax
 
         private void ReadIdentifierOrKeyword()
         {
-            while (char.IsLetter(Current) || char.IsNumber(Current) || Current == '[' || Current == ']') _position++;
+            while (char.IsLetter(Current) || char.IsNumber(Current)) _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
+            if ((text is "int" or "float" or "bool" or "string") && Current == '[')
+            {
+                _position++;
+                if (Current == ']')
+                {
+                    _position++;
+                    text += "[]";
+                }
+            }
             _type = text.GetKeywordType();
         }
 

@@ -1,3 +1,4 @@
+using System.Text;
 using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
@@ -129,6 +130,7 @@ namespace Shore.CodeAnalysis
             {
                 BoundNodeKind.LiteralExpression => EvaluateLiteralExpression((BoundLiteralExpression)node),
                 BoundNodeKind.VariableExpression => EvaluateVariableExpression((BoundVariableExpression)node),
+                BoundNodeKind.ArrayExpression => EvaluateArrayExpression((BoundArrayExpression)node),
                 BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression((BoundAssignmentExpression)node),
                 BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression)node),
                 BoundNodeKind.BinaryExpression => EvaluateBinaryExpression((BoundBinaryExpression)node),
@@ -142,12 +144,25 @@ namespace Shore.CodeAnalysis
 
         private object EvaluateVariableExpression(BoundVariableExpression v)
         {
-            if (v.Variable!.Kind == SymbolKind.GlobalVariable) return _globals[v.Variable];
-            else
+            if (v.Type.ParentType == TypeSymbol.NumberArr || v.Type.ParentType == TypeSymbol.Array)
             {
-                var locals = _locals.Peek();
-                return locals[v.Variable];
+                var sb = new StringBuilder();
+                foreach(var value in _globalArrays[v.Variable]) sb.Append($"{value}, ");
+                return $"[{sb.Remove(sb.Length-2, 2)}]";
             }
+            if (v.Variable!.Kind == SymbolKind.GlobalVariable) return _globals[v.Variable];
+            
+            var locals = _locals.Peek();
+            return locals[v.Variable];
+        }
+        
+        private object EvaluateArrayExpression(BoundArrayExpression a)
+        {
+            var accessor = EvaluateExpression(a.Accessor);
+            if (a.Array.Kind == SymbolKind.GlobalVariable) return _globalArrays[a.Array][Convert.ToInt64(accessor)];
+           
+            var locals = _localArrays.Peek();
+            return locals[a.Array][Convert.ToInt64(accessor)];
         }
 
         private object? EvaluateAssignmentExpression(BoundAssignmentExpression a)

@@ -20,6 +20,7 @@ namespace Shore.CodeAnalysis.Binding
         CallExpression,
         ConversionExpression,
         ReturnStatement,
-        ArrayDeclaration
+        ArrayDeclaration,
+        ArrayExpression
     }
 }

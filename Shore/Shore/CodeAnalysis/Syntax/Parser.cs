@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;
 
@@ -186,7 +187,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.OpenBraceToken => ParseBlockStatement(),
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
                 TokType.BoolKeyword or TokType.StringKeyword or TokType.Int64Keyword or TokType.Float64Keyword or 
-                    TokType.IntArrayKeyword or TokType.FloatArrayKeyword
+                    TokType.StringArrayKeyword or TokType.BoolArrayKeyword or TokType.IntArrayKeyword or TokType.FloatArrayKeyword
                     => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
@@ -224,7 +225,8 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var keyword = MatchToken(CurrentToken.Type);
 
-            if (keyword.Type is TokType.IntArrayKeyword or TokType.FloatArrayKeyword) return ParseArrayDeclaration(keyword);
+            if (keyword.Type is TokType.IntArrayKeyword or TokType.FloatArrayKeyword or TokType.BoolArrayKeyword
+                or TokType.StringArrayKeyword) return ParseArrayDeclaration(keyword);
 
             var isFloat = keyword.Text == "float";
             var identifier = MatchToken(TokType.IdentifierToken);
@@ -414,7 +416,18 @@ namespace Shore.CodeAnalysis.Syntax
         private ExpressionNode ParseNameExpression()
         {
             var identifierToken = MatchToken(TokType.IdentifierToken);
+
+            if (CurrentToken.Type == TokType.OpenBracketToken) return ParseArrayAccessExpression(identifierToken);
+            
             return new NameExpressionNode(_nodeTree, identifierToken);
+        }
+
+        private ExpressionNode ParseArrayAccessExpression(Token identifierToken)
+        {
+            var openBracket = MatchToken(TokType.OpenBracketToken);
+            var accessor = ParseExpression();
+            var closeBracket = MatchToken(TokType.CloseBracketToken);
+            return new ArrayAccessExpressionNode(_nodeTree, identifierToken, openBracket, accessor, closeBracket);
         }
     }
 }

@@ -87,6 +87,9 @@ namespace Shore.CodeAnalysis.Syntax
         OpenBracketToken,
         FloatArrayKeyword,
         IntArrayKeyword,
-        ArrayDeclarationStatement
+        ArrayDeclarationStatement,
+        ArrayAccessExpression,
+        StringArrayKeyword,
+        BoolArrayKeyword
     }
 }
