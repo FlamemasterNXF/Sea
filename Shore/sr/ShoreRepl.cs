@@ -164,7 +164,7 @@ namespace sr
         private static string GetSubmissionsDirectory()
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var submissionsDirectory = Path.Combine(localAppData, "Minsk", "Submissions");
+            var submissionsDirectory = Path.Combine(localAppData, "Shore", "Submissions");
             return submissionsDirectory;
         }
 

@@ -215,5 +215,11 @@ namespace Shore.CodeAnalysis
             var message = $"'{name}' cannot be accessed as a non-array value.";
             ReportError(location, message);
         }
+
+        public void ListReDeclaration(TextLocation location, string name)
+        {
+            var message = $"'{name}' Already Exists. This shouldn't be an error you see.";
+            ReportError(location, message);
+        }
     }
 }

@@ -252,6 +252,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.BlockStatement => BindBlockStatement((BlockStatementNode)node),
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
                 TokType.ArrayDeclarationStatement => BindArrayDeclaration((ArrayDeclarationNode)node),
+                TokType.ListDeclarationStatement => BindListDeclaration((ListDeclarationNode)node),
                 TokType.IfStatement => BindIfStatement((IfStatementNode)node),
                 TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
                 TokType.ForStatement => BindForStatement((ForStatementNode)node),
@@ -289,7 +290,7 @@ namespace Shore.CodeAnalysis.Binding
             var convertedInitializer = BindConversion(node.Initializer.Location, initializer, type);
             return new BoundVariableDeclaration(variable, convertedInitializer);
         }
-        
+
         private BoundStatement BindArrayDeclaration(ArrayDeclarationNode node)
         {
             var type = LookupType(node.AType.Text);
@@ -310,6 +311,31 @@ namespace Shore.CodeAnalysis.Binding
             
             //var convertedInitializer = BindConversion(node.Initializer.Location, initializer, type);
             return new BoundArrayDeclaration(array, boundMembers.ToImmutable());
+        }
+        
+        private BoundStatement BindListDeclaration(ListDeclarationNode node)
+        {
+            var type = LookupType(node.AType.Text);
+
+            ImmutableArray<VariableSymbol>.Builder boundMembers = ImmutableArray.CreateBuilder<VariableSymbol>();
+            ImmutableArray<BoundExpression>.Builder boundValues = ImmutableArray.CreateBuilder<BoundExpression>();
+
+            for (var i = 0; i < node.Members.Count; i++)
+            {
+                var member = node.Members[i];
+                var boundValue = BindExpression(member);
+                var boundMember = BindListVariable(node, member, type, i);
+
+                if (boundValue.Type != TypeSymbol.GetAcceptedType(type))
+                    _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
+
+                boundValues.Add(boundValue);
+                boundMembers.Add(boundMember);
+            }
+
+            var list = BindList(node, type);
+            
+            return new BoundListDeclaration(list, boundMembers.ToImmutable(), boundValues.ToImmutable());
         }
 
         private BoundStatement BindIfStatement(IfStatementNode node)
@@ -408,10 +434,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType)
-        {
-            return BindConversion(node, targetType);
-        }
+        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType) => BindConversion(node, targetType);
 
         private BoundExpression BindExpression(ExpressionNode node, bool canBeVoid = false)
         {
@@ -474,11 +497,7 @@ namespace Shore.CodeAnalysis.Binding
             var name = node.Identifier.Text;
             var accessor = BindExpression(node.Accessor);
 
-            if (string.IsNullOrEmpty(name))
-            {
-                // This ensures that 'Token Fabrication' does not cause an Error.
-                return new BoundNullExpression();
-            }
+            if (string.IsNullOrEmpty(name)) return new BoundNullExpression();
 
             if (!_scope!.TryLookupVariable(name, out var variable))
             {
@@ -644,7 +663,41 @@ namespace Shore.CodeAnalysis.Binding
 
             return array;
         }
+        
+        private VariableSymbol BindList(ListDeclarationNode node, TypeSymbol type)
+        {
+            var name = node.Identifier.Text ?? "?";
+            var list = _function == null ? 
+                (VariableSymbol)new GlobalVariableSymbol(name, false, type)
+                : new LocalVariableSymbol(name, false, type);
+            
+            if (!_scope!.TryDeclareVariable(list))
+                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
 
+            return list;
+        }
+        
+        private VariableSymbol BindListVariable(ListDeclarationNode node, ExpressionNode value, TypeSymbol type, int i)
+        {
+            var name = $"{node.Identifier.Text}<{i}>";
+            var variable = _function == null
+                ? (VariableSymbol)new GlobalVariableSymbol(name, false, type)
+                : new LocalVariableSymbol(name, false, type);
+            
+            if (!_scope!.TryDeclareVariable(variable))
+                _diagnostics.ListReDeclaration(node.Identifier.Location, name);
+            
+            BindListVariableDeclaration(variable, value);
+            
+            return variable;
+        }
+        
+        private BoundStatement BindListVariableDeclaration(VariableSymbol variable, ExpressionNode value)
+        {
+            var boundValue = BindExpression(value);
+            return new BoundVariableDeclaration(variable, boundValue);
+        }
+        
         private TypeSymbol? LookupType(string? name)
         {
             return name switch
@@ -657,6 +710,10 @@ namespace Shore.CodeAnalysis.Binding
                 "string[]" => TypeSymbol.StringArr,
                 "int[]" => TypeSymbol.Int64Arr,
                 "float[]" => TypeSymbol.Float64Arr,
+                "bool<>" => TypeSymbol.BoolList,
+                "string<>" => TypeSymbol.StringList,
+                "int<>" => TypeSymbol.Int64List,
+                "float<>" => TypeSymbol.Float64List,
                 _ => null
             };
         }
