@@ -86,6 +86,14 @@ namespace Shore.CodeAnalysis.Syntax
                     _type = TokType.CloseBraceToken;
                     _position++;
                     break;
+                case '[':
+                    _type = TokType.OpenBracketToken;
+                    _position++;
+                    break;              
+                case ']':
+                    _type = TokType.CloseBracketToken;
+                    _position++;
+                    break;
                 case ',':
                     _type = TokType.CommaToken;
                     _position++;
@@ -283,6 +291,15 @@ namespace Shore.CodeAnalysis.Syntax
             while (char.IsLetter(Current) || char.IsNumber(Current)) _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
+            if ((text is "int" or "float" or "bool" or "string") && Current == '[')
+            {
+                _position++;
+                if (Current == ']')
+                {
+                    _position++;
+                    text += "[]";
+                }
+            }
             _type = text.GetKeywordType();
         }
 

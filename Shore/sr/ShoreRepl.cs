@@ -14,7 +14,8 @@ namespace sr
         private Compilation? _previous;
         private bool _showTree;
         private bool _showProgram;
-        private readonly Dictionary<VariableSymbol?, object?> _variables = new();
+        private readonly Dictionary<VariableSymbol, object?> _variables = new();
+        private readonly Dictionary<VariableSymbol, object?[]> _arrays = new();
 
         public ShoreRepl() => LoadSubmissions();
 
@@ -52,6 +53,7 @@ namespace sr
         {
             _previous = null;
             _variables.Clear();
+            _arrays.Clear();
             ClearSubmissions();
         }
 
@@ -141,7 +143,7 @@ namespace sr
             if (_showTree) nodeTree.Root.WriteTo(Console.Out);
             if (_showProgram) compilation.EmitTree(Console.Out);
 
-            var result = compilation.Evaluate(_variables);
+            var result = compilation.Evaluate(_variables, _arrays);
 
             if (!result.Diagnostics.Any())
             {

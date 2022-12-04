@@ -251,6 +251,7 @@ namespace Shore.CodeAnalysis.Binding
             {
                 TokType.BlockStatement => BindBlockStatement((BlockStatementNode)node),
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
+                TokType.ArrayDeclarationStatement => BindArrayDeclaration((ArrayDeclarationNode)node),
                 TokType.IfStatement => BindIfStatement((IfStatementNode)node),
                 TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
                 TokType.ForStatement => BindForStatement((ForStatementNode)node),
@@ -287,6 +288,28 @@ namespace Shore.CodeAnalysis.Binding
 
             var convertedInitializer = BindConversion(node.Initializer.Location, initializer, type);
             return new BoundVariableDeclaration(variable, convertedInitializer);
+        }
+        
+        private BoundStatement BindArrayDeclaration(ArrayDeclarationNode node)
+        {
+            var type = LookupType(node.AType.Text);
+
+            ImmutableArray<BoundExpression>.Builder boundMembers = ImmutableArray.CreateBuilder<BoundExpression>();
+
+            foreach (var member in node.Members)
+            {
+                var boundMember = BindLiteralExpression(member);
+
+                if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
+                    _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
+                
+                boundMembers.Add(boundMember);
+            }
+
+            var array = BindArray(node, type);
+            
+            //var convertedInitializer = BindConversion(node.Initializer.Location, initializer, type);
+            return new BoundArrayDeclaration(array, boundMembers.ToImmutable());
         }
 
         private BoundStatement BindIfStatement(IfStatementNode node)
@@ -420,6 +443,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.CallExpression => BindCallExpression((CallExpressionNode)node),
                 TokType.ParenthesisExpression => BindExpressionDistributor(((ParenthesisExpressionNode)node).Expression),
                 TokType.NameExpression => BindNameExpression((NameExpressionNode)node),
+                TokType.ArrayAccessExpression => BindArrayAccessExpression((ArrayAccessExpressionNode)node),
                 TokType.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionNode)node),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
@@ -441,7 +465,28 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
+
             return new BoundVariableExpression(variable);
+        }
+        
+        private BoundExpression BindArrayAccessExpression(ArrayAccessExpressionNode node)
+        {
+            var name = node.Identifier.Text;
+            var accessor = BindExpression(node.Accessor);
+
+            if (string.IsNullOrEmpty(name))
+            {
+                // This ensures that 'Token Fabrication' does not cause an Error.
+                return new BoundNullExpression();
+            }
+
+            if (!_scope!.TryLookupVariable(name, out var variable))
+            {
+                _diagnostics.ReportUndefinedName(node.Identifier.Location, name);
+                return new BoundNullExpression();
+            }
+            
+            return new BoundArrayExpression(variable, accessor);
         }
 
         private BoundExpression BindAssignmentExpression(AssignmentExpressionNode node)
@@ -585,6 +630,21 @@ namespace Shore.CodeAnalysis.Binding
             return variable;
         }
 
+        private VariableSymbol BindArray(ArrayDeclarationNode node, TypeSymbol type)
+        {
+            var name = node.Identifier.Text ?? "?";
+            var array = _function == null ? 
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type)
+                : new LocalVariableSymbol(name, true, type);
+
+            if (node.Members.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
+            
+            if (!_scope!.TryDeclareVariable(array))
+                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
+
+            return array;
+        }
+
         private TypeSymbol? LookupType(string? name)
         {
             return name switch
@@ -597,6 +657,10 @@ namespace Shore.CodeAnalysis.Binding
                 "int64" or "int" => TypeSymbol.Int64,
                 //"float32" or "float" => TypeSymbol.Float32,
                 "float64" or "float" => TypeSymbol.Float64,
+                "bool[]" => TypeSymbol.BoolArr,
+                "string[]" => TypeSymbol.StringArr,
+                "int[]" => TypeSymbol.Int64Arr,
+                "float[]" => TypeSymbol.Float64Arr,
                 _ => null
             };
         }

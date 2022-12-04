@@ -10,6 +10,7 @@ namespace Shore.CodeAnalysis.Binding
             {
                 BoundNodeKind.BlockStatement => RewriteBlockStatement((BoundBlockStatement)node),
                 BoundNodeKind.VariableDeclaration => RewriteVariableDeclaration((BoundVariableDeclaration)node),
+                BoundNodeKind.ArrayDeclaration => RewriteArrayDeclaration((BoundArrayDeclaration)node),
                 BoundNodeKind.IfStatement => RewriteIfStatement((BoundIfStatement)node),
                 BoundNodeKind.WhileStatement => RewriteWhileStatement((BoundWhileStatement)node),
                 BoundNodeKind.ForStatement => RewriteForStatement((BoundForStatement)node),
@@ -54,6 +55,8 @@ namespace Shore.CodeAnalysis.Binding
 
             return new BoundVariableDeclaration(node.Variable, initializer!);
         }
+
+        protected virtual BoundStatement RewriteArrayDeclaration(BoundArrayDeclaration node) => node;
 
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)
         {
@@ -121,6 +124,7 @@ namespace Shore.CodeAnalysis.Binding
                 BoundNodeKind.NullExpression => RewriteNullExpression((BoundNullExpression)node),
                 BoundNodeKind.LiteralExpression => RewriteLiteralExpression((BoundLiteralExpression)node),
                 BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
+                BoundNodeKind.ArrayExpression => RewriteArrayExpression((BoundArrayExpression)node),
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
                 BoundNodeKind.UnaryExpression => RewriteUnaryExpression((BoundUnaryExpression)node),
                 BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
@@ -135,6 +139,8 @@ namespace Shore.CodeAnalysis.Binding
         protected virtual BoundExpression? RewriteLiteralExpression(BoundLiteralExpression? node) => node;
 
         protected virtual BoundExpression? RewriteVariableExpression(BoundVariableExpression? node) => node;
+        
+        protected virtual BoundExpression? RewriteArrayExpression(BoundArrayExpression? node) => node;
 
         protected virtual BoundExpression? RewriteAssignmentExpression(BoundAssignmentExpression? node)
         {
