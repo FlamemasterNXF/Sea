@@ -133,7 +133,7 @@ namespace Shore.CodeAnalysis
 
         private object EvaluateVariableExpression(BoundVariableExpression v, bool getLength = false)
         {
-            if (v.Type.ParentType == TypeSymbol.NumberArr || v.Type.ParentType == TypeSymbol.Array)
+            if (v.Type.HeadType == TypeSymbol.Array)
             {
                 var sb = new StringBuilder();
                 if (v.Variable.Kind == SymbolKind.GlobalVariable)
@@ -278,11 +278,16 @@ namespace Shore.CodeAnalysis
 
             if (node.Function == BuiltinFunctions.Length)
             {
+                if (node.Arguments[0].Type == TypeSymbol.String)
+                {
+                    var value = EvaluateExpression(node.Arguments[0]);
+                    return Convert.ToString(value).Length;
+                }
                 return EvaluateVariableExpression((BoundVariableExpression)node.Arguments[0], true);
             }
 
             var locals = new Dictionary<VariableSymbol?, object?>();
-            for (int i = 0; i < node.Arguments.Length; i++)
+            for (var i = 0; i < node.Arguments.Length; i++)
             {
                 var parameter = node.Function.Parameters[i];
                 var value = EvaluateExpression(node.Arguments[i]);

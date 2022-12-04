@@ -21,8 +21,8 @@ namespace Shore.CodeAnalysis.Symbols
             ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Int64);
         
         public static readonly FunctionSymbol Length = new("length",
-            ImmutableArray.Create(new ParameterSymbol("array", TypeSymbol.Array)), TypeSymbol.Int64);
-        
+            ImmutableArray.Create(new ParameterSymbol("array", TypeSymbol.StringAndArray)), TypeSymbol.Int64);
+
         internal static IEnumerable<FunctionSymbol?> GetAll() => typeof(BuiltinFunctions)
             .GetFields(BindingFlags.Public | BindingFlags.Static)
             .Where(f => f.FieldType == typeof(FunctionSymbol))

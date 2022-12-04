@@ -579,8 +579,8 @@ namespace Shore.CodeAnalysis.Binding
             {
                 var argument = boundArguments[i];
                 var parameter = function.Parameters[i];
-
-                if ((argument.Type != parameter.Type) && (argument.Type.ParentType != parameter.Type) && (argument.Type.HeadType != parameter.Type))
+                
+                if ((argument.Type != parameter.Type) && (argument.Type.ParentType != parameter.Type) && (argument.Type.HeadType != parameter.Type) && (parameter.Type != TypeSymbol.Any))
                 {
                     _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter?.Name, parameter?.Type, argument.Type);
                     return new BoundNullExpression();

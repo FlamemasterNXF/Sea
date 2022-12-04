@@ -16,26 +16,29 @@
         
         public static readonly TypeSymbol Null = new("null", null, null);
         public static readonly TypeSymbol Any = new ("any", null, null); //Internal usage ONLY.
+
+        //Specialized Types (Internal Only)
+        public static readonly TypeSymbol StringAndArray = new("stringAndArray");
+        
         public static readonly TypeSymbol Bool = new ("bool");
-        public static readonly TypeSymbol String = new ("string");
+        public static readonly TypeSymbol String = new ("string", StringAndArray);
         public static readonly TypeSymbol Number = new("number");
         public static readonly TypeSymbol Int64 = new ("int64", Number);
         public static readonly TypeSymbol Float64 = new ("float64", Number);
         public static readonly TypeSymbol Void = new("void");
         
         public static readonly TypeSymbol Array = new("[]");
-        public static readonly TypeSymbol BoolArr = new ("bool", Array);
-        public static readonly TypeSymbol StringArr = new ("string[]", Array);
-        public static readonly TypeSymbol NumberArr = new("number[]", Array);
-        public static readonly TypeSymbol Int64Arr = new ("int64", NumberArr);
-        public static readonly TypeSymbol Float64Arr = new ("float64", NumberArr);
+        public static readonly TypeSymbol BoolArr = new ("bool[]", StringAndArray, Array);
+        public static readonly TypeSymbol StringArr = new ("string[]", StringAndArray, Array);
+        public static readonly TypeSymbol Int64Arr = new ("int64[]", StringAndArray, Array);
+        public static readonly TypeSymbol Float64Arr = new ("float64[]", StringAndArray, Array);
 
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
             actual == required || actual.ParentType == required;
 
         public static List<TypeSymbol>? GetChildrenTypes(TypeSymbol parent)
         {
-            if (parent == NumberArr) return new List<TypeSymbol>() { Int64Arr, Float64Arr };
+            //if (parent == NumberArr) return new List<TypeSymbol>() { Int64Arr, Float64Arr };
             return parent == Number ? new List<TypeSymbol>() { Int64, Float64 } : null;
         }
 
