@@ -220,16 +220,16 @@ namespace Shore.CodeAnalysis
                     if (useFloat) return (double)Math.Pow(Convert.ToDouble(left), Convert.ToDouble(right));
                     return (long)Math.Pow(Convert.ToInt64(left), Convert.ToInt64(right));
                 case BoundBinaryOperatorKind.BitwiseAnd:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) & Convert.ToInt64(right);
+                    if (b.Type!.ParentType == TypeSymbol.Integer) return (int)left & (int)right;
                     return (bool)left! & (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseOr:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) | Convert.ToInt64(right);
+                    if (b.Type!.ParentType == TypeSymbol.Integer) return (int)left | (int)right;
                     return (bool)left! | (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseXor:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) ^ Convert.ToInt64(right);
+                    if (b.Type!.ParentType == TypeSymbol.Integer) return (int)left ^ (int)right;
                     return (bool)left! ^ (bool)right!;
-                case BoundBinaryOperatorKind.BitwiseLeftShift: return Convert.ToInt64(left) << Convert.ToInt32(right);
-                case BoundBinaryOperatorKind.BitwiseRightShift: return Convert.ToInt64(left) >> Convert.ToInt32(right);
+                case BoundBinaryOperatorKind.BitwiseLeftShift: return Convert.ToInt32(left) << Convert.ToInt32(right);
+                case BoundBinaryOperatorKind.BitwiseRightShift: return Convert.ToInt32(left) >> Convert.ToInt32(right);
                 case BoundBinaryOperatorKind.LogicalAnd:
                     return (bool)left! && (bool)right!;
                 case BoundBinaryOperatorKind.LogicalOr:
