@@ -11,6 +11,7 @@ namespace Shore.CodeAnalysis.Binding
                 BoundNodeKind.BlockStatement => RewriteBlockStatement((BoundBlockStatement)node),
                 BoundNodeKind.VariableDeclaration => RewriteVariableDeclaration((BoundVariableDeclaration)node),
                 BoundNodeKind.ArrayDeclaration => RewriteArrayDeclaration((BoundArrayDeclaration)node),
+                BoundNodeKind.ListDeclaration => RewriteListDeclaration((BoundListDeclaration)node),
                 BoundNodeKind.IfStatement => RewriteIfStatement((BoundIfStatement)node),
                 BoundNodeKind.WhileStatement => RewriteWhileStatement((BoundWhileStatement)node),
                 BoundNodeKind.ForStatement => RewriteForStatement((BoundForStatement)node),
@@ -51,12 +52,12 @@ namespace Shore.CodeAnalysis.Binding
         protected virtual BoundStatement RewriteVariableDeclaration(BoundVariableDeclaration node)
         {
             var initializer = RewriteExpression(node.Initializer);
-            if (initializer == node.Initializer) return node;
-
-            return new BoundVariableDeclaration(node.Variable, initializer!);
+            return initializer == node.Initializer ? node : new BoundVariableDeclaration(node.Variable, initializer);
         }
 
         protected virtual BoundStatement RewriteArrayDeclaration(BoundArrayDeclaration node) => node;
+
+        protected virtual BoundStatement RewriteListDeclaration(BoundListDeclaration node) => node;
 
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)
         {

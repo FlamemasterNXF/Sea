@@ -1,7 +1,6 @@
 using System.Text;
 using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Symbols;
-using Shore.CodeAnalysis.Syntax.Nodes;
 
 namespace Shore.CodeAnalysis
 {
@@ -73,6 +72,10 @@ namespace Shore.CodeAnalysis
                         EvaluateArrayDeclaration((BoundArrayDeclaration)s);
                         index++;
                         break;
+                    case BoundNodeKind.ListDeclaration:
+                        EvaluateListDeclaration((BoundListDeclaration)s);
+                        index++;
+                        break;
                     case BoundNodeKind.ExpressionStatement:
                         EvaluateExpressionStatement((BoundExpressionStatement)s);
                         index++;
@@ -108,18 +111,25 @@ namespace Shore.CodeAnalysis
             _lastValue = value;
             Assign(node.Variable, value);
         }
-        
-        private void EvaluateArrayDeclaration(BoundArrayDeclaration node)
-        {
-            var values = new List<object>();
-            
-            for (int i = 0; i < node.Members.Length; i++)
-            {
-                var value = EvaluateExpression(node.Members[i]);
-                values.Add(value);
-            }
 
-            AssignArray(node.Array, values.ToArray());
+        private void EvaluateArrayDeclaration(BoundArrayDeclaration node) =>
+            AssignArray(node.Array, node.Members.Select(EvaluateExpression).ToArray());
+
+        private void EvaluateListDeclaration(BoundListDeclaration node)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var value in node.Members) sb.Append($"{value}, ");
+            var str = $"[{sb.Remove(sb.Length - 2, 2)}]".ToString();
+
+            if (node.List.Kind == SymbolKind.GlobalVariable) _globals[node.List] = str;
+            else
+            {
+                var locals = _locals.Peek();
+                locals[node.List] = str;
+            }
+            
+            for (var i = 0; i < node.Members.Length; i++) Assign(node.Members[i], node.Values[i]);
         }
 
         private void EvaluateExpressionStatement(BoundExpressionStatement node) => _lastValue = EvaluateExpression(node.Expression);
@@ -144,7 +154,7 @@ namespace Shore.CodeAnalysis
 
         private object EvaluateVariableExpression(BoundVariableExpression v, bool getLength = false)
         {
-            if (v.Type.ParentType == TypeSymbol.NumberArr || v.Type.ParentType == TypeSymbol.Array)
+            if (v.Type.HeadType == TypeSymbol.Array)
             {
                 var sb = new StringBuilder();
                 if (v.Variable.Kind == SymbolKind.GlobalVariable)
@@ -196,7 +206,7 @@ namespace Shore.CodeAnalysis
 
         private object? EvaluateBinaryExpression(BoundBinaryExpression b)
         {
-            var useFloat = b.Left.Type.ParentType == TypeSymbol.Float || b.Right.Type.ParentType == TypeSymbol.Float;
+            var useFloat = b.Left.Type == TypeSymbol.Float64 || b.Right.Type == TypeSymbol.Float64;
                 var left = EvaluateExpression(b.Left);
             var right = EvaluateExpression(b.Right);
 
@@ -204,7 +214,7 @@ namespace Shore.CodeAnalysis
             {
                 case BoundBinaryOperatorKind.Addition:
                     if (useFloat) return Convert.ToDouble(left) + Convert.ToDouble(right);
-                    if (b.Type.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) + Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) + Convert.ToInt64(right);
                     return (string)left! + (string)right!;
                 case BoundBinaryOperatorKind.Subtraction: 
                     if (useFloat) return Convert.ToDouble(left) - Convert.ToDouble(right);
@@ -214,19 +224,19 @@ namespace Shore.CodeAnalysis
                     return Convert.ToInt64(left) * Convert.ToInt64(right);
                 case BoundBinaryOperatorKind.Division: 
                     if (useFloat) return Convert.ToDouble(left) / Convert.ToDouble(right);
-                    if (b.Type.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) / Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) / Convert.ToInt64(right);
                     return left.ToString()[Convert.ToInt32(right)].ToString();
                 case BoundBinaryOperatorKind.Exponentiation: 
-                    if (useFloat) return (double)Math.Pow(Convert.ToDouble(left), Convert.ToDouble(right));
+                    if (useFloat) return Math.Pow(Convert.ToDouble(left), Convert.ToDouble(right));
                     return (long)Math.Pow(Convert.ToInt64(left), Convert.ToInt64(right));
                 case BoundBinaryOperatorKind.BitwiseAnd:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) & Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Float64) return Convert.ToInt64(left) & Convert.ToInt64(right);
                     return (bool)left! & (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseOr:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) | Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) | Convert.ToInt64(right);
                     return (bool)left! | (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseXor:
-                    if (b.Type!.ParentType == TypeSymbol.Integer) return Convert.ToInt64(left) ^ Convert.ToInt64(right);
+                    if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) ^ Convert.ToInt64(right);
                     return (bool)left! ^ (bool)right!;
                 case BoundBinaryOperatorKind.BitwiseLeftShift: return Convert.ToInt64(left) << Convert.ToInt32(right);
                 case BoundBinaryOperatorKind.BitwiseRightShift: return Convert.ToInt64(left) >> Convert.ToInt32(right);
@@ -289,11 +299,16 @@ namespace Shore.CodeAnalysis
 
             if (node.Function == BuiltinFunctions.Length)
             {
+                if (node.Arguments[0].Type == TypeSymbol.String)
+                {
+                    var value = EvaluateExpression(node.Arguments[0]);
+                    return Convert.ToString(value).Length;
+                }
                 return EvaluateVariableExpression((BoundVariableExpression)node.Arguments[0], true);
             }
 
             var locals = new Dictionary<VariableSymbol?, object?>();
-            for (int i = 0; i < node.Arguments.Length; i++)
+            for (var i = 0; i < node.Arguments.Length; i++)
             {
                 var parameter = node.Function.Parameters[i];
                 var value = EvaluateExpression(node.Arguments[i]);
@@ -317,6 +332,8 @@ namespace Shore.CodeAnalysis
             if (node.Type == TypeSymbol.Bool) return Convert.ToBoolean(value);
             if (node.Type == TypeSymbol.Float64) return Convert.ToDouble(value);
             if (node.Type == TypeSymbol.Int64) return Convert.ToInt64(value);
+            if (node.Type == TypeSymbol.Float64List) return Convert.ToDouble(value);
+            if (node.Type == TypeSymbol.Int64List) return Convert.ToInt64(value);
             if (node.Type == TypeSymbol.String) return Convert.ToString(value);
             throw new Exception($"Unexpected type {node.Type}");
         }

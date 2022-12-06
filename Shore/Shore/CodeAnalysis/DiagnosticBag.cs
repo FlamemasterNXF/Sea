@@ -122,7 +122,7 @@ namespace Shore.CodeAnalysis
         public void ReportCannotConvertImplicitly(TextLocation location, TypeSymbol? fromType, TypeSymbol? toType)
         {
             var message =
-                $"Cannot convert Type '{fromType}' to '{toType}'. An explicit conversion exists (are you missing a cast?).";
+                $"Cannot Convert Type '{fromType}' to Type '{toType}'.";
             ReportError(location, message);
         }
 
@@ -213,6 +213,12 @@ namespace Shore.CodeAnalysis
         public void ReportAccessArrayNoIndex(TextLocation location, string name)
         {
             var message = $"'{name}' cannot be accessed as a non-array value.";
+            ReportError(location, message);
+        }
+
+        public void ListReDeclaration(TextLocation location, string name)
+        {
+            var message = $"'{name}' Already Exists. This shouldn't be an error you see.";
             ReportError(location, message);
         }
     }

@@ -63,9 +63,6 @@ namespace Shore.CodeAnalysis.Syntax
         CommaToken,
         BoolKeyword,
         StringKeyword,
-        //Int8Keyword,
-        //Int16Keyword,
-        //Int32Keyword,
         Int64Keyword,
         Parameter,
         GlobalStatement,
@@ -80,7 +77,6 @@ namespace Shore.CodeAnalysis.Syntax
         ReturnKeyword,
         DoubleStarToken,
         Float64Keyword,
-        //Float32Keyword
         SingleLineCommentToken,
         MultiLineCommentToken,
         CloseBracketToken,
@@ -90,6 +86,11 @@ namespace Shore.CodeAnalysis.Syntax
         ArrayDeclarationStatement,
         ArrayAccessExpression,
         StringArrayKeyword,
-        BoolArrayKeyword
+        BoolArrayKeyword,
+        BoolListKeyword,
+        StringListKeyword,
+        IntListKeyword,
+        FloatListKeyword,
+        ListDeclarationStatement,
     }
 }
