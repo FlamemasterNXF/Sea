@@ -302,7 +302,7 @@ namespace Shore.CodeAnalysis
                 if (node.Arguments[0].Type == TypeSymbol.String)
                 {
                     var value = EvaluateExpression(node.Arguments[0]);
-                    return Convert.ToString(value).Length;
+                    return Convert.ToInt64(Convert.ToString(value).Length);
                 }
                 return EvaluateVariableExpression((BoundVariableExpression)node.Arguments[0], true);
             }
