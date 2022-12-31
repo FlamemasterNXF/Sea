@@ -298,7 +298,7 @@ namespace Shore.CodeAnalysis.Binding
 
             foreach (var member in node.Members)
             {
-                var boundMember = BindLiteralExpression(member);
+                var boundMember = BindExpression(member);
 
                 if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
                     _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);

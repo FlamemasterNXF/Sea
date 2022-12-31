@@ -245,7 +245,7 @@ namespace Shore.CodeAnalysis.Syntax
             return new ArrayDeclarationNode(_nodeTree, keyword, identifier, equals, openBrace, members, closeBrace);
         }
         
-        private SeparatedNodeList<LiteralExpressionNode> ParseArrayMembers()
+        private SeparatedNodeList<ExpressionNode> ParseArrayMembers()
         {
             var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
 
@@ -263,7 +263,7 @@ namespace Shore.CodeAnalysis.Syntax
                 else parseNextArgument = false;
             }
 
-            return new SeparatedNodeList<LiteralExpressionNode>(nodesAndSeparators.ToImmutable());
+            return new SeparatedNodeList<ExpressionNode>(nodesAndSeparators.ToImmutable());
         }
 
         private StatementNode ParseIfStatement()
