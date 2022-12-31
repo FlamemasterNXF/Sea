@@ -139,12 +139,12 @@ namespace Shore.CodeAnalysis
                 if (v.Variable.Kind == SymbolKind.GlobalVariable)
                 {
                     foreach(var value in _globalArrays[v.Variable]) sb.Append($"{value}, ");
-                    return getLength? _globalArrays[v.Variable].Length : $"[{sb.Remove(sb.Length-2, 2)}]";   
+                    return getLength? (long)_globalArrays[v.Variable].Length : $"[{sb.Remove(sb.Length-2, 2)}]";   
                 }
                 
                 var localArrays = _localArrays.Peek();
                 foreach (var value in localArrays.SelectMany(value => value.Value)) sb.Append($"{value}, ");
-                return getLength ? localArrays[v.Variable].Length : $"[{sb.Remove(sb.Length-2, 2)}]";   
+                return getLength ? (long)localArrays[v.Variable].Length : $"[{sb.Remove(sb.Length-2, 2)}]";   
             }
             if (v.Variable!.Kind == SymbolKind.GlobalVariable) return _globals[v.Variable];
             
