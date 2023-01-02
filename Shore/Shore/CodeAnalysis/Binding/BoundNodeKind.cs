@@ -23,6 +23,7 @@ namespace Shore.CodeAnalysis.Binding
         ArrayDeclaration,
         ArrayExpression,
         ListDeclaration,
-        ListExpression
+        ListExpression,
+        ListAssignmentExpression
     }
 }

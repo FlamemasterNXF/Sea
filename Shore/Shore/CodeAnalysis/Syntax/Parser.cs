@@ -43,6 +43,8 @@ namespace Shore.CodeAnalysis.Syntax
         
         private Token CurrentToken => PeekToken(0);
 
+        private ExpressionNode? _currentAccessor;
+
         private Token NextToken()
         {
             var current = CurrentToken;
@@ -72,10 +74,19 @@ namespace Shore.CodeAnalysis.Syntax
                 var right = ParseAssignmentExpression(forceFloat);
                 return new AssignmentExpressionNode(_nodeTree, identifierToken, operatorToken, right);
             }
+            
+            if (CurrentToken.Type is TokType.EqualsToken && PeekToken(-4).Type == TokType.IdentifierToken)
+            {
+                var identifierToken = PeekToken(-4);
+                var operatorToken = MatchToken(TokType.EqualsToken);
+                var right = ParseAssignmentExpression(forceFloat);
+                return new ListAssignmentExpressionNode(_nodeTree, identifierToken, operatorToken, right,
+                    _currentAccessor);
+            }
 
             return ParseBinaryExpression(forceFloat);
         }
-        
+
         private ExpressionNode ParseBinaryExpression(bool forceFloat, int parentPrecedence = 0)
         {
             ExpressionNode left;
@@ -434,7 +445,7 @@ namespace Shore.CodeAnalysis.Syntax
         private ExpressionNode ParseNameExpression()
         {
             var identifierToken = MatchToken(TokType.IdentifierToken);
-
+            
             if (CurrentToken.Type == TokType.OpenBracketToken) return ParseArrayAccessExpression(identifierToken);
             
             return new NameExpressionNode(_nodeTree, identifierToken);
@@ -445,6 +456,8 @@ namespace Shore.CodeAnalysis.Syntax
             var openBracket = MatchToken(TokType.OpenBracketToken);
             var accessor = ParseExpression();
             var closeBracket = MatchToken(TokType.CloseBracketToken);
+
+            _currentAccessor = accessor;
             
             return new ArrayAccessExpressionNode(_nodeTree, identifierToken, openBracket, accessor, closeBracket);
         }

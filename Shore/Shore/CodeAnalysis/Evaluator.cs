@@ -9,11 +9,11 @@ namespace Shore.CodeAnalysis
         private readonly BoundProgram _program;
         private readonly Dictionary<VariableSymbol, object> _globals;
         private readonly Dictionary<VariableSymbol, object[]> _globalArrays;
-        private readonly Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _globalLists;
+        private Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _globalLists;
         private readonly Dictionary<FunctionSymbol, BoundBlockStatement> _functions = new();
         private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
         private readonly Stack<Dictionary<VariableSymbol, object[]>> _localArrays = new();
-        private readonly Stack<Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>> _localLists = new();
+        private Stack<Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>> _localLists = new();
 
         private object? _lastValue;
 
@@ -142,6 +142,7 @@ namespace Shore.CodeAnalysis
                 BoundNodeKind.ArrayExpression => EvaluateArrayExpression((BoundArrayExpression)node),
                 BoundNodeKind.ListExpression => EvaluateListExpression((BoundListExpression)node),
                 BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression((BoundAssignmentExpression)node),
+                BoundNodeKind.ListAssignmentExpression => EvaluateListAssignmentExpression((BoundListAssignmentExpression)node),
                 BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression)node),
                 BoundNodeKind.BinaryExpression => EvaluateBinaryExpression((BoundBinaryExpression)node),
                 BoundNodeKind.CallExpression => EvaluateCallExpression((BoundCallExpression)node),
@@ -212,6 +213,14 @@ namespace Shore.CodeAnalysis
         {
             var value = EvaluateExpression(a.Expression);
             Assign(a.Variable, value);
+            return value;
+        }
+        
+        private object? EvaluateListAssignmentExpression(BoundListAssignmentExpression a)
+        {
+            var value = EvaluateExpression(a.Expression);
+            var accessor = EvaluateExpression(a.Accessor);
+            AssignListValue(a.Variable, value, accessor);
             return value;
         }
 
@@ -391,6 +400,21 @@ namespace Shore.CodeAnalysis
             {
                 var locals = _localLists.Peek();
                 locals[array] = values;
+            }
+        }
+        
+        private void AssignListValue(VariableSymbol array, object value, object accessor)
+        {
+            if (array.Kind == SymbolKind.GlobalVariable)
+            {
+                var oldEntry = _globalLists[array].ElementAt(Convert.ToInt32(accessor));
+                _globalLists[array][oldEntry.Key] = value;
+            }
+            else
+            {
+                var locals = _localLists.Peek();
+                var oldEntry = locals[array].ElementAt(Convert.ToInt32(accessor));
+                locals[array][oldEntry.Key] = value;
             }
         }
     }

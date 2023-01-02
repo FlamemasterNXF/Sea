@@ -482,6 +482,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.NameExpression => BindNameExpression((NameExpressionNode)node),
                 TokType.ArrayAccessExpression => BindArrayAccessExpression((ArrayAccessExpressionNode)node),
                 TokType.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionNode)node),
+                TokType.ListAssignmentExpression => BindListAssignmentExpression((ListAssignmentExpressionNode)node),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
         }
@@ -529,19 +530,37 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpressionDistributor(node.Expression);
-
-            Console.WriteLine(name);
-
+            
             if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Location, name);
                 return boundExpression;
             }
 
-            if (variable!.IsReadOnly) _diagnostics.ReportCannotAssign(node.EqualsToken.Location, name);
+            if (variable.IsReadOnly && !variable.IsList)
+                _diagnostics.ReportCannotAssign(node.EqualsToken.Location, name);
 
             var convertedExpression = BindConversion(node.Expression.Location, boundExpression, variable.Type);
             return new BoundAssignmentExpression(variable, convertedExpression);
+        }
+        
+        private BoundExpression BindListAssignmentExpression(ListAssignmentExpressionNode node)
+        {
+            var name = node.IdentifierToken.Text;
+            var boundExpression = BindExpressionDistributor(node.Expression);
+            
+            if (!_scope.TryLookupVariable(name, out var variable))
+            {
+                _diagnostics.ReportUndefinedName(node.IdentifierToken.Location, name);
+                return boundExpression;
+            }
+
+            if(!variable.IsList) _diagnostics.ReportCannotAssign(node.IdentifierToken.Location, name);
+
+            var accessor = BindExpression(node.Accessor);
+            var convertedExpression = BindConversion(node.Expression.Location, boundExpression,
+                TypeSymbol.GetAcceptedType(variable.Type));
+            return new BoundListAssignmentExpression(variable, convertedExpression, accessor);
         }
 
         private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
