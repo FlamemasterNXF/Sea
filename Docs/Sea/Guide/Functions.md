@@ -28,3 +28,5 @@ Sea includes two built-in functions that come packaged with the language.<br>
 - `ceil(<float>)`: Returns the smallest Integral Value that is greater than a given Floating Point Number.
 - `floor(<float>)`: Returns the largest Integral Value that is less than a given Floating Point Number.
 - `length(<array OR string>)`: Returns the length of an Array or String as an integer.
+- `unixTime()`: Returns the Unix Timestamp as an integer (includes milliseconds).
+- `sleep(<int>)`: Pauses program execution for a given amount of milliseconds.
