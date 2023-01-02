@@ -257,7 +257,8 @@ namespace Shore.CodeAnalysis
                 case BoundBinaryOperatorKind.Multiplication: 
                     if (useFloat) return Convert.ToDouble(left) * Convert.ToDouble(right);
                     return Convert.ToInt64(left) * Convert.ToInt64(right);
-                case BoundBinaryOperatorKind.Division: 
+                case BoundBinaryOperatorKind.Division:
+                    if (Convert.ToDouble(left) == 0 && Convert.ToDouble(right) == 0) return "undefined";
                     if (useFloat) return Convert.ToDouble(left) / Convert.ToDouble(right);
                     if (b.Type == TypeSymbol.Int64) return Convert.ToInt64(left) / Convert.ToInt64(right);
                     return left.ToString()[Convert.ToInt32(right)].ToString();
