@@ -299,7 +299,7 @@ namespace Shore.CodeAnalysis.Binding
 
             foreach (var member in node.Members)
             {
-                var boundMember = BindLiteralExpression(member);
+                var boundMember = BindExpression(member);
 
                 if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
                     _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
@@ -317,25 +317,36 @@ namespace Shore.CodeAnalysis.Binding
         {
             var type = LookupType(node.AType.Text);
 
-            ImmutableArray<VariableSymbol>.Builder boundMembers = ImmutableArray.CreateBuilder<VariableSymbol>();
-            ImmutableArray<BoundExpression>.Builder boundValues = ImmutableArray.CreateBuilder<BoundExpression>();
+            var boundMembers = new List<BoundExpression>();
 
-            for (var i = 0; i < node.Members.Count; i++)
+            foreach (var member in node.Members)
             {
-                var member = node.Members[i];
-                var boundValue = BindExpression(member);
-                var boundMember = BindListVariable(node, member, type, i);
+                var boundMember = BindExpression(member);
 
-                if (boundValue.Type != TypeSymbol.GetAcceptedType(type))
+                if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
                     _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
-
-                boundValues.Add(boundValue);
+                
                 boundMembers.Add(boundMember);
             }
 
-            var list = BindList(node, type);
+            var array = BindList(node, type);
+
+            var variables = ImmutableArray.CreateBuilder<VariableSymbol>();
+            for (var i = 0; i < boundMembers.Count; i++)
+            {
+                if (_function != null) variables.Add(new LocalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{i}_{_function.Name}", false, TypeSymbol.GetAcceptedType(type)));
+                variables.Add(new GlobalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{i}", false, TypeSymbol.GetAcceptedType(type)));
+            }
+
+            variables.ToImmutable();
             
-            return new BoundListDeclaration(list, boundMembers.ToImmutable(), boundValues.ToImmutable());
+            var dict = new Dictionary<VariableSymbol, BoundExpression>();
+            for (var i = 0; i < variables.Count; i++)
+            {
+                dict.Add(variables[i], boundMembers[i]);
+            }
+
+            return new BoundListDeclaration(array, dict);
         }
 
         private BoundStatement BindIfStatement(IfStatementNode node)
@@ -468,6 +479,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.NameExpression => BindNameExpression((NameExpressionNode)node),
                 TokType.ArrayAccessExpression => BindArrayAccessExpression((ArrayAccessExpressionNode)node),
                 TokType.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionNode)node),
+                TokType.ListAssignmentExpression => BindListAssignmentExpression((ListAssignmentExpressionNode)node),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
         }
@@ -499,30 +511,53 @@ namespace Shore.CodeAnalysis.Binding
 
             if (string.IsNullOrEmpty(name)) return new BoundNullExpression();
 
-            if (!_scope!.TryLookupVariable(name, out var variable))
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.Identifier.Location, name);
                 return new BoundNullExpression();
             }
-            
+
+            if (variable.IsList) return new BoundListExpression(variable, accessor);
+
             return new BoundArrayExpression(variable, accessor);
         }
+        
 
         private BoundExpression BindAssignmentExpression(AssignmentExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpressionDistributor(node.Expression);
-
-            if (!_scope!.TryLookupVariable(name, out var variable))
+            
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Location, name);
                 return boundExpression;
             }
 
-            if (variable!.IsReadOnly) _diagnostics.ReportCannotAssign(node.EqualsToken.Location, name);
+            if (variable.IsReadOnly && !variable.IsList)
+                _diagnostics.ReportCannotAssign(node.EqualsToken.Location, name);
 
             var convertedExpression = BindConversion(node.Expression.Location, boundExpression, variable.Type);
             return new BoundAssignmentExpression(variable, convertedExpression);
+        }
+        
+        private BoundExpression BindListAssignmentExpression(ListAssignmentExpressionNode node)
+        {
+            var name = node.IdentifierToken.Text;
+            var boundExpression = BindExpressionDistributor(node.Expression);
+            
+            if (!_scope.TryLookupVariable(name, out var variable))
+            {
+                _diagnostics.ReportUndefinedName(node.IdentifierToken.Location, name);
+                return boundExpression;
+            }
+
+            if(!variable.IsList) _diagnostics.ReportCannotAssign(node.IdentifierToken.Location, name);
+
+            var accessor = BindExpression(node.Accessor);
+            var convertedExpression = BindConversion(node.Expression.Location, boundExpression,
+                TypeSymbol.GetAcceptedType(variable.Type));
+            return new BoundListAssignmentExpression(variable, convertedExpression, accessor);
         }
 
         private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
@@ -667,14 +702,16 @@ namespace Shore.CodeAnalysis.Binding
         private VariableSymbol BindList(ListDeclarationNode node, TypeSymbol type)
         {
             var name = node.Identifier.Text ?? "?";
-            var list = _function == null ? 
-                (VariableSymbol)new GlobalVariableSymbol(name, false, type)
-                : new LocalVariableSymbol(name, false, type);
-            
-            if (!_scope!.TryDeclareVariable(list))
-                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
+            var array = _function == null ? 
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type, true)
+                : new LocalVariableSymbol(name, true, type, true);
 
-            return list;
+            if (node.Members.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
+            
+            if (!_scope.TryDeclareVariable(array))
+                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
+            
+            return array;
         }
         
         private VariableSymbol BindListVariable(ListDeclarationNode node, ExpressionNode value, TypeSymbol type, int i)

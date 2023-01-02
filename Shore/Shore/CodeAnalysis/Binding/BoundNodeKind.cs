@@ -22,6 +22,8 @@ namespace Shore.CodeAnalysis.Binding
         ReturnStatement,
         ArrayDeclaration,
         ArrayExpression,
-        ListDeclaration
+        ListDeclaration,
+        ListExpression,
+        ListAssignmentExpression
     }
 }

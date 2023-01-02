@@ -1,20 +1,17 @@
-﻿using System.Collections.Immutable;
 using Shore.CodeAnalysis.Symbols;
 
 namespace Shore.CodeAnalysis.Binding
 {
     internal sealed class BoundListDeclaration : BoundStatement
     {
-        public VariableSymbol List { get; }
-        public ImmutableArray<VariableSymbol> Members { get; }
-        public ImmutableArray<BoundExpression> Values { get; }
+        public VariableSymbol Array { get; }
+        public Dictionary<VariableSymbol, BoundExpression> Members { get; }
         public override BoundNodeKind Kind => BoundNodeKind.ListDeclaration;
 
-        public BoundListDeclaration(VariableSymbol list, ImmutableArray<VariableSymbol> members, ImmutableArray<BoundExpression> values)
+        public BoundListDeclaration(VariableSymbol array, Dictionary<VariableSymbol, BoundExpression> members)
         {
-            List = list;
+            Array = array;
             Members = members;
-            Values = values;
         }
     }
 }

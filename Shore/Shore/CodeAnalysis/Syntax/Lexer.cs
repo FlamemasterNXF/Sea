@@ -1,5 +1,4 @@
 using System.Text;
-using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;
 
@@ -291,20 +290,27 @@ namespace Shore.CodeAnalysis.Syntax
             while (char.IsLetter(Current) || char.IsNumber(Current) || Current is '<' or '>') _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
-            switch (text)
+            
+            // TODO: Clean up this garbage 
+            if ((text is "int" or "float" or "bool" or "string") && Current == '[')
             {
-                case "int" or "float" or "bool" or "string" when Current == '[':
+                _position++;
+                if (Current == ']')
                 {
                     _position++;
-                    if (Current == ']')
-                    {
-                        _position++;
-                        text += "[]";
-                    }
-
-                    break;
+                    text += "[]";
                 }
             }
+            if ((text is "int" or "float" or "bool" or "string") && Current == '<')
+            {
+                _position++;
+                if (Current == '>')
+                {
+                    _position++;
+                    text += "<>";
+                }
+            }
+            
             _type = text.GetKeywordType();
         }
 

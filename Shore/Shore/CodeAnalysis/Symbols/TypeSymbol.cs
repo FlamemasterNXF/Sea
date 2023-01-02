@@ -36,10 +36,10 @@ namespace Shore.CodeAnalysis.Symbols
         public static readonly TypeSymbol Float64Arr = new ("float64[]", StringAndArray, Array);
         
         public static readonly TypeSymbol List = new("<>");
-        public static readonly TypeSymbol BoolList = new ("bool<>", List);
-        public static readonly TypeSymbol StringList = new ("string<>", List);
-        public static readonly TypeSymbol Int64List = new ("int<>", List);
-        public static readonly TypeSymbol Float64List = new ("float<>", List);
+        public static readonly TypeSymbol BoolList = new ("bool<>", StringAndArray, List);
+        public static readonly TypeSymbol StringList = new ("string<>", StringAndArray, List);
+        public static readonly TypeSymbol Int64List = new ("int64<>", StringAndArray, List);
+        public static readonly TypeSymbol Float64List = new ("float64<>", StringAndArray, List);
 
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
             actual == required || actual.ParentType == required;
@@ -52,8 +52,7 @@ namespace Shore.CodeAnalysis.Symbols
             if (arrType == BoolArr || arrType == BoolList) return Bool;
             if (arrType == StringArr || arrType == StringList) return String;
             if (arrType == Int64Arr || arrType == Int64List) return Int64;
-            if (arrType == Float64Arr || arrType == Float64List) return Float64;
-            return null;
+            return arrType == Float64Arr || arrType == Float64List ? Float64 : null;
         }
     }
 }

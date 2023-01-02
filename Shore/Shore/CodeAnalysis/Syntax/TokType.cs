@@ -92,5 +92,6 @@ namespace Shore.CodeAnalysis.Syntax
         IntListKeyword,
         FloatListKeyword,
         ListDeclarationStatement,
+        ListAssignmentExpression
     }
 }

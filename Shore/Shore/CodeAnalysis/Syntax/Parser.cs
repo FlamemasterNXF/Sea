@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Diagnostics;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;
 
@@ -43,6 +42,8 @@ namespace Shore.CodeAnalysis.Syntax
         
         private Token CurrentToken => PeekToken(0);
 
+        private ExpressionNode? _currentAccessor;
+
         private Token NextToken()
         {
             var current = CurrentToken;
@@ -58,23 +59,6 @@ namespace Shore.CodeAnalysis.Syntax
             return new Token(_nodeTree, type, CurrentToken.Position, null, null);
         }
         
-        private readonly List<TokType> _variableTypes = new()
-        {
-            TokType.BoolKeyword, TokType.StringKeyword, TokType.Int64Keyword, TokType.Float64Keyword,
-            TokType.BoolArrayKeyword, TokType.StringArrayKeyword, TokType.IntArrayKeyword, TokType.FloatArrayKeyword,
-            TokType.BoolListKeyword, TokType.StringListKeyword, TokType.IntListKeyword, TokType.FloatListKeyword
-        };
-        
-        private readonly List<TokType> _arrayTypes = new()
-        {
-            TokType.BoolArrayKeyword, TokType.StringArrayKeyword, TokType.IntArrayKeyword, TokType.FloatArrayKeyword
-        };
-        
-        private readonly List<TokType> _listTypes = new()
-        {
-            TokType.BoolListKeyword, TokType.StringListKeyword, TokType.IntListKeyword, TokType.FloatListKeyword
-        };
-
         private ExpressionNode ParseExpression(bool isFloat = false)
         {
             return ParseAssignmentExpression(isFloat);
@@ -82,17 +66,26 @@ namespace Shore.CodeAnalysis.Syntax
         
         private ExpressionNode ParseAssignmentExpression(bool forceFloat = false)
         {
-            if (CurrentToken.Type == TokType.IdentifierToken && PeekToken(1).Type == TokType.EqualsToken)
+            if (CurrentToken.Type is TokType.IdentifierToken && PeekToken(1).Type == TokType.EqualsToken)
             {
                 var identifierToken = NextToken();
                 var operatorToken = NextToken();
                 var right = ParseAssignmentExpression(forceFloat);
                 return new AssignmentExpressionNode(_nodeTree, identifierToken, operatorToken, right);
             }
+            
+            if (CurrentToken.Type is TokType.EqualsToken && PeekToken(-4).Type == TokType.IdentifierToken)
+            {
+                var identifierToken = PeekToken(-4);
+                var operatorToken = MatchToken(TokType.EqualsToken);
+                var right = ParseAssignmentExpression(forceFloat);
+                return new ListAssignmentExpressionNode(_nodeTree, identifierToken, operatorToken, right,
+                    _currentAccessor);
+            }
 
             return ParseBinaryExpression(forceFloat);
         }
-        
+
         private ExpressionNode ParseBinaryExpression(bool forceFloat, int parentPrecedence = 0)
         {
             ExpressionNode left;
@@ -199,11 +192,14 @@ namespace Shore.CodeAnalysis.Syntax
 
         private StatementNode ParseStatement()
         {
-            if (_variableTypes.Contains(CurrentToken.Type)) return ParseVariableDeclaration();
             return CurrentToken.Type switch
             {
                 TokType.OpenBraceToken => ParseBlockStatement(),
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
+                TokType.BoolKeyword or TokType.StringKeyword or TokType.Int64Keyword or TokType.Float64Keyword or 
+                    TokType.StringArrayKeyword or TokType.BoolArrayKeyword or TokType.IntArrayKeyword or TokType.FloatArrayKeyword
+                    or TokType.StringListKeyword or TokType.BoolListKeyword or TokType.IntListKeyword or TokType.FloatListKeyword
+                    => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
                 TokType.ForKeyword => ParseForStatement(),
@@ -240,8 +236,15 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var keyword = MatchToken(CurrentToken.Type);
 
-            if (_arrayTypes.Contains(keyword.Type)) return ParseArrayDeclaration(keyword);
-            if (_listTypes.Contains(keyword.Type)) return ParseListDeclaration(keyword);
+            switch (keyword.Type)
+            {
+                case TokType.IntArrayKeyword or TokType.FloatArrayKeyword or TokType.BoolArrayKeyword
+                    or TokType.StringArrayKeyword:
+                    return ParseArrayDeclaration(keyword);
+                case TokType.IntListKeyword or TokType.FloatListKeyword or TokType.BoolListKeyword
+                    or TokType.StringListKeyword:
+                    return ParseListDeclaration(keyword);
+            }
 
             var isFloat = keyword.Text == "float";
             var identifier = MatchToken(TokType.IdentifierToken);
@@ -265,12 +268,12 @@ namespace Shore.CodeAnalysis.Syntax
             var identifier = MatchToken(TokType.IdentifierToken);
             var equals = MatchToken(TokType.EqualsToken);
             var openBrace = MatchToken(TokType.OpenBracketToken);
-            var members = ParseListMembers();
+            var members = ParseArrayMembers();
             var closeBrace = MatchToken(TokType.CloseBracketToken);
             return new ListDeclarationNode(_nodeTree, keyword, identifier, equals, openBrace, members, closeBrace);
         }
         
-        private SeparatedNodeList<LiteralExpressionNode> ParseArrayMembers()
+        private SeparatedNodeList<ExpressionNode> ParseArrayMembers()
         {
             var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
 
@@ -288,28 +291,7 @@ namespace Shore.CodeAnalysis.Syntax
                 else parseNextArgument = false;
             }
 
-            return new SeparatedNodeList<LiteralExpressionNode>(nodesAndSeparators.ToImmutable());
-        }
-        
-        private SeparatedNodeList<LiteralExpressionNode> ParseListMembers()
-        {
-            var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
-
-            var parseNextArgument = true;
-            while (parseNextArgument && CurrentToken.Type != TokType.CloseBracketToken && CurrentToken.Type != TokType.EndOfFileToken)
-            {
-                var expression = ParseExpression();
-                nodesAndSeparators.Add(expression);
-
-                if (CurrentToken.Type == TokType.CommaToken)
-                {
-                    var comma = MatchToken(TokType.CommaToken);
-                    nodesAndSeparators.Add(comma);
-                }
-                else parseNextArgument = false;
-            }
-
-            return new SeparatedNodeList<LiteralExpressionNode>(nodesAndSeparators.ToImmutable());
+            return new SeparatedNodeList<ExpressionNode>(nodesAndSeparators.ToImmutable());
         }
 
         private StatementNode ParseIfStatement()
@@ -462,7 +444,7 @@ namespace Shore.CodeAnalysis.Syntax
         private ExpressionNode ParseNameExpression()
         {
             var identifierToken = MatchToken(TokType.IdentifierToken);
-
+            
             if (CurrentToken.Type == TokType.OpenBracketToken) return ParseArrayAccessExpression(identifierToken);
             
             return new NameExpressionNode(_nodeTree, identifierToken);
@@ -473,6 +455,9 @@ namespace Shore.CodeAnalysis.Syntax
             var openBracket = MatchToken(TokType.OpenBracketToken);
             var accessor = ParseExpression();
             var closeBracket = MatchToken(TokType.CloseBracketToken);
+
+            _currentAccessor = accessor;
+            
             return new ArrayAccessExpressionNode(_nodeTree, identifierToken, openBracket, accessor, closeBracket);
         }
     }
