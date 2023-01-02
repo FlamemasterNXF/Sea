@@ -234,5 +234,11 @@ namespace Shore.CodeAnalysis
             var message = $"Index {accessor} is out of the bounds of Array '{variable.Name}'. The highest index is {variable.Length - 1}";
             ReportError(location, message);
         }
+
+        public void ReportStringOutOfBounds(TextLocation location, BoundExpression boundLeft, BoundExpression boundRight)
+        {
+            var message = $"Index {boundRight} is out of the bounds of String '{boundLeft}'. The highest index is {boundLeft.ToString().Length - 3}";
+            ReportError(location, message);
+        }
     }
 }

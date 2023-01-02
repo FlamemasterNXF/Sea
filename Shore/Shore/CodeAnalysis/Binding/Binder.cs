@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Data;
 using Shore.CodeAnalysis.Binding.ControlFlow;
 using Shore.CodeAnalysis.Binding.Converting;
 using Shore.CodeAnalysis.Lowering;
@@ -508,7 +509,7 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.Identifier.Text;
             var accessor = BindExpression(node.Accessor);
-            var usableAccessor = Convert.ToInt64(accessor.ToString());
+            var usableAccessor = Convert.ToInt64(new DataTable().Compute(accessor.ToString(), null));
 
             if (string.IsNullOrEmpty(name)) return new BoundNullExpression();
 
@@ -612,6 +613,12 @@ namespace Shore.CodeAnalysis.Binding
                 _diagnostics.ReportUndefinedBinaryOperator(node.OperatorToken.Location, node.OperatorToken.Text!,
                     boundLeft.Type, boundRight.Type);
                 return new BoundNullExpression();
+            }
+
+            if (boundLeft.Type == TypeSymbol.String && boundOperator.Kind == BoundBinaryOperatorKind.Division &&
+                Convert.ToInt64(new DataTable().Compute(boundRight.ToString(), null)) > boundLeft.ToString().Length-3)
+            {
+                _diagnostics.ReportStringOutOfBounds(node.OperatorToken.Location, boundLeft, boundRight);
             }
 
             return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
