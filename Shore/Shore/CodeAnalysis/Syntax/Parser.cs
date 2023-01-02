@@ -65,7 +65,7 @@ namespace Shore.CodeAnalysis.Syntax
         
         private ExpressionNode ParseAssignmentExpression(bool forceFloat = false)
         {
-            if (CurrentToken.Type == TokType.IdentifierToken && PeekToken(1).Type == TokType.EqualsToken)
+            if (CurrentToken.Type is TokType.IdentifierToken && PeekToken(1).Type == TokType.EqualsToken)
             {
                 var identifierToken = NextToken();
                 var operatorToken = NextToken();
@@ -445,6 +445,7 @@ namespace Shore.CodeAnalysis.Syntax
             var openBracket = MatchToken(TokType.OpenBracketToken);
             var accessor = ParseExpression();
             var closeBracket = MatchToken(TokType.CloseBracketToken);
+            
             return new ArrayAccessExpressionNode(_nodeTree, identifierToken, openBracket, accessor, closeBracket);
         }
     }

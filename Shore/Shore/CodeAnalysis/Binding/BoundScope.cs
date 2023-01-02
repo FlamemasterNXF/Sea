@@ -7,7 +7,6 @@ namespace Shore.CodeAnalysis.Binding
     {
         public BoundScope? Parent { get; }
         private Dictionary<string, Symbol>? _symbols;
-        private Dictionary<Symbol, bool> _isArray;
 
         public BoundScope(BoundScope? parent)
         {
@@ -22,7 +21,7 @@ namespace Shore.CodeAnalysis.Binding
             where TSymbol : Symbol
         {
             if (_symbols == null) _symbols = new Dictionary<string, Symbol>();
-            else if (_symbols.ContainsKey(symbol?.Name!)) return false;
+            else if (_symbols.ContainsKey(symbol.Name)) return false;
 
             _symbols.Add(symbol.Name, symbol);
             return true;

@@ -14,7 +14,6 @@ namespace Shore.CodeAnalysis
         private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
         private readonly Stack<Dictionary<VariableSymbol, object[]>> _localArrays = new();
         private readonly Stack<Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>> _localLists = new();
-        private Random _random;
 
         private object? _lastValue;
 
@@ -141,6 +140,7 @@ namespace Shore.CodeAnalysis
                 BoundNodeKind.LiteralExpression => EvaluateLiteralExpression((BoundLiteralExpression)node),
                 BoundNodeKind.VariableExpression => EvaluateVariableExpression((BoundVariableExpression)node),
                 BoundNodeKind.ArrayExpression => EvaluateArrayExpression((BoundArrayExpression)node),
+                BoundNodeKind.ListExpression => EvaluateListExpression((BoundListExpression)node),
                 BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression((BoundAssignmentExpression)node),
                 BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression)node),
                 BoundNodeKind.BinaryExpression => EvaluateBinaryExpression((BoundBinaryExpression)node),
@@ -150,7 +150,7 @@ namespace Shore.CodeAnalysis
             };
         }
 
-        private static object EvaluateLiteralExpression(BoundLiteralExpression n) => n.Value;
+        private object EvaluateLiteralExpression(BoundLiteralExpression n) => n.Value;
 
         private object EvaluateVariableExpression(BoundVariableExpression v, bool getLength = false)
         {
@@ -195,6 +195,17 @@ namespace Shore.CodeAnalysis
            
             var locals = _localArrays.Peek();
             return locals[a.Array][Convert.ToInt64(accessor)];
+        }
+        
+        private object EvaluateListExpression(BoundListExpression a)
+        {
+            var accessor = EvaluateExpression(a.Accessor);
+            
+            if (a.Array.Kind == SymbolKind.GlobalVariable)
+                return _globalLists[a.Array].ElementAt(Convert.ToInt32(accessor)).Value;
+           
+            var locals = _localLists.Peek();
+            return locals[a.Array].ElementAt(Convert.ToInt32(accessor)).Value;
         }
 
         private object? EvaluateAssignmentExpression(BoundAssignmentExpression a)
@@ -343,11 +354,13 @@ namespace Shore.CodeAnalysis
         private object? EvaluateConversionExpression(BoundConversionExpression node)
         {
             var value = EvaluateExpression(node.Expression);
+            
             if (node.Type == TypeSymbol.Any) return value;
             if (node.Type == TypeSymbol.Bool) return Convert.ToBoolean(value);
             if (node.Type == TypeSymbol.Float64) return Convert.ToDouble(value);
             if (node.Type == TypeSymbol.Int64) return Convert.ToInt64(value);
             if (node.Type == TypeSymbol.String) return Convert.ToString(value);
+            
             throw new Exception($"Unexpected type {node.Type}");
         }
 

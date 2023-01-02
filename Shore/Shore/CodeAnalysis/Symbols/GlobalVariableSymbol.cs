@@ -4,8 +4,8 @@
     {
         public override SymbolKind Kind => SymbolKind.GlobalVariable;
 
-        internal GlobalVariableSymbol(string name, bool isReadOnly, TypeSymbol? type)
-            : base(name, isReadOnly, type)
+        internal GlobalVariableSymbol(string name, bool isReadOnly, TypeSymbol? type, bool isList = false)
+            : base(name, isReadOnly, type, isList)
         {
         }
     }

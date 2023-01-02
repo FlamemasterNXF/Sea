@@ -334,13 +334,11 @@ namespace Shore.CodeAnalysis.Binding
             var variables = ImmutableArray.CreateBuilder<VariableSymbol>();
             for (var i = 0; i < boundMembers.Count; i++)
             {
-                if (_function != null) variables.Add(new LocalVariableSymbol($"%HIDDEN_{node.Identifier}_{i}_{_function.Name}", false, TypeSymbol.GetAcceptedType(type)));
-                variables.Add(new GlobalVariableSymbol($"%HIDDEN_{node.Identifier}_{i}", false, TypeSymbol.GetAcceptedType(type)));
+                if (_function != null) variables.Add(new LocalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{i}_{_function.Name}", false, TypeSymbol.GetAcceptedType(type)));
+                variables.Add(new GlobalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{i}", false, TypeSymbol.GetAcceptedType(type)));
             }
 
             variables.ToImmutable();
-
-            // TODO: Make Lists Zero-Length Safe
             
             var dict = new Dictionary<VariableSymbol, BoundExpression>();
             for (var i = 0; i < variables.Count; i++)
@@ -513,27 +511,28 @@ namespace Shore.CodeAnalysis.Binding
             var name = node.Identifier.Text;
             var accessor = BindExpression(node.Accessor);
 
-            if (string.IsNullOrEmpty(name))
-            {
-                // This ensures that 'Token Fabrication' does not cause an Error.
-                return new BoundNullExpression();
-            }
+            if (string.IsNullOrEmpty(name)) return new BoundNullExpression();
 
-            if (!_scope!.TryLookupVariable(name, out var variable))
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.Identifier.Location, name);
                 return new BoundNullExpression();
             }
-            
+
+            if (variable.IsList) return new BoundListExpression(variable, accessor);
+
             return new BoundArrayExpression(variable, accessor);
         }
+        
 
         private BoundExpression BindAssignmentExpression(AssignmentExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpressionDistributor(node.Expression);
 
-            if (!_scope!.TryLookupVariable(name, out var variable))
+            Console.WriteLine(name);
+
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Location, name);
                 return boundExpression;
@@ -688,14 +687,14 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.Identifier.Text ?? "?";
             var array = _function == null ? 
-                (VariableSymbol)new GlobalVariableSymbol(name, true, type)
-                : new LocalVariableSymbol(name, true, type);
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type, true)
+                : new LocalVariableSymbol(name, true, type, true);
 
             if (node.Members.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
             
-            if (!_scope!.TryDeclareVariable(array))
+            if (!_scope.TryDeclareVariable(array))
                 _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
-
+            
             return array;
         }
 
