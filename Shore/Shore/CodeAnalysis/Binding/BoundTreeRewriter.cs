@@ -58,9 +58,7 @@ namespace Shore.CodeAnalysis.Binding
         protected virtual BoundStatement RewriteArrayDeclaration(BoundArrayDeclaration node) => node;
         
         protected virtual BoundStatement RewriteListDeclaration(BoundListDeclaration node) => node;
-
-        protected virtual BoundStatement RewriteListDeclaration(BoundListDeclaration node) => node;
-
+        
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)
         {
             var condition = RewriteExpression(node.Condition);
