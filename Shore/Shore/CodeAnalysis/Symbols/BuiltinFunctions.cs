@@ -24,7 +24,7 @@ namespace Shore.CodeAnalysis.Symbols
             ImmutableArray.Create(new ParameterSymbol("array", TypeSymbol.StringAndArray)), TypeSymbol.Int64);
 
         public static readonly FunctionSymbol UnixTimestamp = new("unixTime",
-            ImmutableArray<ParameterSymbol>.Empty, TypeSymbol.String);
+            ImmutableArray<ParameterSymbol>.Empty, TypeSymbol.Int64);
         
         public static readonly FunctionSymbol Sleep = new("sleep",
             ImmutableArray.Create(new ParameterSymbol("ms", TypeSymbol.Int64)), TypeSymbol.Void);
