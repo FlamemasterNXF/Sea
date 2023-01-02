@@ -304,6 +304,12 @@ namespace Shore.CodeAnalysis
         {
             if (node.Function == BuiltinFunctions.Input) return Console.ReadLine();
 
+            if (node.Function == BuiltinFunctions.UnixTimestamp)
+            {
+                DateTimeOffset offset = new DateTimeOffset(DateTime.UtcNow);
+                return offset.ToUnixTimeMilliseconds().ToString();
+            }
+
             if (node.Function == BuiltinFunctions.Print)
             {
                 var value = EvaluateExpression(node.Arguments[0])!;
@@ -340,6 +346,13 @@ namespace Shore.CodeAnalysis
                     return Convert.ToInt64(Convert.ToString(value).Length);
                 }
                 return EvaluateVariableExpression((BoundVariableExpression)node.Arguments[0], true);
+            }
+            
+            if (node.Function == BuiltinFunctions.Sleep)
+            {
+                var value = EvaluateExpression(node.Arguments[0]);
+                Thread.Sleep(Convert.ToInt32(value));
+                return 0;
             }
 
             var locals = new Dictionary<VariableSymbol?, object?>();

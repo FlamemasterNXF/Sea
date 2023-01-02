@@ -23,6 +23,12 @@ namespace Shore.CodeAnalysis.Symbols
         public static readonly FunctionSymbol Length = new("length",
             ImmutableArray.Create(new ParameterSymbol("array", TypeSymbol.StringAndArray)), TypeSymbol.Int64);
 
+        public static readonly FunctionSymbol UnixTimestamp = new("unixTime",
+            ImmutableArray<ParameterSymbol>.Empty, TypeSymbol.String);
+        
+        public static readonly FunctionSymbol Sleep = new("sleep",
+            ImmutableArray.Create(new ParameterSymbol("ms", TypeSymbol.Int64)), TypeSymbol.Void);
+
         internal static IEnumerable<FunctionSymbol?> GetAll() => typeof(BuiltinFunctions)
             .GetFields(BindingFlags.Public | BindingFlags.Static)
             .Where(f => f.FieldType == typeof(FunctionSymbol))
