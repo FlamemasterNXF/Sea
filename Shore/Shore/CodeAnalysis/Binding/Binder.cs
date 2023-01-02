@@ -508,12 +508,25 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.Identifier.Text;
             var accessor = BindExpression(node.Accessor);
+            var usableAccessor = Convert.ToInt64(accessor.ToString());
 
             if (string.IsNullOrEmpty(name)) return new BoundNullExpression();
 
             if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.Identifier.Location, name);
+                return new BoundNullExpression();
+            }
+
+            if (usableAccessor > int.MaxValue)
+            {
+                _diagnostics.ReportArrayTooLarge(node.Identifier.Location);
+                return new BoundNullExpression();
+            }
+
+            if (usableAccessor > variable.Length - 1)
+            {
+                _diagnostics.ReportArrayOutOfBounds(node.Identifier.Location, variable, accessor);
                 return new BoundNullExpression();
             }
 
@@ -636,7 +649,7 @@ namespace Shore.CodeAnalysis.Binding
                 
                 if ((argument.Type != parameter.Type) && (argument.Type.ParentType != parameter.Type) && (argument.Type.HeadType != parameter.Type) && (parameter.Type != TypeSymbol.Any))
                 {
-                    _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter?.Name, parameter?.Type, argument.Type);
+                    _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter.Name, parameter.Type, argument.Type);
                     return new BoundNullExpression();
                 }
             }
@@ -688,8 +701,8 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.Identifier.Text ?? "?";
             var array = _function == null ? 
-                (VariableSymbol)new GlobalVariableSymbol(name, true, type)
-                : new LocalVariableSymbol(name, true, type);
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type, node.Members.Count)
+                : new LocalVariableSymbol(name, true, type, node.Members.Count);
 
             if (node.Members.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
             
@@ -703,8 +716,8 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.Identifier.Text ?? "?";
             var array = _function == null ? 
-                (VariableSymbol)new GlobalVariableSymbol(name, true, type, true)
-                : new LocalVariableSymbol(name, true, type, true);
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type, node.Members.Count, true)
+                : new LocalVariableSymbol(name, true, type, node.Members.Count, true);
 
             if (node.Members.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
             
@@ -713,28 +726,7 @@ namespace Shore.CodeAnalysis.Binding
             
             return array;
         }
-        
-        private VariableSymbol BindListVariable(ListDeclarationNode node, ExpressionNode value, TypeSymbol type, int i)
-        {
-            var name = $"{node.Identifier.Text}<{i}>";
-            var variable = _function == null
-                ? (VariableSymbol)new GlobalVariableSymbol(name, false, type)
-                : new LocalVariableSymbol(name, false, type);
-            
-            if (!_scope!.TryDeclareVariable(variable))
-                _diagnostics.ListReDeclaration(node.Identifier.Location, name);
-            
-            BindListVariableDeclaration(variable, value);
-            
-            return variable;
-        }
-        
-        private BoundStatement BindListVariableDeclaration(VariableSymbol variable, ExpressionNode value)
-        {
-            var boundValue = BindExpression(value);
-            return new BoundVariableDeclaration(variable, boundValue);
-        }
-        
+
         private TypeSymbol? LookupType(string? name)
         {
             return name switch

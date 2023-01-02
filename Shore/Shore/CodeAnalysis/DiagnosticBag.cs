@@ -1,4 +1,5 @@
 using System.Collections;
+using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 using Shore.Text;
@@ -219,6 +220,18 @@ namespace Shore.CodeAnalysis
         public void ListReDeclaration(TextLocation location, string name)
         {
             var message = $"'{name}' Already Exists. This shouldn't be an error you see.";
+            ReportError(location, message);
+        }
+
+        public void ReportArrayTooLarge(TextLocation location)
+        {
+            var message = $"Arrays may only be accessed or created up to index {int.MaxValue}.";
+            ReportError(location, message);
+        }
+
+        public void ReportArrayOutOfBounds(TextLocation location, VariableSymbol variable, BoundExpression accessor)
+        {
+            var message = $"Index {accessor} is out of the bounds of Array '{variable.Name}'. The highest index is {variable.Length - 1}";
             ReportError(location, message);
         }
     }
