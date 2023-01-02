@@ -36,7 +36,8 @@ namespace sc
             
             var compilation = Compilation.Create(nodeTrees.ToArray());
             var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>(),
-                new Dictionary<VariableSymbol, object[]>());
+                new Dictionary<VariableSymbol, object[]>(),
+                new Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>());
 
             if (!result.Diagnostics.Any() && result.Value is not null) Console.WriteLine(result.Value);
             else

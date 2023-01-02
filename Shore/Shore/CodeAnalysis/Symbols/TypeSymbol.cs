@@ -32,6 +32,12 @@
         public static readonly TypeSymbol StringArr = new ("string[]", StringAndArray, Array);
         public static readonly TypeSymbol Int64Arr = new ("int64[]", StringAndArray, Array);
         public static readonly TypeSymbol Float64Arr = new ("float64[]", StringAndArray, Array);
+        
+        public static readonly TypeSymbol List = new("<>");
+        public static readonly TypeSymbol BoolList = new ("bool<>", StringAndArray, List);
+        public static readonly TypeSymbol StringList = new ("string<>", StringAndArray, List);
+        public static readonly TypeSymbol Int64List = new ("int64<>", StringAndArray, List);
+        public static readonly TypeSymbol Float64List = new ("float64<>", StringAndArray, List);
 
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
             actual == required || actual.ParentType == required;
@@ -44,10 +50,10 @@
 
         public static TypeSymbol? GetAcceptedType(TypeSymbol arrType)
         {
-            if (arrType == BoolArr) return Bool;
-            if (arrType == StringArr) return String;
-            if (arrType == Int64Arr) return Int64;
-            return arrType == Float64Arr ? Float64 : null;
+            if (arrType == BoolArr || arrType == BoolList) return Bool;
+            if (arrType == StringArr || arrType == StringList) return String;
+            if (arrType == Int64Arr || arrType == Int64List) return Int64;
+            return arrType == Float64Arr || arrType == Float64List ? Float64 : null;
         }
     }
 }

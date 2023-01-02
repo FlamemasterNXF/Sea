@@ -188,6 +188,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.ReadOnlyKeyword => ParseVariableDeclaration(),
                 TokType.BoolKeyword or TokType.StringKeyword or TokType.Int64Keyword or TokType.Float64Keyword or 
                     TokType.StringArrayKeyword or TokType.BoolArrayKeyword or TokType.IntArrayKeyword or TokType.FloatArrayKeyword
+                    or TokType.StringListKeyword or TokType.BoolListKeyword or TokType.IntListKeyword or TokType.FloatListKeyword
                     => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
@@ -225,8 +226,15 @@ namespace Shore.CodeAnalysis.Syntax
         {
             var keyword = MatchToken(CurrentToken.Type);
 
-            if (keyword.Type is TokType.IntArrayKeyword or TokType.FloatArrayKeyword or TokType.BoolArrayKeyword
-                or TokType.StringArrayKeyword) return ParseArrayDeclaration(keyword);
+            switch (keyword.Type)
+            {
+                case TokType.IntArrayKeyword or TokType.FloatArrayKeyword or TokType.BoolArrayKeyword
+                    or TokType.StringArrayKeyword:
+                    return ParseArrayDeclaration(keyword);
+                case TokType.IntListKeyword or TokType.FloatListKeyword or TokType.BoolListKeyword
+                    or TokType.StringListKeyword:
+                    return ParseListDeclaration(keyword);
+            }
 
             var isFloat = keyword.Text == "float";
             var identifier = MatchToken(TokType.IdentifierToken);
@@ -243,6 +251,16 @@ namespace Shore.CodeAnalysis.Syntax
             var members = ParseArrayMembers();
             var closeBrace = MatchToken(TokType.CloseBracketToken);
             return new ArrayDeclarationNode(_nodeTree, keyword, identifier, equals, openBrace, members, closeBrace);
+        }
+        
+        private StatementNode ParseListDeclaration(Token keyword)
+        {
+            var identifier = MatchToken(TokType.IdentifierToken);
+            var equals = MatchToken(TokType.EqualsToken);
+            var openBrace = MatchToken(TokType.OpenBracketToken);
+            var members = ParseArrayMembers();
+            var closeBrace = MatchToken(TokType.CloseBracketToken);
+            return new ListDeclarationNode(_nodeTree, keyword, identifier, equals, openBrace, members, closeBrace);
         }
         
         private SeparatedNodeList<ExpressionNode> ParseArrayMembers()

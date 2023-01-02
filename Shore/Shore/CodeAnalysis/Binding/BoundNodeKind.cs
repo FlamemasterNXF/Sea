@@ -21,6 +21,7 @@ namespace Shore.CodeAnalysis.Binding
         ConversionExpression,
         ReturnStatement,
         ArrayDeclaration,
-        ArrayExpression
+        ArrayExpression,
+        ListDeclaration
     }
 }

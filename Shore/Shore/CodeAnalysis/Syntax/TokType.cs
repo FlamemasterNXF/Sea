@@ -90,6 +90,11 @@ namespace Shore.CodeAnalysis.Syntax
         ArrayDeclarationStatement,
         ArrayAccessExpression,
         StringArrayKeyword,
-        BoolArrayKeyword
+        BoolArrayKeyword,
+        BoolListKeyword,
+        StringListKeyword,
+        IntListKeyword,
+        FloatListKeyword,
+        ListDeclarationStatement
     }
 }

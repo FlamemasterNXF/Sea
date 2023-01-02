@@ -93,6 +93,7 @@ namespace Shore.CodeAnalysis.Binding.ControlFlow
                             break;
                         case BoundNodeKind.VariableDeclaration:
                         case BoundNodeKind.ArrayDeclaration:
+                        case BoundNodeKind.ListDeclaration:
                         case BoundNodeKind.ExpressionStatement:
                             _statements.Add(statement);
                             break;

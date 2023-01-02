@@ -9,20 +9,26 @@ namespace Shore.CodeAnalysis
         private readonly BoundProgram _program;
         private readonly Dictionary<VariableSymbol, object> _globals;
         private readonly Dictionary<VariableSymbol, object[]> _globalArrays;
+        private readonly Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _globalLists;
         private readonly Dictionary<FunctionSymbol, BoundBlockStatement> _functions = new();
         private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
         private readonly Stack<Dictionary<VariableSymbol, object[]>> _localArrays = new();
+        private readonly Stack<Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>> _localLists = new();
         private Random _random;
 
         private object? _lastValue;
 
-        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object> variables, Dictionary<VariableSymbol, object[]> arrays)
+        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object> variables,
+            Dictionary<VariableSymbol, object[]> arrays,
+            Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> lists)
         {
             _program = program;
             _globals = variables;
             _globalArrays = arrays;
+            _globalLists = lists;
             _locals.Push(new Dictionary<VariableSymbol, object>());
             _localArrays.Push(new Dictionary<VariableSymbol, object[]>());
+            _localLists.Push(new Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>());
 
             var current = program;
             while (current != null)
@@ -72,6 +78,10 @@ namespace Shore.CodeAnalysis
                         EvaluateArrayDeclaration((BoundArrayDeclaration)s);
                         index++;
                         break;
+                    case BoundNodeKind.ListDeclaration:
+                        EvaluateListDeclaration((BoundListDeclaration)s);
+                        index++;
+                        break;
                     case BoundNodeKind.ExpressionStatement:
                         EvaluateExpressionStatement((BoundExpressionStatement)s);
                         index++;
@@ -111,6 +121,17 @@ namespace Shore.CodeAnalysis
         private void EvaluateArrayDeclaration(BoundArrayDeclaration node) =>
             AssignArray(node.Array, node.Members.Select(EvaluateExpression).ToArray());
 
+        private void EvaluateListDeclaration(BoundListDeclaration node)
+        {
+            Dictionary<VariableSymbol, object> values = new();
+            foreach (var pair in node.Members)
+            {
+                var evaluatedValue = EvaluateExpression(pair.Value);
+                values.Add(pair.Key, evaluatedValue);
+            }
+            AssignList(node.Array, values);
+        }
+
         private void EvaluateExpressionStatement(BoundExpressionStatement node) => _lastValue = EvaluateExpression(node.Expression);
 
         private object? EvaluateExpression(BoundExpression? node)
@@ -146,6 +167,21 @@ namespace Shore.CodeAnalysis
                 foreach (var value in localArrays.SelectMany(value => value.Value)) sb.Append($"{value}, ");
                 return getLength ? (long)localArrays[v.Variable].Length : $"[{sb.Remove(sb.Length-2, 2)}]";   
             }
+            
+            if (v.Type.HeadType == TypeSymbol.List)
+            {
+                var sb = new StringBuilder();
+                if (v.Variable.Kind == SymbolKind.GlobalVariable)
+                {
+                    foreach(var value in _globalLists[v.Variable]) sb.Append($"{value.Value}, ");
+                    return getLength? (long)_globalLists[v.Variable].Count : $"[{sb.Remove(sb.Length-2, 2)}]";   
+                }
+                
+                var localArrays = _localLists.Peek();
+                foreach (var value in localArrays.SelectMany(value => value.Value)) sb.Append($"{value.Value}, ");
+                return getLength ? (long)localArrays[v.Variable].Count : $"[{sb.Remove(sb.Length-2, 2)}]";   
+            }
+            
             if (v.Variable!.Kind == SymbolKind.GlobalVariable) return _globals[v.Variable];
             
             var locals = _locals.Peek();
@@ -331,6 +367,16 @@ namespace Shore.CodeAnalysis
             else
             {
                 var locals = _localArrays.Peek();
+                locals[array] = values;
+            }
+        }
+        
+        private void AssignList(VariableSymbol array, Dictionary<VariableSymbol, object> values)
+        {
+            if (array.Kind == SymbolKind.GlobalVariable) _globalLists[array] = values;
+            else
+            {
+                var locals = _localLists.Peek();
                 locals[array] = values;
             }
         }

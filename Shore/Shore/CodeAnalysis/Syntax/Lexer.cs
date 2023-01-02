@@ -1,5 +1,4 @@
 using System.Text;
-using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;
 
@@ -291,6 +290,8 @@ namespace Shore.CodeAnalysis.Syntax
             while (char.IsLetter(Current) || char.IsNumber(Current)) _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
+            
+            // TODO: Clean up this garbage 
             if ((text is "int" or "float" or "bool" or "string") && Current == '[')
             {
                 _position++;
@@ -300,6 +301,16 @@ namespace Shore.CodeAnalysis.Syntax
                     text += "[]";
                 }
             }
+            if ((text is "int" or "float" or "bool" or "string") && Current == '<')
+            {
+                _position++;
+                if (Current == '>')
+                {
+                    _position++;
+                    text += "<>";
+                }
+            }
+            
             _type = text.GetKeywordType();
         }
 

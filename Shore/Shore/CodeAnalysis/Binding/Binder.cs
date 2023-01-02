@@ -252,6 +252,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.BlockStatement => BindBlockStatement((BlockStatementNode)node),
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
                 TokType.ArrayDeclarationStatement => BindArrayDeclaration((ArrayDeclarationNode)node),
+                TokType.ListDeclarationStatement => BindListDeclaration((ListDeclarationNode)node),
                 TokType.IfStatement => BindIfStatement((IfStatementNode)node),
                 TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
                 TokType.ForStatement => BindForStatement((ForStatementNode)node),
@@ -310,6 +311,44 @@ namespace Shore.CodeAnalysis.Binding
             
             //var convertedInitializer = BindConversion(node.Initializer.Location, initializer, type);
             return new BoundArrayDeclaration(array, boundMembers.ToImmutable());
+        }
+        
+        private BoundStatement BindListDeclaration(ListDeclarationNode node)
+        {
+            var type = LookupType(node.AType.Text);
+
+            var boundMembers = new List<BoundExpression>();
+
+            foreach (var member in node.Members)
+            {
+                var boundMember = BindExpression(member);
+
+                if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
+                    _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
+                
+                boundMembers.Add(boundMember);
+            }
+
+            var array = BindList(node, type);
+
+            var variables = ImmutableArray.CreateBuilder<VariableSymbol>();
+            for (var i = 0; i < boundMembers.Count; i++)
+            {
+                if (_function != null) variables.Add(new LocalVariableSymbol($"%HIDDEN_{node.Identifier}_{i}_{_function.Name}", false, TypeSymbol.GetAcceptedType(type)));
+                variables.Add(new GlobalVariableSymbol($"%HIDDEN_{node.Identifier}_{i}", false, TypeSymbol.GetAcceptedType(type)));
+            }
+
+            variables.ToImmutable();
+
+            // TODO: Make Lists Zero-Length Safe
+            
+            var dict = new Dictionary<VariableSymbol, BoundExpression>();
+            for (var i = 0; i < variables.Count; i++)
+            {
+                dict.Add(variables[i], boundMembers[i]);
+            }
+
+            return new BoundListDeclaration(array, dict);
         }
 
         private BoundStatement BindIfStatement(IfStatementNode node)
@@ -644,6 +683,22 @@ namespace Shore.CodeAnalysis.Binding
 
             return array;
         }
+        
+        private VariableSymbol BindList(ListDeclarationNode node, TypeSymbol type)
+        {
+            var name = node.Identifier.Text ?? "?";
+            var array = _function == null ? 
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type)
+                : new LocalVariableSymbol(name, true, type);
+
+            if (node.Members.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
+            
+            if (!_scope!.TryDeclareVariable(array))
+                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
+
+            return array;
+        }
+
 
         private TypeSymbol? LookupType(string? name)
         {
@@ -657,6 +712,10 @@ namespace Shore.CodeAnalysis.Binding
                 "string[]" => TypeSymbol.StringArr,
                 "int[]" => TypeSymbol.Int64Arr,
                 "float[]" => TypeSymbol.Float64Arr,
+                "bool<>" => TypeSymbol.BoolList,
+                "string<>" => TypeSymbol.StringList,
+                "int<>" => TypeSymbol.Int64List,
+                "float<>" => TypeSymbol.Float64List,
                 _ => null
             };
         }
