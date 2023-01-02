@@ -287,7 +287,7 @@ namespace Shore.CodeAnalysis.Syntax
 
         private void ReadIdentifierOrKeyword()
         {
-            while (char.IsLetter(Current) || char.IsNumber(Current)) _position++;
+            while (char.IsLetter(Current) || char.IsNumber(Current) || Current is '<' or '>') _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
             

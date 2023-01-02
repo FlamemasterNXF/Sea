@@ -337,7 +337,7 @@ namespace Shore.CodeAnalysis
                 if (node.Arguments[0].Type == TypeSymbol.String)
                 {
                     var value = EvaluateExpression(node.Arguments[0]);
-                    return Convert.ToString(value).Length;
+                    return Convert.ToInt64(Convert.ToString(value).Length);
                 }
                 return EvaluateVariableExpression((BoundVariableExpression)node.Arguments[0], true);
             }
@@ -368,6 +368,8 @@ namespace Shore.CodeAnalysis
             if (node.Type == TypeSymbol.Bool) return Convert.ToBoolean(value);
             if (node.Type == TypeSymbol.Float64) return Convert.ToDouble(value);
             if (node.Type == TypeSymbol.Int64) return Convert.ToInt64(value);
+            if (node.Type == TypeSymbol.Float64List) return Convert.ToDouble(value);
+            if (node.Type == TypeSymbol.Int64List) return Convert.ToInt64(value);
             if (node.Type == TypeSymbol.String) return Convert.ToString(value);
             
             throw new Exception($"Unexpected type {node.Type}");

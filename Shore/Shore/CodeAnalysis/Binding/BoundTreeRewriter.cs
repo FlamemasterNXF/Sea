@@ -52,13 +52,13 @@ namespace Shore.CodeAnalysis.Binding
         protected virtual BoundStatement RewriteVariableDeclaration(BoundVariableDeclaration node)
         {
             var initializer = RewriteExpression(node.Initializer);
-            if (initializer == node.Initializer) return node;
-
-            return new BoundVariableDeclaration(node.Variable, initializer!);
+            return initializer == node.Initializer ? node : new BoundVariableDeclaration(node.Variable, initializer);
         }
 
         protected virtual BoundStatement RewriteArrayDeclaration(BoundArrayDeclaration node) => node;
         
+        protected virtual BoundStatement RewriteListDeclaration(BoundListDeclaration node) => node;
+
         protected virtual BoundStatement RewriteListDeclaration(BoundListDeclaration node) => node;
 
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)

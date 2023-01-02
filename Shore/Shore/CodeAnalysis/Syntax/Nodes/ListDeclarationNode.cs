@@ -1,4 +1,4 @@
-﻿namespace Shore.CodeAnalysis.Syntax.Nodes
+namespace Shore.CodeAnalysis.Syntax.Nodes
 {
     public sealed class ListDeclarationNode : StatementNode
     {

@@ -1,4 +1,6 @@
-﻿namespace Shore.CodeAnalysis.Symbols
+﻿using System.Collections.Immutable;
+
+namespace Shore.CodeAnalysis.Symbols
 {
     public sealed class TypeSymbol : Symbol
     {
@@ -42,11 +44,8 @@
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
             actual == required || actual.ParentType == required;
 
-        public static List<TypeSymbol>? GetChildrenTypes(TypeSymbol parent)
-        {
-            //if (parent == NumberArr) return new List<TypeSymbol>() { Int64Arr, Float64Arr };
-            return parent == Number ? new List<TypeSymbol>() { Int64, Float64 } : null;
-        }
+        public static List<TypeSymbol>? GetChildrenTypes(TypeSymbol parent) =>
+            parent == Number ? new List<TypeSymbol>() { Int64, Float64 } : null;
 
         public static TypeSymbol? GetAcceptedType(TypeSymbol arrType)
         {

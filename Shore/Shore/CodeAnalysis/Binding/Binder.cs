@@ -290,7 +290,7 @@ namespace Shore.CodeAnalysis.Binding
             var convertedInitializer = BindConversion(node.Initializer.Location, initializer, type);
             return new BoundVariableDeclaration(variable, convertedInitializer);
         }
-        
+
         private BoundStatement BindArrayDeclaration(ArrayDeclarationNode node)
         {
             var type = LookupType(node.AType.Text);
@@ -445,10 +445,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType)
-        {
-            return BindConversion(node, targetType);
-        }
+        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType) => BindConversion(node, targetType);
 
         private BoundExpression BindExpression(ExpressionNode node, bool canBeVoid = false)
         {
@@ -716,8 +713,28 @@ namespace Shore.CodeAnalysis.Binding
             
             return array;
         }
-
-
+        
+        private VariableSymbol BindListVariable(ListDeclarationNode node, ExpressionNode value, TypeSymbol type, int i)
+        {
+            var name = $"{node.Identifier.Text}<{i}>";
+            var variable = _function == null
+                ? (VariableSymbol)new GlobalVariableSymbol(name, false, type)
+                : new LocalVariableSymbol(name, false, type);
+            
+            if (!_scope!.TryDeclareVariable(variable))
+                _diagnostics.ListReDeclaration(node.Identifier.Location, name);
+            
+            BindListVariableDeclaration(variable, value);
+            
+            return variable;
+        }
+        
+        private BoundStatement BindListVariableDeclaration(VariableSymbol variable, ExpressionNode value)
+        {
+            var boundValue = BindExpression(value);
+            return new BoundVariableDeclaration(variable, boundValue);
+        }
+        
         private TypeSymbol? LookupType(string? name)
         {
             return name switch

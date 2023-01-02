@@ -1,4 +1,4 @@
-﻿using Shore.CodeAnalysis.Symbols;
+using Shore.CodeAnalysis.Symbols;
 
 namespace Shore.CodeAnalysis.Binding
 {
