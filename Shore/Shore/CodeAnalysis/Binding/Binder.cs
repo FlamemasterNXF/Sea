@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Data;
 using Shore.CodeAnalysis.Binding.ControlFlow;
 using Shore.CodeAnalysis.Binding.Converting;
 using Shore.CodeAnalysis.Lowering;
@@ -251,6 +252,9 @@ namespace Shore.CodeAnalysis.Binding
             {
                 TokType.BlockStatement => BindBlockStatement((BlockStatementNode)node),
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
+                TokType.ArrayDeclarationStatement => BindArrayDeclaration((ArrayDeclarationNode)node),
+                TokType.ListDeclarationStatement => BindListDeclaration((ListDeclarationNode)node),
+                TokType.DictDeclarationStatement => BindDictDeclaration((DictDeclarationNode)node),
                 TokType.IfStatement => BindIfStatement((IfStatementNode)node),
                 TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
                 TokType.ForStatement => BindForStatement((ForStatementNode)node),
@@ -289,6 +293,102 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundVariableDeclaration(variable, convertedInitializer);
         }
 
+        private BoundStatement BindArrayDeclaration(ArrayDeclarationNode node)
+        {
+            var type = LookupType(node.AType.Text);
+
+            ImmutableArray<BoundExpression>.Builder boundMembers = ImmutableArray.CreateBuilder<BoundExpression>();
+
+            foreach (var member in node.Members)
+            {
+                var boundMember = BindExpression(member);
+
+                if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
+                    _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
+                
+                boundMembers.Add(boundMember);
+            }
+
+            var array = BindArray(node, type);
+            
+            //var convertedInitializer = BindConversion(node.Initializer.Location, initializer, type);
+            return new BoundArrayDeclaration(array, boundMembers.ToImmutable());
+        }
+        
+        private BoundStatement BindListDeclaration(ListDeclarationNode node)
+        {
+            var type = LookupType(node.AType.Text);
+
+            var boundMembers = new List<BoundExpression>();
+
+            foreach (var member in node.Members)
+            {
+                var boundMember = BindExpression(member);
+
+                if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
+                    _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
+                
+                boundMembers.Add(boundMember);
+            }
+
+            var array = BindList(node, type);
+
+            var variables = ImmutableArray.CreateBuilder<VariableSymbol>();
+            for (var i = 0; i < boundMembers.Count; i++)
+            {
+                if (_function != null) variables.Add(new LocalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{i}_{_function.Name}", false, TypeSymbol.GetAcceptedType(type)));
+                variables.Add(new GlobalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{i}", false, TypeSymbol.GetAcceptedType(type)));
+            }
+
+            variables.ToImmutable();
+            
+            var dict = new Dictionary<VariableSymbol, BoundExpression>();
+            for (var i = 0; i < variables.Count; i++)
+            {
+                dict.Add(variables[i], boundMembers[i]);
+            }
+
+            return new BoundListDeclaration(array, dict);
+        }
+        
+        private BoundStatement BindDictDeclaration(DictDeclarationNode node)
+        {
+            var type = LookupType(node.AType.Text);
+
+            var boundKeys = node.Keys.Select(key => BindExpression(key)).ToList();
+
+            var boundValues = new List<BoundExpression>();
+
+            foreach (var value in node.Values)
+            {
+                var boundMember = BindExpression(value);
+
+                if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
+                    _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
+                
+                boundValues.Add(boundMember);
+            }
+
+            var array = BindDict(node, type);
+
+            var variables = ImmutableArray.CreateBuilder<VariableSymbol>();
+            for (var i = 0; i < boundValues.Count; i++)
+            {
+                if (_function != null) variables.Add(new LocalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{boundKeys[i]}", false, TypeSymbol.GetAcceptedType(type)));
+                variables.Add(new GlobalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{boundKeys[i]}", false, TypeSymbol.GetAcceptedType(type)));
+            }
+
+            variables.ToImmutable();
+            
+            var dict = new Dictionary<BoundExpression, BoundExpression>();
+            for (var i = 0; i < variables.Count; i++)
+            {
+                dict.Add(boundKeys[i], boundValues[i]);
+            }
+
+            return new BoundDictDeclaration(array, dict);
+        }
+
         private BoundStatement BindIfStatement(IfStatementNode node)
         {
             var condition = BindExpressionDistributor(node.Condition, TypeSymbol.Bool);
@@ -306,12 +406,12 @@ namespace Shore.CodeAnalysis.Binding
 
         private BoundStatement BindForStatement(ForStatementNode node)
         {
-            var lowerBound = BindExpressionDistributor(node.LowerBound, TypeSymbol.Int32);
-            var upperBound = BindExpressionDistributor(node.UpperBound, TypeSymbol.Int32);
+            var lowerBound = BindExpressionDistributor(node.LowerBound, TypeSymbol.Int64);
+            var upperBound = BindExpressionDistributor(node.UpperBound, TypeSymbol.Int64);
 
             _scope = new BoundScope(_scope);
 
-            var variable = BindVariable(node.Identifier, true, TypeSymbol.Int32);
+            var variable = BindVariable(node.Identifier, true, TypeSymbol.Int64);
             var body = BindLoopBody(node.Body, out var breakLabel, out var continueLabel);
 
             _scope = _scope.Parent;
@@ -385,10 +485,7 @@ namespace Shore.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType)
-        {
-            return BindConversion(node, targetType);
-        }
+        private BoundExpression BindExpression(ExpressionNode node, TypeSymbol? targetType) => BindConversion(node, targetType);
 
         private BoundExpression BindExpression(ExpressionNode node, bool canBeVoid = false)
         {
@@ -420,7 +517,9 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.CallExpression => BindCallExpression((CallExpressionNode)node),
                 TokType.ParenthesisExpression => BindExpressionDistributor(((ParenthesisExpressionNode)node).Expression),
                 TokType.NameExpression => BindNameExpression((NameExpressionNode)node),
+                TokType.ArrayAccessExpression => BindArrayAccessExpression((ArrayAccessExpressionNode)node),
                 TokType.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionNode)node),
+                TokType.ListAssignmentExpression => BindListAssignmentExpression((ListAssignmentExpressionNode)node),
                 _ => throw new Exception($"Unexpected Node {node.Type}")
             };
         }
@@ -441,29 +540,94 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
+
             return new BoundVariableExpression(variable);
         }
+        
+        private BoundExpression BindArrayAccessExpression(ArrayAccessExpressionNode node)
+        {
+            var name = node.Identifier.Text;
+            var accessor = BindExpression(node.Accessor);
+
+            if (string.IsNullOrEmpty(name)) return new BoundNullExpression();
+
+            if (!_scope.TryLookupVariable(name, out var variable))
+            {
+                _diagnostics.ReportUndefinedName(node.Identifier.Location, name);
+                return new BoundNullExpression();
+            }
+
+            if (!variable.IsDict)
+            {
+                if (accessor.Type == TypeSymbol.String || accessor.Type == TypeSymbol.Bool)
+                {
+                    _diagnostics.ReportInvalidArrayAccess(node.Identifier.Location, accessor);
+                    return new BoundNullExpression();
+                }
+                var usableAccessor = Convert.ToInt64(new DataTable().Compute(accessor.ToString(), null));
+
+                if (usableAccessor > int.MaxValue)
+                {
+                    _diagnostics.ReportArrayTooLarge(node.Identifier.Location);
+                    return new BoundNullExpression();
+                }
+
+                if (usableAccessor > variable.Length - 1)
+                {
+                    _diagnostics.ReportArrayOutOfBounds(node.Identifier.Location, variable, accessor);
+                    return new BoundNullExpression();
+                }   
+            }
+
+            if (variable.IsList) return new BoundListExpression(variable, accessor);
+
+            if (variable.IsDict) return new BoundDictExpression(variable, accessor);
+
+            return new BoundArrayExpression(variable, accessor);
+        }
+        
 
         private BoundExpression BindAssignmentExpression(AssignmentExpressionNode node)
         {
             var name = node.IdentifierToken.Text;
             var boundExpression = BindExpressionDistributor(node.Expression);
-
-            if (!_scope!.TryLookupVariable(name, out var variable))
+            
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(node.IdentifierToken.Location, name);
                 return boundExpression;
             }
 
-            if (variable!.IsReadOnly) _diagnostics.ReportCannotAssign(node.EqualsToken.Location, name);
+            if (variable.IsReadOnly && !variable.IsList)
+                _diagnostics.ReportCannotAssign(node.EqualsToken.Location, name);
 
             var convertedExpression = BindConversion(node.Expression.Location, boundExpression, variable.Type);
             return new BoundAssignmentExpression(variable, convertedExpression);
         }
-
-        private BoundExpression BindLiteralExpression(LiteralExpressionNode? node)
+        
+        private BoundExpression BindListAssignmentExpression(ListAssignmentExpressionNode node)
         {
-            var value = node?.Value ?? 0;
+            var name = node.IdentifierToken.Text;
+            var boundExpression = BindExpressionDistributor(node.Expression);
+            
+            if (!_scope.TryLookupVariable(name, out var variable))
+            {
+                _diagnostics.ReportUndefinedName(node.IdentifierToken.Location, name);
+                return boundExpression;
+            }
+
+            if(!variable.IsList && !variable.IsDict) _diagnostics.ReportCannotAssign(node.IdentifierToken.Location, name);
+
+            var accessor = BindExpression(node.Accessor);
+            var convertedExpression = BindConversion(node.Expression.Location, boundExpression,
+                TypeSymbol.GetAcceptedType(variable.Type));
+            return new BoundListAssignmentExpression(variable, convertedExpression, accessor);
+        }
+
+        private BoundExpression BindLiteralExpression(LiteralExpressionNode node)
+        {
+            var value = node.Value ?? (long)0;
+
             return new BoundLiteralExpression(value);
         }
 
@@ -501,6 +665,12 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
+            if (boundLeft.Type == TypeSymbol.String && boundOperator.Kind == BoundBinaryOperatorKind.Division &&
+                Convert.ToInt64(new DataTable().Compute(boundRight.ToString(), null)) > boundLeft.ToString().Length-3)
+            {
+                _diagnostics.ReportStringOutOfBounds(node.OperatorToken.Location, boundLeft, boundRight);
+            }
+
             return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
         }
 
@@ -533,10 +703,10 @@ namespace Shore.CodeAnalysis.Binding
             {
                 var argument = boundArguments[i];
                 var parameter = function.Parameters[i];
-
-                if (argument.Type != parameter?.Type)
+                
+                if ((argument.Type != parameter.Type) && (argument.Type.ParentType != parameter.Type) && (argument.Type.HeadType != parameter.Type) && (parameter.Type != TypeSymbol.Any))
                 {
-                    _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter?.Name, parameter?.Type, argument.Type);
+                    _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter.Name, parameter.Type, argument.Type);
                     return new BoundNullExpression();
                 }
             }
@@ -584,16 +754,71 @@ namespace Shore.CodeAnalysis.Binding
             return variable;
         }
 
+        private VariableSymbol BindArray(ArrayDeclarationNode node, TypeSymbol type)
+        {
+            var name = node.Identifier.Text ?? "?";
+            var array = _function == null ? 
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type, node.Members.Count)
+                : new LocalVariableSymbol(name, true, type, node.Members.Count);
+
+            if (node.Members.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
+            
+            if (!_scope!.TryDeclareVariable(array))
+                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
+
+            return array;
+        }
+        
+        private VariableSymbol BindList(ListDeclarationNode node, TypeSymbol type)
+        {
+            var name = node.Identifier.Text ?? "?";
+            var array = _function == null ? 
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type, node.Members.Count, true)
+                : new LocalVariableSymbol(name, true, type, node.Members.Count, true);
+
+            if (node.Members.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
+            
+            if (!_scope.TryDeclareVariable(array))
+                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
+            
+            return array;
+        }
+        
+        private VariableSymbol BindDict(DictDeclarationNode node, TypeSymbol type)
+        {
+            var name = node.Identifier.Text ?? "?";
+            var array = _function == null ? 
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type, node.Values.Count, false, true)
+                : new LocalVariableSymbol(name, true, type, node.Values.Count, false, true);
+
+            if (node.Values.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
+            
+            if (!_scope.TryDeclareVariable(array))
+                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
+            
+            return array;
+        }
+
         private TypeSymbol? LookupType(string? name)
         {
             return name switch
             {
                 "bool" => TypeSymbol.Bool,
                 "string" => TypeSymbol.String,
-                "int8" or "byte" => TypeSymbol.Int8,
-                "int16" or "short" => TypeSymbol.Int16,
-                "int32" or "int" => TypeSymbol.Int32,
-                "int64" or "long" => TypeSymbol.Int64,
+                "int64" or "int" => TypeSymbol.Int64,
+                "float64" or "float" => TypeSymbol.Float64,
+                "bool[]" => TypeSymbol.BoolArr,
+                "string[]" => TypeSymbol.StringArr,
+                "int[]" => TypeSymbol.Int64Arr,
+                "float[]" => TypeSymbol.Float64Arr,
+                "bool<>" => TypeSymbol.BoolList,
+                "string<>" => TypeSymbol.StringList,
+                "int<>" => TypeSymbol.Int64List,
+                "float<>" => TypeSymbol.Float64List,
+                "bool{}" => TypeSymbol.BoolDict,
+                "string{}" => TypeSymbol.StringDict,
+                "int{}" => TypeSymbol.Int64Dict,
+                "float{}" => TypeSymbol.Float64Dict,
                 _ => null
             };
         }

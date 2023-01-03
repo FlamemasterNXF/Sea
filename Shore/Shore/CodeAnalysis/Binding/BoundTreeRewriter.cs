@@ -10,6 +10,9 @@ namespace Shore.CodeAnalysis.Binding
             {
                 BoundNodeKind.BlockStatement => RewriteBlockStatement((BoundBlockStatement)node),
                 BoundNodeKind.VariableDeclaration => RewriteVariableDeclaration((BoundVariableDeclaration)node),
+                BoundNodeKind.ArrayDeclaration => RewriteArrayDeclaration((BoundArrayDeclaration)node),
+                BoundNodeKind.ListDeclaration => RewriteListDeclaration((BoundListDeclaration)node),
+                BoundNodeKind.DictDeclaration => RewriteDictDeclaration((BoundDictDeclaration)node),
                 BoundNodeKind.IfStatement => RewriteIfStatement((BoundIfStatement)node),
                 BoundNodeKind.WhileStatement => RewriteWhileStatement((BoundWhileStatement)node),
                 BoundNodeKind.ForStatement => RewriteForStatement((BoundForStatement)node),
@@ -50,11 +53,14 @@ namespace Shore.CodeAnalysis.Binding
         protected virtual BoundStatement RewriteVariableDeclaration(BoundVariableDeclaration node)
         {
             var initializer = RewriteExpression(node.Initializer);
-            if (initializer == node.Initializer) return node;
-
-            return new BoundVariableDeclaration(node.Variable, initializer!);
+            return initializer == node.Initializer ? node : new BoundVariableDeclaration(node.Variable, initializer);
         }
 
+        protected virtual BoundStatement RewriteArrayDeclaration(BoundArrayDeclaration node) => node;
+        
+        protected virtual BoundStatement RewriteListDeclaration(BoundListDeclaration node) => node;
+        protected virtual BoundStatement RewriteDictDeclaration(BoundDictDeclaration node) => node;
+        
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)
         {
             var condition = RewriteExpression(node.Condition);
@@ -121,7 +127,11 @@ namespace Shore.CodeAnalysis.Binding
                 BoundNodeKind.NullExpression => RewriteNullExpression((BoundNullExpression)node),
                 BoundNodeKind.LiteralExpression => RewriteLiteralExpression((BoundLiteralExpression)node),
                 BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
+                BoundNodeKind.ArrayExpression => RewriteArrayExpression((BoundArrayExpression)node),
+                BoundNodeKind.ListExpression => RewriteListExpression((BoundListExpression)node),
+                BoundNodeKind.DictExpression => RewriteDictExpression((BoundDictExpression)node),
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
+                BoundNodeKind.ListAssignmentExpression => RewriteListAssignmentExpression((BoundListAssignmentExpression)node),
                 BoundNodeKind.UnaryExpression => RewriteUnaryExpression((BoundUnaryExpression)node),
                 BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
                 BoundNodeKind.CallExpression => RewriteCallExpression((BoundCallExpression)node),
@@ -135,6 +145,12 @@ namespace Shore.CodeAnalysis.Binding
         protected virtual BoundExpression? RewriteLiteralExpression(BoundLiteralExpression? node) => node;
 
         protected virtual BoundExpression? RewriteVariableExpression(BoundVariableExpression? node) => node;
+        
+        protected virtual BoundExpression? RewriteArrayExpression(BoundArrayExpression? node) => node;
+        
+        protected virtual BoundExpression? RewriteListExpression(BoundListExpression? node) => node;
+        
+        protected virtual BoundExpression? RewriteDictExpression(BoundDictExpression? node) => node;
 
         protected virtual BoundExpression? RewriteAssignmentExpression(BoundAssignmentExpression? node)
         {
@@ -143,6 +159,15 @@ namespace Shore.CodeAnalysis.Binding
 
             return new BoundAssignmentExpression(node.Variable, expression);
         }
+        
+        protected virtual BoundExpression? RewriteListAssignmentExpression(BoundListAssignmentExpression? node)
+        {
+            var expression = RewriteExpression(node.Expression);
+            if (expression == node.Expression) return node;
+            
+            return new BoundListAssignmentExpression(node.Variable, expression, node.Accessor);
+        }
+
 
         protected virtual BoundExpression? RewriteUnaryExpression(BoundUnaryExpression? node)
         {

@@ -32,7 +32,23 @@ namespace Shore.CodeAnalysis.Binding.Converting
                 return Explicit;
             
             if (from != TypeSymbol.Void && to == TypeSymbol.Any) return Implicit;
-
+            
+            //if (from == TypeSymbol.Float32 && to == TypeSymbol.Int32) return Implicit;
+            if (from == TypeSymbol.Float64 && to == TypeSymbol.Int64) return Implicit;
+            
+            if (from == TypeSymbol.BoolArr && to == TypeSymbol.Bool) return Implicit;
+            if (from == TypeSymbol.StringArr && to == TypeSymbol.String) return Implicit;
+            
+            if (from == TypeSymbol.Int64Arr && to == TypeSymbol.Int64) return Implicit;
+            if (from == TypeSymbol.Float64Arr && to == TypeSymbol.Float64) return Implicit;
+            
+            if (from == TypeSymbol.Int64List && to == TypeSymbol.Int64) return Implicit;
+            if (from == TypeSymbol.Float64List && to == TypeSymbol.Float64) return Implicit;
+            if (from == TypeSymbol.Int64 && to == TypeSymbol.Int64List) return Implicit;
+            if (from == TypeSymbol.Float64 && to == TypeSymbol.Float64List) return Implicit;
+            if (from == TypeSymbol.Int64Arr && to == TypeSymbol.Int64List) return Implicit;
+            if (from == TypeSymbol.Float64Arr && to == TypeSymbol.Float64List) return Implicit;
+            
             if (from == TypeSymbol.Any && to != TypeSymbol.Void) return Explicit;
 
             return None;

@@ -33,7 +33,7 @@ namespace Shore.IO
                 
                 writer.WriteLine();
 
-                writer.SetForeground(ConsoleColor.DarkRed);
+                writer.SetForeground(diagnostic.IsError?ConsoleColor.DarkRed:ConsoleColor.Yellow);
                 writer.Write($"{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): ");
                 writer.WriteLine(diagnostic);
                 writer.ResetForeground();
@@ -48,7 +48,7 @@ namespace Shore.IO
                 writer.Write("    ");
                 writer.Write(prefix);
 
-                writer.SetForeground(ConsoleColor.DarkRed);
+                writer.SetForeground(diagnostic.IsError?ConsoleColor.DarkRed:ConsoleColor.Yellow);                
                 writer.Write(error);
                 writer.ResetForeground();
 
@@ -67,6 +67,13 @@ namespace Shore.IO
         public static void ResetForeground(this TextWriter writer)
         {
             if (writer.IsConsole()) Console.ResetColor();
+        }
+
+        public static void WriteFatal(this TextWriter writer, string text)
+        {
+            writer.SetForeground(ConsoleColor.DarkRed);
+            writer.Write($"FATAL: You have done something that would cause Shore to crash!\n Stack Trace: \n {text}");
+            writer.ResetForeground();
         }
         
         public static void WriteKeyword(this TextWriter writer, string text)

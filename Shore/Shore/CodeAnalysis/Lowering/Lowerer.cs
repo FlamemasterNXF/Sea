@@ -96,11 +96,11 @@ namespace Shore.CodeAnalysis.Lowering
         {
             var variableDeclaration = new BoundVariableDeclaration(node.Variable, node.LowerBound);
             var variableExpression = new BoundVariableExpression(node.Variable);
-            var upperBoundSymbol = new LocalVariableSymbol("upperBound", true, TypeSymbol.Int32);
+            var upperBoundSymbol = new LocalVariableSymbol("upperBound", true, TypeSymbol.Int64);
             var upperBoundDeclaration = new BoundVariableDeclaration(upperBoundSymbol, node.UpperBound);
             var condition = new BoundBinaryExpression(
                 variableExpression,
-                BoundBinaryOperator.Bind(TokType.LessThanOrEqualToken, TypeSymbol.Int32, TypeSymbol.Int32),
+                BoundBinaryOperator.Bind(TokType.LessThanOrEqualToken, TypeSymbol.Int64, TypeSymbol.Int64),
                 new BoundVariableExpression(upperBoundSymbol)
             );           
             var continueLabelStatement = new BoundLabelStatement(node.ContinueLabel);
@@ -109,8 +109,8 @@ namespace Shore.CodeAnalysis.Lowering
                     node.Variable,
                     new BoundBinaryExpression(
                         variableExpression,
-                        BoundBinaryOperator.Bind(TokType.PlusToken, TypeSymbol.Int32, TypeSymbol.Int32),
-                        new BoundLiteralExpression(1)
+                        BoundBinaryOperator.Bind(TokType.PlusToken, TypeSymbol.Int64, TypeSymbol.Int64),
+                        new BoundLiteralExpression((long)1)
                     )
                 )
             );

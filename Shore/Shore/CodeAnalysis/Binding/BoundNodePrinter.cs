@@ -25,6 +25,15 @@ namespace Shore.CodeAnalysis.Binding
                 case BoundNodeKind.VariableDeclaration:
                     WriteVariableDeclaration((BoundVariableDeclaration)node, writer);
                     break;
+                case BoundNodeKind.ArrayDeclaration:
+                    WriteArrayDeclaration((BoundArrayDeclaration)node, writer);
+                    break;
+                case BoundNodeKind.ListDeclaration:
+                    WriteListDeclaration((BoundListDeclaration)node, writer);
+                    break;
+                case BoundNodeKind.DictDeclaration:
+                    WriteListDeclaration((BoundListDeclaration)node, writer);
+                    break;
                 case BoundNodeKind.IfStatement:
                     WriteIfStatement((BoundIfStatement)node, writer);
                     break;
@@ -57,6 +66,15 @@ namespace Shore.CodeAnalysis.Binding
                     break;
                 case BoundNodeKind.VariableExpression:
                     WriteVariableExpression((BoundVariableExpression)node, writer);
+                    break;
+                case BoundNodeKind.ArrayExpression:
+                    WriteArrayExpression((BoundArrayExpression)node, writer);
+                    break;
+                case BoundNodeKind.ListExpression:
+                    WriteListExpression((BoundListExpression)node, writer);
+                    break;
+                case BoundNodeKind.DictExpression:
+                    WriteDictExpression((BoundDictExpression)node, writer);
                     break;
                 case BoundNodeKind.AssignmentExpression:
                     WriteAssignmentExpression((BoundAssignmentExpression)node, writer);
@@ -128,6 +146,54 @@ namespace Shore.CodeAnalysis.Binding
             writer.WriteIdentifier(node.Variable.Name);
             writer.WritePunctuation(" = ");
             node.Initializer.WriteTo(writer);
+            writer.WriteLine();
+        }
+        
+        private static void WriteArrayDeclaration(BoundArrayDeclaration node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(node.Array.IsReadOnly ? $"readonly {node.Array.Type} " : $"{node.Array.Type} ");
+            writer.WriteIdentifier(node.Array.Name);
+            writer.WritePunctuation(" = ");
+            writer.WritePunctuation(" [");
+            foreach (var member in node.Members)
+            {
+                member.WriteTo(writer);
+            }
+            writer.WritePunctuation("] ");
+            writer.WriteLine();
+        }
+        
+        private static void WriteListDeclaration(BoundListDeclaration node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(node.Array.IsReadOnly ? $"readonly {node.Array.Type} " : $"{node.Array.Type} ");
+            writer.WriteIdentifier(node.Array.Name);
+            writer.WritePunctuation(" = ");
+            writer.WritePunctuation(" [");
+            foreach (var member in node.Members)
+            {
+                member.Key.WriteTo(writer);
+                writer.WritePunctuation(":");
+                member.Value.WriteTo(writer);
+                writer.WritePunctuation(" ");
+            }
+            writer.WritePunctuation("] ");
+            writer.WriteLine();
+        }
+        
+        private static void WriteDictDeclaration(BoundDictDeclaration node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(node.Array.IsReadOnly ? $"readonly {node.Array.Type} " : $"{node.Array.Type} ");
+            writer.WriteIdentifier(node.Array.Name);
+            writer.WritePunctuation(" = ");
+            writer.WritePunctuation(" [");
+            foreach (var pair in node.Values)
+            {
+                pair.Key.WriteTo(writer);
+                writer.WritePunctuation(":");
+                pair.Value.WriteTo(writer);
+                writer.WritePunctuation(" ");
+            }
+            writer.WritePunctuation("] ");
             writer.WriteLine();
         }
 
@@ -230,10 +296,17 @@ namespace Shore.CodeAnalysis.Binding
             else throw new Exception($"Unexpected type {node.Type}");
         }
 
-        private static void WriteVariableExpression(BoundVariableExpression node, IndentedTextWriter writer)
-        {
+        private static void WriteVariableExpression(BoundVariableExpression node, IndentedTextWriter writer) =>
             writer.WriteIdentifier(node.Variable.Name);
-        }
+
+        private static void WriteArrayExpression(BoundArrayExpression node, IndentedTextWriter writer) =>
+            writer.WriteIdentifier(node.Array.Name);
+
+        private static void WriteListExpression(BoundListExpression node, IndentedTextWriter writer) =>
+            writer.WriteIdentifier(node.Array.Name);
+        
+        private static void WriteDictExpression(BoundDictExpression node, IndentedTextWriter writer) =>
+            writer.WriteIdentifier(node.Array.Name);
 
         private static void WriteAssignmentExpression(BoundAssignmentExpression node, IndentedTextWriter writer)
         {

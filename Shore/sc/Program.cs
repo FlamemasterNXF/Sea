@@ -35,7 +35,10 @@ namespace sc
             if (hasErrors) return 1;
             
             var compilation = Compilation.Create(nodeTrees.ToArray());
-            var result = compilation.Evaluate(new Dictionary<VariableSymbol?, object?>());
+            var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>(),
+                new Dictionary<VariableSymbol, object[]>(),
+                new Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>(),
+                new Dictionary<VariableSymbol, Dictionary<object, object>>());
 
             if (!result.Diagnostics.Any() && result.Value is not null) Console.WriteLine(result.Value);
             else

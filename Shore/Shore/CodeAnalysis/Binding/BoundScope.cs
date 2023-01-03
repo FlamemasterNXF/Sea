@@ -18,18 +18,18 @@ namespace Shore.CodeAnalysis.Binding
         public bool TryDeclareFunction(FunctionSymbol? function) => TryDeclareSymbol(function);
 
         private bool TryDeclareSymbol<TSymbol>(TSymbol symbol)
-            where TSymbol : Symbol?
+            where TSymbol : Symbol
         {
             if (_symbols == null) _symbols = new Dictionary<string, Symbol>();
-            else if (_symbols.ContainsKey(symbol?.Name!)) return false;
+            else if (_symbols.ContainsKey(symbol.Name)) return false;
 
-            _symbols.Add(symbol?.Name!, symbol!);
+            _symbols.Add(symbol.Name, symbol);
             return true;
         }
         
-        public bool TryLookupVariable(string? name, out VariableSymbol? variable) => TryLookupSymbol(name, out variable);
+        public bool TryLookupVariable(string name, out VariableSymbol? variable) => TryLookupSymbol(name, out variable);
 
-        public bool TryLookupFunction(string? name, out FunctionSymbol? function) => TryLookupSymbol(name, out function);
+        public bool TryLookupFunction(string name, out FunctionSymbol? function) => TryLookupSymbol(name, out function);
 
         private bool TryLookupSymbol<TSymbol>(string? name, out TSymbol? symbol)
             where TSymbol : Symbol

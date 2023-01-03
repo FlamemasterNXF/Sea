@@ -11,6 +11,7 @@ namespace Shore.Tests.CodeAnalysis.Syntax
         public void Lexer_Tests_AllTokens()
         {
             var tokenTypes = Enum.GetValues(typeof(TokType)).Cast<TokType>()
+                .Where(t => t != TokType.SingleLineCommentToken && t != TokType.MultiLineCommentToken)
                 .Where(t => t.ToString().EndsWith("Keyword") || t.ToString().EndsWith("Token"));
             var testedTokenTypes = GetTokens().Concat(GetSeparators()).Select(t => t.type);
             var untestedTokenTypes = new SortedSet<TokType>(tokenTypes);
@@ -60,7 +61,7 @@ namespace Shore.Tests.CodeAnalysis.Syntax
         }
 
         [Theory]
-        [MemberData(nameof(GetTokenPairsWithSeperatorData))]
+        [MemberData(nameof(GetTokenPairsWithSeparatorsData))]
         public void Lexer_Lexes_TokenParis_WithSeparators(TokType type1, string text1, TokType separatorType,
             string separatorText, TokType type2, string text2)
         {
@@ -86,22 +87,13 @@ namespace Shore.Tests.CodeAnalysis.Syntax
         
         public static IEnumerable<object[]> GetTokenPairsData()
         {
-            foreach (var tokPair in GetTokenPairs())
-            {
-                yield return new object[] { tokPair.type1, tokPair.text1, tokPair.type2, tokPair.text2 };
-            }
+            return GetTokenPairs().Select(t => new object[] { t.type1, t.text1, t.type2, t.text2 });
         }
 
-        public static IEnumerable<object[]> GetTokenPairsWithSeperatorData()
+        public static IEnumerable<object[]> GetTokenPairsWithSeparatorsData()
         {
-            foreach (var tokPair in GetTokenPairsWithSeparators())
-            {
-                yield return new object[]
-                {
-                    tokPair.type1, tokPair.text1, tokPair.separatorType, tokPair.separatorText, tokPair.type2,
-                    tokPair.text2
-                };
-            }
+            return GetTokenPairsWithSeparators().Select(t => new object[]
+                { t.t1Kind, t.t1Text, t.separatorKind, t.separatorText, t.t2Kind, t.t2Text });
         }
 
         private static IEnumerable<(TokType type, string text)> GetTokens()
@@ -130,6 +122,7 @@ namespace Shore.Tests.CodeAnalysis.Syntax
                 (TokType.WhitespaceToken, "\r"),
                 (TokType.WhitespaceToken, "\n"),
                 (TokType.WhitespaceToken, "\r\n"),
+                (TokType.MultiLineCommentToken, "/**/"),
             };
         }
 
@@ -138,42 +131,48 @@ namespace Shore.Tests.CodeAnalysis.Syntax
             var oneIsKeyword = type1.ToString().EndsWith("Keyword");
             var twoIsKeyword = type2.ToString().EndsWith("Keyword");
 
-            if (type1 == TokType.IdentifierToken && type2 == TokType.IdentifierToken) return true;
+            if (type1 is TokType.IdentifierToken && type2 is TokType.IdentifierToken) return true;
+            if (type1 is TokType.NumberToken || type2 is TokType.NumberToken) return true;
             
             switch (oneIsKeyword)
             {
                 case true when twoIsKeyword:
-                case true when type2 == TokType.IdentifierToken:
+                case true when type2 is TokType.IdentifierToken:
                     return true;
             }
 
             switch (type1)
             {
-                case TokType.LeftShiftToken when type2 == TokType.LessThanToken:
-                case TokType.RightShiftToken when type2 == TokType.GreaterThanToken:
-                case TokType.LessThanToken when type2 == TokType.LeftShiftToken:
-                case TokType.GreaterThanToken when type2 == TokType.RightShiftToken:
-                case TokType.GreaterThanToken when type2 == TokType.GreaterThanToken:
-                case TokType.GreaterThanToken when type2 == TokType.GreaterThanOrEqualToken:
-                case TokType.LessThanToken when type2 == TokType.LessThanOrEqualToken:
-                case TokType.LessThanToken when type2 == TokType.LessThanToken:
-                case TokType.AmpersandToken when type2 == TokType.AmpersandToken:
-                case TokType.AmpersandToken when type2 == TokType.DoubleAmpersandToken:
-                case TokType.PipeToken when type2 == TokType.PipeToken:
-                case TokType.PipeToken when type2 == TokType.DoublePipeToken:
-                case TokType.GreaterThanToken when type2 == TokType.EqualsToken:
-                case TokType.GreaterThanToken when type2 == TokType.DoubleEqualsToken:
-                case TokType.LessThanToken when type2 == TokType.EqualsToken:
-                case TokType.LessThanToken when type2 == TokType.DoubleEqualsToken:
+                case TokType.LeftShiftToken when type2 is TokType.LessThanToken:
+                case TokType.RightShiftToken when type2 is TokType.GreaterThanToken:
+                case TokType.LessThanToken when type2 is TokType.LeftShiftToken:
+                case TokType.GreaterThanToken when type2 is TokType.RightShiftToken:
+                case TokType.GreaterThanToken when type2 is TokType.GreaterThanToken:
+                case TokType.GreaterThanToken when type2 is TokType.GreaterThanOrEqualToken:
+                case TokType.LessThanToken when type2 is TokType.LessThanOrEqualToken:
+                case TokType.LessThanToken when type2 is TokType.LessThanToken:
+                case TokType.AmpersandToken when type2 is TokType.AmpersandToken:
+                case TokType.AmpersandToken when type2 is TokType.DoubleAmpersandToken:
+                case TokType.PipeToken when type2 is TokType.PipeToken:
+                case TokType.PipeToken when type2 is TokType.DoublePipeToken:
+                case TokType.SlashToken when type2 is TokType.SlashToken:
+                case TokType.SlashToken when type2 is TokType.StarToken:
+                case TokType.SlashToken when type2 is TokType.SingleLineCommentToken:
+                case TokType.SlashToken when type2 is TokType.MultiLineCommentToken:
+                case TokType.SlashToken when type2 is TokType.DoubleStarToken:
+                case TokType.GreaterThanToken when type2 is TokType.EqualsToken:
+                case TokType.GreaterThanToken when type2 is TokType.DoubleEqualsToken:
+                case TokType.LessThanToken when type2 is TokType.EqualsToken:
+                case TokType.LessThanToken when type2 is TokType.DoubleEqualsToken:
                 case TokType.IdentifierToken when twoIsKeyword:
-                case TokType.BangToken when type2 == TokType.EqualsToken:
-                case TokType.BangToken when type2 == TokType.DoubleEqualsToken:
-                case TokType.EqualsToken when type2 == TokType.EqualsToken:
-                case TokType.EqualsToken when type2 == TokType.DoubleEqualsToken:
-                case TokType.StarToken when type2 == TokType.DoubleStarToken:
-                case TokType.StarToken when type2 == TokType.StarToken:
-                case TokType.NumberToken when type2 == TokType.NumberToken:
-                case TokType.StringToken when type2 == TokType.StringToken:
+                case TokType.BangToken when type2 is TokType.EqualsToken:
+                case TokType.BangToken when type2 is TokType.DoubleEqualsToken:
+                case TokType.EqualsToken when type2 is TokType.EqualsToken:
+                case TokType.EqualsToken when type2 is TokType.DoubleEqualsToken:
+                case TokType.StarToken when type2 is TokType.DoubleStarToken:
+                case TokType.StarToken when type2 is TokType.StarToken:
+                case TokType.NumberToken when type2 is TokType.NumberToken:
+                case TokType.StringToken when type2 is TokType.StringToken:
                     return true;
                 default:
                     return false;
@@ -185,9 +184,15 @@ namespace Shore.Tests.CodeAnalysis.Syntax
             return from t1 in GetTokens() from t2 in GetTokens() where !RequiresSeparator(t1.type, t2.type) select (t1.type, t1.text, t2.type, t2.text);
         }
 
-        private static IEnumerable<(TokType type1, string text1, TokType separatorType, string separatorText, TokType type2, string text2)> GetTokenPairsWithSeparators()
+        private static IEnumerable<(TokType t1Kind, string t1Text, TokType separatorKind, string separatorText, 
+            TokType t2Kind, string t2Text)> GetTokenPairsWithSeparators()
         {
-            return from t1 in GetTokens() from t2 in GetTokens() where RequiresSeparator(t1.type, t2.type) from s in GetSeparators() select (t1.type, t1.text, s.type, s.text, t2.type, t2.text);
+            return from t1 in GetTokens()
+                from t2 in GetTokens()
+                where RequiresSeparator(t1.type, t2.type)
+                from s in GetSeparators()
+                where !RequiresSeparator(t1.type, s.type) && !RequiresSeparator(s.type, t2.type)
+                select (t1.type, t1.text, s.type, s.text, t2.type, t2.text);
         }
     }
 }

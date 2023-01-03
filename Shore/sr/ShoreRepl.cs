@@ -14,13 +14,13 @@ namespace sr
         private Compilation? _previous;
         private bool _showTree;
         private bool _showProgram;
-        private readonly Dictionary<VariableSymbol?, object?> _variables = new();
+        private readonly Dictionary<VariableSymbol, object?> _variables = new();
+        private readonly Dictionary<VariableSymbol, object?[]> _arrays = new();
+        private readonly Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _lists = new();
+        private readonly Dictionary<VariableSymbol, Dictionary<object, object>> _dicts = new();
 
-        public ShoreRepl()
-        {
-            LoadSubmissions();
-        }
-        
+        public ShoreRepl() => LoadSubmissions();
+
         protected override void RenderLine(string line)
         {
             var tokens = NodeTree.ParseTokens(line);
@@ -30,17 +30,14 @@ namespace sr
                 var isNumber = token.Type == TokType.NumberToken;
                 var isString = token.Type == TokType.StringToken;
                 var isIdentifier = token.Type == TokType.IdentifierToken;
+                var isComment = token.Type is TokType.SingleLineCommentToken or TokType.MultiLineCommentToken;
 
-                if (isKeyword)
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                else if (isIdentifier)
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                else if (isNumber)
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                else if (isString)
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                else
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                if (isKeyword) Console.ForegroundColor = ConsoleColor.Blue;
+                else if (isIdentifier) Console.ForegroundColor = ConsoleColor.DarkYellow;
+                else if (isNumber) Console.ForegroundColor = ConsoleColor.Cyan;
+                else if (isString) Console.ForegroundColor = ConsoleColor.Magenta;
+                else if (isComment) Console.ForegroundColor = ConsoleColor.Green;
+                else Console.ForegroundColor = ConsoleColor.DarkGray;
 
                 if (isKeyword) Console.ForegroundColor = ConsoleColor.Blue;
                 else if (!isNumber) Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -58,6 +55,7 @@ namespace sr
         {
             _previous = null;
             _variables.Clear();
+            _arrays.Clear();
             ClearSubmissions();
         }
 
@@ -135,8 +133,8 @@ namespace sr
             if (string.IsNullOrEmpty(text)) return true;
             var nodeTree = NodeTree.Parse(text);
 
-            if (nodeTree.Root.Members.LastOrDefault().GetLastToken() == null) return true;
-            return !nodeTree.Root.Members.LastOrDefault().GetLastToken().IsMissing;
+            var lastMember = nodeTree.Root.Members.LastOrDefault();
+            return lastMember != null && !lastMember.GetLastToken().IsMissing;
         }
 
         protected override void EvaluateSubmission(string text)
@@ -147,9 +145,9 @@ namespace sr
             if (_showTree) nodeTree.Root.WriteTo(Console.Out);
             if (_showProgram) compilation.EmitTree(Console.Out);
 
-            var result = compilation.Evaluate(_variables);
-
-            if (!result.Diagnostics.Any())
+            var result = compilation.Evaluate(_variables, _arrays, _lists, _dicts);
+            
+            if (!result.HasDanger)
             {
                 if (result.Value is not null)
                 {
@@ -161,6 +159,8 @@ namespace sr
                 _previous = compilation;
                 
                 SaveSubmission(text);
+                
+                if(result.Diagnostics.Any()) Console.Out.WriteDiagnostics(result.Diagnostics);
             }
             else Console.Out.WriteDiagnostics(result.Diagnostics);
         }
@@ -168,7 +168,7 @@ namespace sr
         private static string GetSubmissionsDirectory()
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var submissionsDirectory = Path.Combine(localAppData, "Minsk", "Submissions");
+            var submissionsDirectory = Path.Combine(localAppData, "Shore", "Submissions");
             return submissionsDirectory;
         }
 

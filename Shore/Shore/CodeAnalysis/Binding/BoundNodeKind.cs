@@ -19,6 +19,13 @@ namespace Shore.CodeAnalysis.Binding
         NullExpression,
         CallExpression,
         ConversionExpression,
-        ReturnStatement
+        ReturnStatement,
+        ArrayDeclaration,
+        ArrayExpression,
+        ListDeclaration,
+        ListExpression,
+        ListAssignmentExpression,
+        DictDeclaration,
+        DictExpression
     }
 }

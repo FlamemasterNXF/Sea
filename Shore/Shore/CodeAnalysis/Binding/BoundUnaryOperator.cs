@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 
@@ -23,34 +24,20 @@ namespace Shore.CodeAnalysis.Binding
             ResultType = resultType;
         }
         
-        private static readonly List<BoundUnaryOperator> FixedOperators = new()
+        private static readonly List<BoundUnaryOperator> Operators = new()
         {
-            new (TokType.TildeToken, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.Int32),
+            new BoundUnaryOperator(TokType.TildeToken, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.Int64),
+            new BoundUnaryOperator(TokType.PlusToken, BoundUnaryOperatorKind.Identity, TypeSymbol.Int64),
+            new BoundUnaryOperator(TokType.DashToken, BoundUnaryOperatorKind.Negation, TypeSymbol.Int64),
             
-            new (TokType.BangToken, BoundUnaryOperatorKind.LogicalNegation, TypeSymbol.Bool),
+            new BoundUnaryOperator(TokType.PlusToken, BoundUnaryOperatorKind.Identity, TypeSymbol.Float64),
+            new BoundUnaryOperator(TokType.DashToken, BoundUnaryOperatorKind.Negation, TypeSymbol.Float64),
+            
+            new BoundUnaryOperator(TokType.BangToken, BoundUnaryOperatorKind.LogicalNegation, TypeSymbol.Bool),
         };
 
-        private static BoundUnaryOperator[] Operators()
-        {
-            List<BoundUnaryOperator> dynamicOperators = new List<BoundUnaryOperator>();
-            foreach (var type in TypeSymbol.GetChildrenTypes(TypeSymbol.Number)!)
-            {
-                dynamicOperators.Add(new BoundUnaryOperator(TokType.PlusToken, BoundUnaryOperatorKind.Identity, type));
-                dynamicOperators.Add(new BoundUnaryOperator(TokType.DashToken, BoundUnaryOperatorKind.Negation, type));
-            }
-
-            var operators = dynamicOperators.Concat(FixedOperators);
-            return operators.ToArray();
-        }
-
-        public static BoundUnaryOperator? Bind(TokType tokType, TypeSymbol? operandType)
-        {
-            foreach (var op in Operators())
-            {
-                if (op.TokType == tokType && op.OperandType == operandType) return op;
-            }
-
-            return null;
-        }
+        public static BoundUnaryOperator? Bind(TokType tokType, TypeSymbol? operandType) =>
+            Enumerable.FirstOrDefault(Operators.ToImmutableArray(),
+                op => op.TokType == tokType && op.OperandType == operandType);
     }
 }

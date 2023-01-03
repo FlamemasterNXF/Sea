@@ -14,10 +14,12 @@ namespace Shore.CodeAnalysis.Binding
             {
                 bool => TypeSymbol.Bool,
                 string => TypeSymbol.String,
-                byte => TypeSymbol.Int8,
-                short => TypeSymbol.Int16,
-                int => TypeSymbol.Int32,
+                //byte => TypeSymbol.Int8,
+                //short => TypeSymbol.Int16,
+                //int => TypeSymbol.Int32,
                 long => TypeSymbol.Int64,
+                //float => TypeSymbol.Float32,
+                double => TypeSymbol.Float64,
                 _ => throw new Exception($"Unexpected Literal '{value}' of Type {value.GetType()}")
             };
         }

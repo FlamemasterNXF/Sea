@@ -2,7 +2,7 @@
 Functions are a core feature of Sea. They are declared with a name and a return Type.
 
 ## Declaration
-You can declare a Function by using the `function <return type> <name>(<arg syntax?>) { ... }` syntax.<br>
+You can declare a Function by using the `<return type> <name>(<arg syntax?>) { ... }` syntax.<br>
 
 ## Calling 
 Functions can be called with the `<name>(<args values?>) syntax.`<br>
@@ -22,5 +22,11 @@ Learn more about [Global Statements](./GlobalStatements.md)<br>
 
 ## Built-In Functions
 Sea includes two built-in functions that come packaged with the language.<br>
-- `print(<string>)`: Prints a String input to the console
+- `print(<any>)`: Prints an input to the console
 - `input()`: Stops program execution and asks the user for an input of the String Type. Resumes program execution when the input is given.
+- `round(<float>)`: Rounds a Floating Point Number to the nearest Integral Number.
+- `ceil(<float>)`: Returns the smallest Integral Value that is greater than a given Floating Point Number.
+- `floor(<float>)`: Returns the largest Integral Value that is less than a given Floating Point Number.
+- `length(<array OR string>)`: Returns the length of an Array or String as an integer.
+- `unixTime()`: Returns the Unix Timestamp as an integer (includes milliseconds).
+- `sleep(<int>)`: Pauses program execution for a given amount of milliseconds.

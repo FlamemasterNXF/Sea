@@ -6,10 +6,28 @@ namespace Shore.CodeAnalysis.Symbols
     internal static class BuiltinFunctions
     {
         public static readonly FunctionSymbol Print = new("print",
-            ImmutableArray.Create(new ParameterSymbol("text", TypeSymbol.String)), TypeSymbol.Void);
+            ImmutableArray.Create(new ParameterSymbol("text", TypeSymbol.Any)), TypeSymbol.Void);
 
         public static readonly FunctionSymbol Input = new("input", ImmutableArray<ParameterSymbol>.Empty,
             TypeSymbol.String);
+
+        public static readonly FunctionSymbol Round = new("round",
+            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Int64);
+        
+        public static readonly FunctionSymbol Floor = new("floor",
+            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Int64);
+        
+        public static readonly FunctionSymbol Ceil = new("ceil",
+            ImmutableArray.Create(new ParameterSymbol("value", TypeSymbol.Float64)), TypeSymbol.Int64);
+        
+        public static readonly FunctionSymbol Length = new("length",
+            ImmutableArray.Create(new ParameterSymbol("array", TypeSymbol.StringAndArray)), TypeSymbol.Int64);
+
+        public static readonly FunctionSymbol UnixTimestamp = new("unixTime",
+            ImmutableArray<ParameterSymbol>.Empty, TypeSymbol.Int64);
+        
+        public static readonly FunctionSymbol Sleep = new("sleep",
+            ImmutableArray.Create(new ParameterSymbol("ms", TypeSymbol.Int64)), TypeSymbol.Void);
 
         internal static IEnumerable<FunctionSymbol?> GetAll() => typeof(BuiltinFunctions)
             .GetFields(BindingFlags.Public | BindingFlags.Static)

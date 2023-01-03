@@ -8,7 +8,7 @@ namespace Shore.CodeAnalysis.Syntax.Nodes
         public NodeTree NodeTree { get; }
         public abstract TokType Type { get; }
 
-        
+
         protected Node(NodeTree nodeTree)
         {
             NodeTree = nodeTree;

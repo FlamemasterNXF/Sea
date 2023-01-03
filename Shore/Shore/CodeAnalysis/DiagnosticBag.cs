@@ -1,4 +1,5 @@
 using System.Collections;
+using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax;
 using Shore.Text;
@@ -7,7 +8,7 @@ namespace Shore.CodeAnalysis
 {
     internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
     {
-        private readonly List<Diagnostic> _diagnostics = new List<Diagnostic>();
+        private readonly List<Diagnostic> _diagnostics = new();
         
         public IEnumerator<Diagnostic> GetEnumerator() => _diagnostics.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -26,9 +27,9 @@ namespace Shore.CodeAnalysis
             _diagnostics.Add(diagnostic);
         }
 
-        public void ReportInvalidNumber(TextLocation location, string text, TypeSymbol? type)
+        public void ReportInvalidNumber(TextLocation location, string text)
         {
-            var message = $"The number {text} isn't a valid {type}.";
+            var message = $"The number {text} isn't a valid Number.";
             ReportError(location, message);
         }
 
@@ -122,7 +123,7 @@ namespace Shore.CodeAnalysis
         public void ReportCannotConvertImplicitly(TextLocation location, TypeSymbol? fromType, TypeSymbol? toType)
         {
             var message =
-                $"Cannot convert Type '{fromType}' to '{toType}'. An explicit conversion exists (are you missing a cast?).";
+                $"Cannot Convert Type '{fromType}' to Type '{toType}'.";
             ReportError(location, message);
         }
 
@@ -195,6 +196,60 @@ namespace Shore.CodeAnalysis
         public void ReportCannotMixMainAndGlobalStatements(TextLocation location)
         {
             var message = $"Cannot declare 'Main' Function when Global Statements are used.";
+            ReportError(location, message);
+        }
+
+        public void ReportUnterminatedMultiLineComment(TextLocation location)
+        {
+            var message = $"Unterminated Multi-Line Comment.";
+            ReportError(location, message);
+        }
+
+        public void ReportEmptyArray(TextLocation location, string name)
+        {
+            var message = $"Array '{name}' is empty.";
+            ReportWarning(location, message);
+        }
+
+        public void ReportAccessArrayNoIndex(TextLocation location, string name)
+        {
+            var message = $"'{name}' cannot be accessed as a non-array value.";
+            ReportError(location, message);
+        }
+
+        public void ListReDeclaration(TextLocation location, string name)
+        {
+            var message = $"'{name}' Already Exists. This shouldn't be an error you see.";
+            ReportError(location, message);
+        }
+
+        public void ReportArrayTooLarge(TextLocation location)
+        {
+            var message = $"Arrays may only be accessed or created up to index {int.MaxValue}.";
+            ReportError(location, message);
+        }
+
+        public void ReportArrayOutOfBounds(TextLocation location, VariableSymbol variable, BoundExpression accessor)
+        {
+            var message = $"Index {accessor} is out of the bounds of Array '{variable.Name}'. The highest index is {variable.Length - 1}";
+            ReportError(location, message);
+        }
+
+        public void ReportStringOutOfBounds(TextLocation location, BoundExpression boundLeft, BoundExpression boundRight)
+        {
+            var message = $"Index {boundRight} is out of the bounds of String '{boundLeft}'. The highest index is {boundLeft.ToString().Length - 3}";
+            ReportError(location, message);
+        }
+
+        public void ReportDeprecated(TextLocation location, string desc, string extraInfo = "")
+        {
+            var message = $"The {desc} is deprecated and will be removed in the next update! The {desc} can be safely removed{extraInfo}.";
+            ReportWarning(location, message);
+        }
+
+        public void ReportInvalidArrayAccess(TextLocation location, BoundExpression accessor)
+        {
+            var message = $"'{accessor}' is not a valid Array Index.";
             ReportError(location, message);
         }
     }

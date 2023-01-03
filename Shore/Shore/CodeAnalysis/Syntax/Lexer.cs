@@ -1,5 +1,4 @@
 using System.Text;
-using Shore.CodeAnalysis.Symbols;
 using Shore.CodeAnalysis.Syntax.Nodes;
 using Shore.Text;
 
@@ -62,8 +61,13 @@ namespace Shore.CodeAnalysis.Syntax
                     }
                     break;
                 case '/':
-                    _type = TokType.SlashToken;
-                    _position++;
+                    if (Lookahead == '/') ReadSingleLineComment();
+                    else if (Lookahead == '*') ReadMultiLineComment();
+                    else
+                    {
+                        _type = TokType.SlashToken;
+                        _position++;
+                    }
                     break;              
                 case '(':
                     _type = TokType.OpenParenToken;
@@ -81,6 +85,14 @@ namespace Shore.CodeAnalysis.Syntax
                     _type = TokType.CloseBraceToken;
                     _position++;
                     break;
+                case '[':
+                    _type = TokType.OpenBracketToken;
+                    _position++;
+                    break;              
+                case ']':
+                    _type = TokType.CloseBracketToken;
+                    _position++;
+                    break;
                 case ',':
                     _type = TokType.CommaToken;
                     _position++;
@@ -91,6 +103,10 @@ namespace Shore.CodeAnalysis.Syntax
                     break;
                 case '^':
                     _type = TokType.CaratToken;
+                    _position++;
+                    break;
+                case ':':
+                    _type = TokType.ColonToken;
                     _position++;
                     break;
                 case '!':
@@ -238,26 +254,130 @@ namespace Shore.CodeAnalysis.Syntax
         
         private void ReadNumberToken()
         {
-            while (char.IsDigit(Current)) _position++;
-            var length = _position - _start;
-            var text = _text.ToString(_start, length);
-            if (!int.TryParse(text, out var value))
+            var hasDecimal = false;
+            while (char.IsDigit(Current) || (Current == '.' && !hasDecimal))
             {
-                var span = new TextSpan(_start, length);
-                var location = new TextLocation(_text, span);
-                _diagnostics.ReportInvalidNumber(location, text, TypeSymbol.Int32);
+                if (Current == '.') hasDecimal = true;
+                _position++;
             }
 
-            _value = value;
+            var length = _position - _start;
+            var text = _text.ToString(_start, length); 
+            
+            double.TryParse(text, out var temp);
+            if (!text.Contains('.') && (Math.Abs(temp % 1)) <= (Double.Epsilon * 100))
+            {
+                if (!long.TryParse(text, out var value))
+                {
+                    var span = new TextSpan(_start, length);
+                    var location = new TextLocation(_text, span);
+                    _diagnostics.ReportInvalidNumber(location, text);
+                }
+                _value = value;
+            }
+            else
+            {
+                if (!double.TryParse(text, out var value))
+                {
+                    var span = new TextSpan(_start, length);
+                    var location = new TextLocation(_text, span);
+                    _diagnostics.ReportInvalidNumber(location, text);
+                }   
+                _value = value;
+            }
+            
             _type = TokType.NumberToken;
         }
 
         private void ReadIdentifierOrKeyword()
         {
-            while (char.IsLetter(Current)) _position++;
+            while (char.IsLetter(Current) || char.IsNumber(Current)) _position++;
             var length = _position - _start;
             var text = _text.ToString(_start, length);
+            
+            // TODO: Clean up this garbage 
+            if ((text is "int" or "float" or "bool" or "string") && Current == '[')
+            {
+                _position++;
+                if (Current == ']')
+                {
+                    _position++;
+                    text += "[]";
+                }
+            }
+            if ((text is "int" or "float" or "bool" or "string") && Current == '<')
+            {
+                _position++;
+                if (Current == '>')
+                {
+                    _position++;
+                    text += "<>";
+                }
+            }
+            if ((text is "int" or "float" or "bool" or "string") && Current == '{')
+            {
+                _position++;
+                if (Current == '}')
+                {
+                    _position++;
+                    text += "{}";
+                }
+            }
+            
             _type = text.GetKeywordType();
+        }
+
+        private void ReadSingleLineComment()
+        {
+            _position += 2;
+            var done = false;
+
+            while (!done)
+            {
+                switch (Current)
+                {
+                    case '\r' or '\n' or '\0':
+                        done = true;
+                        break;
+                    default:
+                        _position++;
+                        break;
+                }
+            }
+
+            _type = TokType.SingleLineCommentToken;
+        }
+
+        private void ReadMultiLineComment()
+        {
+            _position += 2;
+            var done = false;
+
+            while (!done)
+            {
+                switch (Current)
+                {
+                    case '\0':
+                        var span = new TextSpan(_start, 2);
+                        var location = new TextLocation(_text, span);
+                        _diagnostics.ReportUnterminatedMultiLineComment(location);
+                        done = true;
+                        break;
+                    case '*':
+                        if (Lookahead == '/')
+                        {
+                            _position++;
+                            done = true;
+                        }
+                        _position++;
+                        break;
+                    default:
+                        _position++;
+                        break;
+                }
+
+                _type = TokType.MultiLineCommentToken;
+            }
         }
     }
 }
