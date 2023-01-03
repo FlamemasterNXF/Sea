@@ -2,7 +2,7 @@
 Functions are a core feature of Sea. They are declared with a name and a return Type.
 
 ## Declaration
-You can declare a Function by using the `function <return type> <name>(<arg syntax?>) { ... }` syntax.<br>
+You can declare a Function by using the `<return type> <name>(<arg syntax?>) { ... }` syntax.<br>
 
 ## Calling 
 Functions can be called with the `<name>(<args values?>) syntax.`<br>
