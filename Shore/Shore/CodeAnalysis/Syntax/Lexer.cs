@@ -105,6 +105,10 @@ namespace Shore.CodeAnalysis.Syntax
                     _type = TokType.CaratToken;
                     _position++;
                     break;
+                case ':':
+                    _type = TokType.ColonToken;
+                    _position++;
+                    break;
                 case '!':
                     _position++;
                     if (Current != '=') _type = TokType.BangToken;
@@ -308,6 +312,15 @@ namespace Shore.CodeAnalysis.Syntax
                 {
                     _position++;
                     text += "<>";
+                }
+            }
+            if ((text is "int" or "float" or "bool" or "string") && Current == '{')
+            {
+                _position++;
+                if (Current == '}')
+                {
+                    _position++;
+                    text += "{}";
                 }
             }
             
