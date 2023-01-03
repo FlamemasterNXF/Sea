@@ -92,6 +92,12 @@ namespace Shore.CodeAnalysis.Syntax
         IntListKeyword,
         FloatListKeyword,
         ListDeclarationStatement,
-        ListAssignmentExpression
+        ListAssignmentExpression,
+        BoolDictKeyword,
+        StringDictKeyword,
+        IntDictKeyword,
+        FloatDictKeyword,
+        ColonToken,
+        DictDeclarationStatement
     }
 }

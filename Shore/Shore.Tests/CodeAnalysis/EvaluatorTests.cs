@@ -385,7 +385,8 @@ namespace Shore.Tests.CodeAnalysis
             var compilation = Compilation.CreateScript(null, nodeTree);
             var variables = new Dictionary<VariableSymbol, object>();
             var result = compilation.Evaluate(variables, new Dictionary<VariableSymbol, object[]>(),
-                new Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>());
+                new Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>(),
+                new Dictionary<VariableSymbol, Dictionary<object, object>>());
             
             Assert.Empty(result.Diagnostics);
             Assert.Equal(expectedValue, result.Value);
@@ -398,7 +399,8 @@ namespace Shore.Tests.CodeAnalysis
             var compilation = Compilation.CreateScript(null, syntaxTree);
             var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>(),
                 new Dictionary<VariableSymbol, object[]>(),
-                new Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>());
+                new Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>(),
+                new Dictionary<VariableSymbol, Dictionary<object, object>>());
             var expectedDiagnostics = AnnotatedText.UnindentLines(diagnosticText);
 
             if (annotatedText.Spans.Length != expectedDiagnostics.Length)

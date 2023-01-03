@@ -254,6 +254,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.VariableDeclarationStatement => BindVariableDeclaration((VariableDeclarationNode)node),
                 TokType.ArrayDeclarationStatement => BindArrayDeclaration((ArrayDeclarationNode)node),
                 TokType.ListDeclarationStatement => BindListDeclaration((ListDeclarationNode)node),
+                TokType.DictDeclarationStatement => BindDictDeclaration((DictDeclarationNode)node),
                 TokType.IfStatement => BindIfStatement((IfStatementNode)node),
                 TokType.WhileStatement => BindWhileStatement((WhileStatementNode)node),
                 TokType.ForStatement => BindForStatement((ForStatementNode)node),
@@ -348,6 +349,44 @@ namespace Shore.CodeAnalysis.Binding
             }
 
             return new BoundListDeclaration(array, dict);
+        }
+        
+        private BoundStatement BindDictDeclaration(DictDeclarationNode node)
+        {
+            var type = LookupType(node.AType.Text);
+
+            var boundKeys = node.Keys.Select(key => BindExpression(key)).ToList();
+
+            var boundValues = new List<BoundExpression>();
+
+            foreach (var value in node.Values)
+            {
+                var boundMember = BindExpression(value);
+
+                if (boundMember.Type != TypeSymbol.GetAcceptedType(type))
+                    _diagnostics.ReportCannotConvertImplicitly(node.Identifier.Location, boundMember.Type, type);
+                
+                boundValues.Add(boundMember);
+            }
+
+            var array = BindDict(node, type);
+
+            var variables = ImmutableArray.CreateBuilder<VariableSymbol>();
+            for (var i = 0; i < boundValues.Count; i++)
+            {
+                if (_function != null) variables.Add(new LocalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{boundKeys[i]}", false, TypeSymbol.GetAcceptedType(type)));
+                variables.Add(new GlobalVariableSymbol($"%HIDDEN_{node.Identifier.Text}_{boundKeys[i]}", false, TypeSymbol.GetAcceptedType(type)));
+            }
+
+            variables.ToImmutable();
+            
+            var dict = new Dictionary<BoundExpression, BoundExpression>();
+            for (var i = 0; i < variables.Count; i++)
+            {
+                dict.Add(boundKeys[i], boundValues[i]);
+            }
+
+            return new BoundDictDeclaration(array, dict);
         }
 
         private BoundStatement BindIfStatement(IfStatementNode node)
@@ -509,7 +548,6 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.Identifier.Text;
             var accessor = BindExpression(node.Accessor);
-            var usableAccessor = Convert.ToInt64(new DataTable().Compute(accessor.ToString(), null));
 
             if (string.IsNullOrEmpty(name)) return new BoundNullExpression();
 
@@ -519,19 +557,31 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
-            if (usableAccessor > int.MaxValue)
+            if (!variable.IsDict)
             {
-                _diagnostics.ReportArrayTooLarge(node.Identifier.Location);
-                return new BoundNullExpression();
-            }
+                if (accessor.Type == TypeSymbol.String || accessor.Type == TypeSymbol.Bool)
+                {
+                    _diagnostics.ReportInvalidArrayAccess(node.Identifier.Location, accessor);
+                    return new BoundNullExpression();
+                }
+                var usableAccessor = Convert.ToInt64(new DataTable().Compute(accessor.ToString(), null));
 
-            if (usableAccessor > variable.Length - 1)
-            {
-                _diagnostics.ReportArrayOutOfBounds(node.Identifier.Location, variable, accessor);
-                return new BoundNullExpression();
+                if (usableAccessor > int.MaxValue)
+                {
+                    _diagnostics.ReportArrayTooLarge(node.Identifier.Location);
+                    return new BoundNullExpression();
+                }
+
+                if (usableAccessor > variable.Length - 1)
+                {
+                    _diagnostics.ReportArrayOutOfBounds(node.Identifier.Location, variable, accessor);
+                    return new BoundNullExpression();
+                }   
             }
 
             if (variable.IsList) return new BoundListExpression(variable, accessor);
+
+            if (variable.IsDict) return new BoundDictExpression(variable, accessor);
 
             return new BoundArrayExpression(variable, accessor);
         }
@@ -566,7 +616,7 @@ namespace Shore.CodeAnalysis.Binding
                 return boundExpression;
             }
 
-            if(!variable.IsList) _diagnostics.ReportCannotAssign(node.IdentifierToken.Location, name);
+            if(!variable.IsList && !variable.IsDict) _diagnostics.ReportCannotAssign(node.IdentifierToken.Location, name);
 
             var accessor = BindExpression(node.Accessor);
             var convertedExpression = BindConversion(node.Expression.Location, boundExpression,
@@ -733,6 +783,21 @@ namespace Shore.CodeAnalysis.Binding
             
             return array;
         }
+        
+        private VariableSymbol BindDict(DictDeclarationNode node, TypeSymbol type)
+        {
+            var name = node.Identifier.Text ?? "?";
+            var array = _function == null ? 
+                (VariableSymbol)new GlobalVariableSymbol(name, true, type, node.Values.Count, false, true)
+                : new LocalVariableSymbol(name, true, type, node.Values.Count, false, true);
+
+            if (node.Values.Count == 0) _diagnostics.ReportEmptyArray(node.Identifier.Location, name);
+            
+            if (!_scope.TryDeclareVariable(array))
+                _diagnostics.ReportVariableReDeclaration(node.Identifier.Location, name);
+            
+            return array;
+        }
 
         private TypeSymbol? LookupType(string? name)
         {
@@ -750,6 +815,10 @@ namespace Shore.CodeAnalysis.Binding
                 "string<>" => TypeSymbol.StringList,
                 "int<>" => TypeSymbol.Int64List,
                 "float<>" => TypeSymbol.Float64List,
+                "bool{}" => TypeSymbol.BoolDict,
+                "string{}" => TypeSymbol.StringDict,
+                "int{}" => TypeSymbol.Int64Dict,
+                "float{}" => TypeSymbol.Float64Dict,
                 _ => null
             };
         }

@@ -205,6 +205,7 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.BoolKeyword or TokType.StringKeyword or TokType.Int64Keyword or TokType.Float64Keyword or 
                     TokType.StringArrayKeyword or TokType.BoolArrayKeyword or TokType.IntArrayKeyword or TokType.FloatArrayKeyword
                     or TokType.StringListKeyword or TokType.BoolListKeyword or TokType.IntListKeyword or TokType.FloatListKeyword
+                    or TokType.StringDictKeyword or TokType.BoolDictKeyword or TokType.IntDictKeyword or TokType.FloatDictKeyword
                     => ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
@@ -250,6 +251,9 @@ namespace Shore.CodeAnalysis.Syntax
                 case TokType.IntListKeyword or TokType.FloatListKeyword or TokType.BoolListKeyword
                     or TokType.StringListKeyword:
                     return ParseListDeclaration(keyword);
+                case TokType.IntDictKeyword or TokType.FloatDictKeyword or TokType.BoolDictKeyword
+                    or TokType.StringDictKeyword:
+                    return ParseDictDeclaration(keyword);
             }
 
             var isFloat = keyword.Text == "float";
@@ -279,6 +283,42 @@ namespace Shore.CodeAnalysis.Syntax
             return new ListDeclarationNode(_nodeTree, keyword, identifier, equals, openBrace, members, closeBrace);
         }
         
+        private StatementNode ParseDictDeclaration(Token keyword)
+        {
+            var identifier = MatchToken(TokType.IdentifierToken);
+            var equals = MatchToken(TokType.EqualsToken);
+            var openBrace = MatchToken(TokType.OpenBracketToken);
+            
+            var keysAndSeparators = ImmutableArray.CreateBuilder<Node>();
+            var valuesAndSeparators = ImmutableArray.CreateBuilder<Node>();
+
+            var parseNextArgument = true;
+            while (parseNextArgument && CurrentToken.Type != TokType.CloseBracketToken && CurrentToken.Type != TokType.EndOfFileToken)
+            {
+                var key = ParseExpression();
+                keysAndSeparators.Add(key);
+                
+                var colon = MatchToken(TokType.ColonToken);
+                keysAndSeparators.Add(colon);
+                
+                var value = ParseExpression();
+                valuesAndSeparators.Add(value);
+
+                if (CurrentToken.Type == TokType.CommaToken)
+                {
+                    var comma = MatchToken(TokType.CommaToken);
+                    valuesAndSeparators.Add(comma);
+                }
+                else parseNextArgument = false;
+            }
+
+            var keys = new SeparatedNodeList<ExpressionNode>(keysAndSeparators.ToImmutable());
+            var values = new SeparatedNodeList<ExpressionNode>(valuesAndSeparators.ToImmutable());
+            
+            var closeBrace = MatchToken(TokType.CloseBracketToken);
+            return new DictDeclarationNode(_nodeTree, keyword, identifier, equals, openBrace, keys, values, closeBrace);
+        }
+        
         private SeparatedNodeList<ExpressionNode> ParseArrayMembers()
         {
             var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
@@ -300,6 +340,27 @@ namespace Shore.CodeAnalysis.Syntax
             return new SeparatedNodeList<ExpressionNode>(nodesAndSeparators.ToImmutable());
         }
 
+        private SeparatedNodeList<ExpressionNode> ParseDictMembers()
+        {
+            var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();
+
+            var parseNextArgument = true;
+            while (parseNextArgument && CurrentToken.Type != TokType.CloseBracketToken && CurrentToken.Type != TokType.EndOfFileToken)
+            {
+                var expression = ParseExpression();
+                nodesAndSeparators.Add(expression);
+
+                if (CurrentToken.Type == TokType.CommaToken)
+                {
+                    var comma = MatchToken(TokType.CommaToken);
+                    nodesAndSeparators.Add(comma);
+                }
+                else parseNextArgument = false;
+            }
+
+            return new SeparatedNodeList<ExpressionNode>(nodesAndSeparators.ToImmutable());
+        }
+        
         private StatementNode ParseIfStatement()
         {
             var keyword = MatchToken(TokType.IfKeyword);

@@ -17,6 +17,7 @@ namespace sr
         private readonly Dictionary<VariableSymbol, object?> _variables = new();
         private readonly Dictionary<VariableSymbol, object?[]> _arrays = new();
         private readonly Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _lists = new();
+        private readonly Dictionary<VariableSymbol, Dictionary<object, object>> _dicts = new();
 
         public ShoreRepl() => LoadSubmissions();
 
@@ -144,7 +145,7 @@ namespace sr
             if (_showTree) nodeTree.Root.WriteTo(Console.Out);
             if (_showProgram) compilation.EmitTree(Console.Out);
 
-            var result = compilation.Evaluate(_variables, _arrays, _lists);
+            var result = compilation.Evaluate(_variables, _arrays, _lists, _dicts);
             
             if (!result.HasDanger)
             {

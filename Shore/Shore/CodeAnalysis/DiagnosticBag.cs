@@ -246,5 +246,11 @@ namespace Shore.CodeAnalysis
             var message = $"The {desc} is deprecated and will be removed in the next update! The {desc} can be safely removed{extraInfo}.";
             ReportWarning(location, message);
         }
+
+        public void ReportInvalidArrayAccess(TextLocation location, BoundExpression accessor)
+        {
+            var message = $"'{accessor}' is not a valid Array Index.";
+            ReportError(location, message);
+        }
     }
 }

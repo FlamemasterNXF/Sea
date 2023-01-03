@@ -40,6 +40,12 @@ namespace Shore.CodeAnalysis.Symbols
         public static readonly TypeSymbol StringList = new ("string<>", StringAndArray, List);
         public static readonly TypeSymbol Int64List = new ("int64<>", StringAndArray, List);
         public static readonly TypeSymbol Float64List = new ("float64<>", StringAndArray, List);
+        
+        public static readonly TypeSymbol Dictionary = new("{}");
+        public static readonly TypeSymbol BoolDict = new ("bool{}", StringAndArray, Dictionary);
+        public static readonly TypeSymbol StringDict = new ("string{}", StringAndArray, Dictionary);
+        public static readonly TypeSymbol Int64Dict = new ("int64{}", StringAndArray, Dictionary);
+        public static readonly TypeSymbol Float64Dict = new ("float64{}", StringAndArray, Dictionary);
 
         public static bool CheckType(TypeSymbol actual, TypeSymbol required) =>
             actual == required || actual.ParentType == required;
@@ -49,10 +55,10 @@ namespace Shore.CodeAnalysis.Symbols
 
         public static TypeSymbol? GetAcceptedType(TypeSymbol arrType)
         {
-            if (arrType == BoolArr || arrType == BoolList) return Bool;
-            if (arrType == StringArr || arrType == StringList) return String;
-            if (arrType == Int64Arr || arrType == Int64List) return Int64;
-            return arrType == Float64Arr || arrType == Float64List ? Float64 : null;
+            if (arrType == BoolArr || arrType == BoolList || arrType == BoolDict) return Bool;
+            if (arrType == StringArr || arrType == StringList || arrType == StringDict) return String;
+            if (arrType == Int64Arr || arrType == Int64List || arrType == Int64Dict) return Int64;
+            return arrType == Float64Arr || arrType == Float64List || arrType == Float64Dict ? Float64 : null;
         }
     }
 }
