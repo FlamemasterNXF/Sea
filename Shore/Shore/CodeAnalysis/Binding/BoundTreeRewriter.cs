@@ -129,6 +129,7 @@ namespace Shore.CodeAnalysis.Binding
                 BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
                 BoundNodeKind.ArrayExpression => RewriteArrayExpression((BoundArrayExpression)node),
                 BoundNodeKind.ListExpression => RewriteListExpression((BoundListExpression)node),
+                BoundNodeKind.DictExpression => RewriteDictExpression((BoundDictExpression)node),
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
                 BoundNodeKind.ListAssignmentExpression => RewriteListAssignmentExpression((BoundListAssignmentExpression)node),
                 BoundNodeKind.UnaryExpression => RewriteUnaryExpression((BoundUnaryExpression)node),
@@ -148,6 +149,8 @@ namespace Shore.CodeAnalysis.Binding
         protected virtual BoundExpression? RewriteArrayExpression(BoundArrayExpression? node) => node;
         
         protected virtual BoundExpression? RewriteListExpression(BoundListExpression? node) => node;
+        
+        protected virtual BoundExpression? RewriteDictExpression(BoundDictExpression? node) => node;
 
         protected virtual BoundExpression? RewriteAssignmentExpression(BoundAssignmentExpression? node)
         {

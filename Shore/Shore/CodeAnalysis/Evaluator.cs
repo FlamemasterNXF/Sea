@@ -162,6 +162,7 @@ namespace Shore.CodeAnalysis
                 BoundNodeKind.VariableExpression => EvaluateVariableExpression((BoundVariableExpression)node),
                 BoundNodeKind.ArrayExpression => EvaluateArrayExpression((BoundArrayExpression)node),
                 BoundNodeKind.ListExpression => EvaluateListExpression((BoundListExpression)node),
+                BoundNodeKind.DictExpression => EvaluateDictExpression((BoundDictExpression)node),
                 BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression((BoundAssignmentExpression)node),
                 BoundNodeKind.ListAssignmentExpression => EvaluateListAssignmentExpression((BoundListAssignmentExpression)node),
                 BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression)node),
@@ -242,6 +243,17 @@ namespace Shore.CodeAnalysis
            
             var locals = _localLists.Peek();
             return locals[a.Array].ElementAt(Convert.ToInt32(accessor)).Value;
+        }
+        
+        private object EvaluateDictExpression(BoundDictExpression a)
+        {
+            var accessor = EvaluateExpression(a.Accessor);
+            
+            if (a.Array.Kind == SymbolKind.GlobalVariable)
+                return _globalDicts[a.Array][accessor];
+           
+            var locals = _localDicts.Peek();
+            return locals[a.Array][accessor];
         }
 
         private object? EvaluateAssignmentExpression(BoundAssignmentExpression a)

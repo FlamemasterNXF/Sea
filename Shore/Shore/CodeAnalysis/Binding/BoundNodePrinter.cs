@@ -31,6 +31,9 @@ namespace Shore.CodeAnalysis.Binding
                 case BoundNodeKind.ListDeclaration:
                     WriteListDeclaration((BoundListDeclaration)node, writer);
                     break;
+                case BoundNodeKind.DictDeclaration:
+                    WriteListDeclaration((BoundListDeclaration)node, writer);
+                    break;
                 case BoundNodeKind.IfStatement:
                     WriteIfStatement((BoundIfStatement)node, writer);
                     break;
@@ -69,6 +72,9 @@ namespace Shore.CodeAnalysis.Binding
                     break;
                 case BoundNodeKind.ListExpression:
                     WriteListExpression((BoundListExpression)node, writer);
+                    break;
+                case BoundNodeKind.DictExpression:
+                    WriteDictExpression((BoundDictExpression)node, writer);
                     break;
                 case BoundNodeKind.AssignmentExpression:
                     WriteAssignmentExpression((BoundAssignmentExpression)node, writer);
@@ -168,6 +174,23 @@ namespace Shore.CodeAnalysis.Binding
                 member.Key.WriteTo(writer);
                 writer.WritePunctuation(":");
                 member.Value.WriteTo(writer);
+                writer.WritePunctuation(" ");
+            }
+            writer.WritePunctuation("] ");
+            writer.WriteLine();
+        }
+        
+        private static void WriteDictDeclaration(BoundDictDeclaration node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(node.Array.IsReadOnly ? $"readonly {node.Array.Type} " : $"{node.Array.Type} ");
+            writer.WriteIdentifier(node.Array.Name);
+            writer.WritePunctuation(" = ");
+            writer.WritePunctuation(" [");
+            foreach (var pair in node.Values)
+            {
+                pair.Key.WriteTo(writer);
+                writer.WritePunctuation(":");
+                pair.Value.WriteTo(writer);
                 writer.WritePunctuation(" ");
             }
             writer.WritePunctuation("] ");
@@ -280,6 +303,9 @@ namespace Shore.CodeAnalysis.Binding
             writer.WriteIdentifier(node.Array.Name);
 
         private static void WriteListExpression(BoundListExpression node, IndentedTextWriter writer) =>
+            writer.WriteIdentifier(node.Array.Name);
+        
+        private static void WriteDictExpression(BoundDictExpression node, IndentedTextWriter writer) =>
             writer.WriteIdentifier(node.Array.Name);
 
         private static void WriteAssignmentExpression(BoundAssignmentExpression node, IndentedTextWriter writer)

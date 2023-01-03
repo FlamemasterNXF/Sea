@@ -548,7 +548,6 @@ namespace Shore.CodeAnalysis.Binding
         {
             var name = node.Identifier.Text;
             var accessor = BindExpression(node.Accessor);
-            var usableAccessor = Convert.ToInt64(new DataTable().Compute(accessor.ToString(), null));
 
             if (string.IsNullOrEmpty(name)) return new BoundNullExpression();
 
@@ -558,19 +557,26 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
-            if (usableAccessor > int.MaxValue)
+            if (!variable.IsDict)
             {
-                _diagnostics.ReportArrayTooLarge(node.Identifier.Location);
-                return new BoundNullExpression();
-            }
+                var usableAccessor = Convert.ToInt64(new DataTable().Compute(accessor.ToString(), null));
 
-            if (usableAccessor > variable.Length - 1)
-            {
-                _diagnostics.ReportArrayOutOfBounds(node.Identifier.Location, variable, accessor);
-                return new BoundNullExpression();
+                if (usableAccessor > int.MaxValue)
+                {
+                    _diagnostics.ReportArrayTooLarge(node.Identifier.Location);
+                    return new BoundNullExpression();
+                }
+
+                if (usableAccessor > variable.Length - 1)
+                {
+                    _diagnostics.ReportArrayOutOfBounds(node.Identifier.Location, variable, accessor);
+                    return new BoundNullExpression();
+                }   
             }
 
             if (variable.IsList) return new BoundListExpression(variable, accessor);
+
+            if (variable.IsDict) return new BoundDictExpression(variable, accessor);
 
             return new BoundArrayExpression(variable, accessor);
         }

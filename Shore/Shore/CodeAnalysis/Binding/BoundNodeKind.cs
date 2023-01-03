@@ -25,6 +25,7 @@ namespace Shore.CodeAnalysis.Binding
         ListDeclaration,
         ListExpression,
         ListAssignmentExpression,
-        DictDeclaration
+        DictDeclaration,
+        DictExpression
     }
 }
