@@ -172,6 +172,7 @@ namespace Shore.CodeAnalysis.Binding.ControlFlow
                                 break;
                             case BoundNodeKind.VariableDeclaration:
                             case BoundNodeKind.ArrayDeclaration:
+                            case BoundNodeKind.ListDeclaration:
                             case BoundNodeKind.LabelStatement:
                             case BoundNodeKind.ExpressionStatement:
                                 if (isLastStatementInBlock) Connect(current, next);

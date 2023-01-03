@@ -9,11 +9,11 @@ namespace Shore.CodeAnalysis
         private readonly BoundProgram _program;
         private readonly Dictionary<VariableSymbol, object> _globals;
         private readonly Dictionary<VariableSymbol, object[]> _globalArrays;
-        private Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _globalLists;
+        private readonly Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _globalLists;
         private readonly Dictionary<FunctionSymbol, BoundBlockStatement> _functions = new();
         private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
         private readonly Stack<Dictionary<VariableSymbol, object[]>> _localArrays = new();
-        private Stack<Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>> _localLists = new();
+        private readonly Stack<Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>> _localLists = new();
 
         private object? _lastValue;
 

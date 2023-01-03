@@ -37,7 +37,7 @@ namespace Shore.CodeAnalysis.Syntax
         private Token PeekToken(int offset)
         {
             var index = _position + offset;
-            return index >= _tokens.Length || index <= _tokens.Length ? _tokens[^1] : _tokens[index];
+            return index >= _tokens.Length || index < 0 ? _tokens[^1] : _tokens[index];
         }
         
         private Token CurrentToken => PeekToken(0);
