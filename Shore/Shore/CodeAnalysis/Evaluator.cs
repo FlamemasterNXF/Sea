@@ -1,6 +1,7 @@
 using System.Text;
 using Shore.CodeAnalysis.Binding;
 using Shore.CodeAnalysis.Symbols;
+using Shore.IO;
 
 namespace Shore.CodeAnalysis
 {
@@ -72,9 +73,11 @@ namespace Shore.CodeAnalysis
             {
                 var s = body.Statements[index];
 
-                switch (s.Kind)
+                try
                 {
-                    case BoundNodeKind.VariableDeclaration:
+                    switch (s.Kind)
+                    {
+                        case BoundNodeKind.VariableDeclaration:
                         EvaluateVariableDeclaration((BoundVariableDeclaration)s);
                         index++;
                         break;
@@ -113,6 +116,11 @@ namespace Shore.CodeAnalysis
                         return _lastValue;
                     default:
                         throw new Exception($"Unexpected Node {s.Kind}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Out.WriteFatal(e.ToString());
                 }
             }
 
@@ -156,21 +164,29 @@ namespace Shore.CodeAnalysis
 
         private object? EvaluateExpression(BoundExpression? node)
         {
-            return node!.Kind switch
+            try
             {
-                BoundNodeKind.LiteralExpression => EvaluateLiteralExpression((BoundLiteralExpression)node),
-                BoundNodeKind.VariableExpression => EvaluateVariableExpression((BoundVariableExpression)node),
-                BoundNodeKind.ArrayExpression => EvaluateArrayExpression((BoundArrayExpression)node),
-                BoundNodeKind.ListExpression => EvaluateListExpression((BoundListExpression)node),
-                BoundNodeKind.DictExpression => EvaluateDictExpression((BoundDictExpression)node),
-                BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression((BoundAssignmentExpression)node),
-                BoundNodeKind.ListAssignmentExpression => EvaluateListAssignmentExpression((BoundListAssignmentExpression)node),
-                BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression)node),
-                BoundNodeKind.BinaryExpression => EvaluateBinaryExpression((BoundBinaryExpression)node),
-                BoundNodeKind.CallExpression => EvaluateCallExpression((BoundCallExpression)node),
-                BoundNodeKind.ConversionExpression => EvaluateConversionExpression((BoundConversionExpression)node),
-                _ => throw new Exception($"Unexpected Node {node.Kind}")
-            };
+                return node!.Kind switch
+                {
+                    BoundNodeKind.LiteralExpression => EvaluateLiteralExpression((BoundLiteralExpression)node),
+                    BoundNodeKind.VariableExpression => EvaluateVariableExpression((BoundVariableExpression)node),
+                    BoundNodeKind.ArrayExpression => EvaluateArrayExpression((BoundArrayExpression)node),
+                    BoundNodeKind.ListExpression => EvaluateListExpression((BoundListExpression)node),
+                    BoundNodeKind.DictExpression => EvaluateDictExpression((BoundDictExpression)node),
+                    BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression((BoundAssignmentExpression)node),
+                    BoundNodeKind.ListAssignmentExpression => EvaluateListAssignmentExpression((BoundListAssignmentExpression)node),
+                    BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression)node),
+                    BoundNodeKind.BinaryExpression => EvaluateBinaryExpression((BoundBinaryExpression)node),
+                    BoundNodeKind.CallExpression => EvaluateCallExpression((BoundCallExpression)node),
+                    BoundNodeKind.ConversionExpression => EvaluateConversionExpression((BoundConversionExpression)node),
+                    _ => throw new Exception($"Unexpected Node {node.Kind}")
+                };
+            }
+            catch (Exception e)
+            {
+                Console.Out.WriteFatal(e.ToString());
+                return "";
+            }
         }
 
         private object EvaluateLiteralExpression(BoundLiteralExpression n) => n.Value;

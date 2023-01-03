@@ -559,6 +559,11 @@ namespace Shore.CodeAnalysis.Binding
 
             if (!variable.IsDict)
             {
+                if (accessor.Type == TypeSymbol.String || accessor.Type == TypeSymbol.Bool)
+                {
+                    _diagnostics.ReportInvalidArrayAccess(node.Identifier.Location, accessor);
+                    return new BoundNullExpression();
+                }
                 var usableAccessor = Convert.ToInt64(new DataTable().Compute(accessor.ToString(), null));
 
                 if (usableAccessor > int.MaxValue)

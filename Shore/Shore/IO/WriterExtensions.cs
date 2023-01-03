@@ -68,6 +68,13 @@ namespace Shore.IO
         {
             if (writer.IsConsole()) Console.ResetColor();
         }
+
+        public static void WriteFatal(this TextWriter writer, string text)
+        {
+            writer.SetForeground(ConsoleColor.DarkRed);
+            writer.Write($"FATAL: You have done something that would cause Shore to crash!\n Stack Trace: \n {text}");
+            writer.ResetForeground();
+        }
         
         public static void WriteKeyword(this TextWriter writer, string text)
         {
