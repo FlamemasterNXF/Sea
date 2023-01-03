@@ -140,13 +140,13 @@ namespace Shore
 
                 foreach (var line in _document)
                 {
-                    Console.SetCursorPosition(0, _cursorTop + lineCount);
+                    Console.SetCursorPosition(0, Math.Min(_cursorTop + lineCount, Console.BufferHeight - 1));
                     Console.ForegroundColor = ConsoleColor.Green;
 
                     Console.Write(lineCount == 0 ? "» " : "· ");
                     Console.ResetColor();
                     _lineRenderer(line);
-                    Console.Write(new string(' ', Console.WindowWidth - line.Length));
+                    Console.Write(new string(' ', Console.WindowWidth - line.Length - 2));
                     lineCount++;
                 }
                 
@@ -168,7 +168,7 @@ namespace Shore
 
             private void UpdateCursorPosition()
             {
-                Console.CursorTop = _cursorTop + _currentLine;
+                Console.CursorTop = Math.Min(_cursorTop + _currentLine, Console.BufferHeight - 1);
                 Console.CursorLeft = 2 + _currentCharacter;
             }
 
