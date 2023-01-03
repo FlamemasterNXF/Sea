@@ -611,7 +611,7 @@ namespace Shore.CodeAnalysis.Binding
                 return boundExpression;
             }
 
-            if(!variable.IsList) _diagnostics.ReportCannotAssign(node.IdentifierToken.Location, name);
+            if(!variable.IsList && !variable.IsDict) _diagnostics.ReportCannotAssign(node.IdentifierToken.Location, name);
 
             var accessor = BindExpression(node.Accessor);
             var convertedExpression = BindConversion(node.Expression.Location, boundExpression,

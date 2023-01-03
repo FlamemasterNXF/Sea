@@ -267,7 +267,9 @@ namespace Shore.CodeAnalysis
         {
             var value = EvaluateExpression(a.Expression);
             var accessor = EvaluateExpression(a.Accessor);
-            AssignListValue(a.Variable, value, accessor);
+
+            if (a.Variable.IsList) AssignListValue(a.Variable, value, accessor);
+            else AssignDictValue(a.Variable, value, accessor);
             return value;
         }
 
@@ -491,20 +493,17 @@ namespace Shore.CodeAnalysis
             }
         }
         
-        /*private void AssignListValue(VariableSymbol array, object value, object accessor)
+        private void AssignDictValue(VariableSymbol array, object value, object key)
         {
             if (array.Kind == SymbolKind.GlobalVariable)
             {
-                var oldEntry = _globalLists[array].ElementAt(Convert.ToInt32(accessor));
-                _globalLists[array][oldEntry.Key] = value;
+                _globalDicts[array][key] = value;
             }
             else
             {
-                var locals = _localLists.Peek();
-                var oldEntry = locals[array].ElementAt(Convert.ToInt32(accessor));
-                locals[array][oldEntry.Key] = value;
+                var locals = _localDicts.Peek();
+                locals[array][key] = value;
             }
         }
-        */
     }
 }
