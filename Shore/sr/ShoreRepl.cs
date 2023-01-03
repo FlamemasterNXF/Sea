@@ -145,8 +145,8 @@ namespace sr
             if (_showProgram) compilation.EmitTree(Console.Out);
 
             var result = compilation.Evaluate(_variables, _arrays, _lists);
-
-            if (!result.Diagnostics.Any())
+            
+            if (!result.HasDanger)
             {
                 if (result.Value is not null)
                 {
@@ -158,6 +158,8 @@ namespace sr
                 _previous = compilation;
                 
                 SaveSubmission(text);
+                
+                if(result.Diagnostics.Any()) Console.Out.WriteDiagnostics(result.Diagnostics);
             }
             else Console.Out.WriteDiagnostics(result.Diagnostics);
         }

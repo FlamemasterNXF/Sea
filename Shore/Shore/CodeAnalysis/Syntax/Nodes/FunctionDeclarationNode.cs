@@ -2,7 +2,6 @@
 {
     public sealed class FunctionDeclarationNode : MemberNode
     {
-        public Token FunctionKeyword { get; }
         public Token FType { get; }
         public Token Identifier { get; }
         public Token OpenParenToken { get; }
@@ -11,11 +10,10 @@
         public BlockStatementNode? Body { get; }
         public override TokType Type => TokType.FunctionDeclaration;
 
-        public FunctionDeclarationNode(NodeTree nodeTree, Token functionKeyword, Token type, Token identifier,
+        public FunctionDeclarationNode(NodeTree nodeTree, Token type, Token identifier,
             Token openParenToken, SeparatedNodeList<ParameterNode> parameters, Token closeParenToken, BlockStatementNode? body)
             : base(nodeTree)
         {
-            FunctionKeyword = functionKeyword;
             FType = type;
             Identifier = identifier;
             OpenParenToken = openParenToken;

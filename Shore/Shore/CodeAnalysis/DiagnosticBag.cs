@@ -8,7 +8,7 @@ namespace Shore.CodeAnalysis
 {
     internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
     {
-        private readonly List<Diagnostic> _diagnostics = new List<Diagnostic>();
+        private readonly List<Diagnostic> _diagnostics = new();
         
         public IEnumerator<Diagnostic> GetEnumerator() => _diagnostics.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -239,6 +239,12 @@ namespace Shore.CodeAnalysis
         {
             var message = $"Index {boundRight} is out of the bounds of String '{boundLeft}'. The highest index is {boundLeft.ToString().Length - 3}";
             ReportError(location, message);
+        }
+
+        public void ReportDeprecated(TextLocation location, string desc, string extraInfo = "")
+        {
+            var message = $"The {desc} is deprecated and will be removed in the next update! The {desc} can be safely removed{extraInfo}.";
+            ReportWarning(location, message);
         }
     }
 }

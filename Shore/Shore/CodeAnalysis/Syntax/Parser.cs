@@ -7,7 +7,7 @@ namespace Shore.CodeAnalysis.Syntax
     internal sealed class Parser
     {
         private readonly NodeTree _nodeTree;
-        private DiagnosticBag _diagnostics = new();
+        private readonly DiagnosticBag _diagnostics = new();
         private readonly SourceText _text;
         private readonly ImmutableArray<Token> _tokens;
         private int _position;
@@ -140,19 +140,25 @@ namespace Shore.CodeAnalysis.Syntax
 
         private MemberNode ParseMember()
         {
-            return CurrentToken.Type == TokType.FunctionKeyword ?  ParseFunctionDeclaration() : ParseGlobalStatement();
+            return CurrentToken.Type == TokType.FunctionKeyword || PeekToken(2).Type == TokType.OpenParenToken
+                ? ParseFunctionDeclaration()
+                : ParseGlobalStatement();
         }
 
         private MemberNode ParseFunctionDeclaration()
         {
-            var functionKeyword = MatchToken(TokType.FunctionKeyword);
+            if (CurrentToken.Type == TokType.FunctionKeyword)
+            {
+                _diagnostics.ReportDeprecated(CurrentToken.Location, "Function Keyword");
+                NextToken();
+            }
             var type = MatchToken(CurrentToken.Type);
             var identifier = MatchToken(TokType.IdentifierToken);
             var openParenToken = MatchToken(TokType.OpenParenToken);
             var parameters = ParseParameterList();
             var closeParenToken= MatchToken(TokType.CloseParenToken);
             var body = ParseBlockStatement();
-            return new FunctionDeclarationNode(_nodeTree, functionKeyword, type, identifier, openParenToken, parameters,
+            return new FunctionDeclarationNode(_nodeTree, type, identifier, openParenToken, parameters,
                 closeParenToken, body);
         }
 
