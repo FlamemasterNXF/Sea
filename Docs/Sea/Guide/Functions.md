@@ -15,6 +15,11 @@ Learn more about [Types](./Types.md)<br>
 ## Arguments 
 You can declare arguments for any given Function with the `<type> <name>, <type2> <name2>, ...` syntax. These arguments must all be given a value when the Function is called.<br>
 
+## Extension Functions 
+Extension Functions are Functions that are assigned to a Type itself rather than a scope.<br>
+You can declare an Extension Function by using the `extend <function declaration syntax>` syntax.<br>
+Extension Functions can be called with the `<type alias>.<name>(<args values?>)` syntax.<br>
+
 ## The Main Function
 The Main Function is an optional Function which you can declare at the top of your Sea file. If a Sea File uses this Function Global Statements (Statements outside of Functions) are no longer allowed. This Function will be evaluated and ran at runtime in place of the Globals. The Main Functions must always be of Type Void and must have zero arguments.<br>
 Learn more about the [Void Type](./Types/Void.md)<br>
