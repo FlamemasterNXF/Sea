@@ -140,6 +140,7 @@ namespace Shore.CodeAnalysis.Syntax
 
         private MemberNode ParseMember()
         {
+            if (CurrentToken.Type == TokType.ExtendKeyword) return ParseExtendStatement();
             return CurrentToken.Type == TokType.FunctionKeyword || PeekToken(2).Type == TokType.OpenParenToken
                 ? ParseFunctionDeclaration()
                 : ParseGlobalStatement();
@@ -161,7 +162,14 @@ namespace Shore.CodeAnalysis.Syntax
             return new FunctionDeclarationNode(_nodeTree, type, identifier, openParenToken, parameters,
                 closeParenToken, body);
         }
-
+        
+        private MemberNode ParseExtendStatement()
+        {
+            var extend = MatchToken(TokType.ExtendKeyword);
+            var function = ParseFunctionDeclaration();
+            return new ExtendStatementNode(_nodeTree, extend, (FunctionDeclarationNode)function);
+        }
+        
         private SeparatedNodeList<ParameterNode> ParseParameterList()
         {
             var nodesAndSeparators = ImmutableArray.CreateBuilder<Node>();

@@ -65,8 +65,11 @@ namespace Shore.CodeAnalysis.Binding
             var binder = new Binder(isScript, parentScope, null);
 
             var functionDeclarations = nodeTrees.SelectMany(nt => nt.Root.Members).OfType<FunctionDeclarationNode>();
+            var extensionFunctionDeclarations =
+                nodeTrees.SelectMany(nt => nt.Root.Members).OfType<ExtendStatementNode>();
 
             foreach (var function in functionDeclarations) binder.BindFunctionDeclaration(function);
+            foreach (var node in extensionFunctionDeclarations) binder.BindExtendStatement(node);
 
             var globalStatements = nodeTrees.SelectMany(nt => nt.Root.Members).OfType<GlobalStatementNode>();
 
@@ -193,7 +196,7 @@ namespace Shore.CodeAnalysis.Binding
             return result;
         }
 
-        private void BindFunctionDeclaration(FunctionDeclarationNode node)
+        private void BindFunctionDeclaration(FunctionDeclarationNode node, bool isExtension = false)
         {
             ImmutableArray<ParameterSymbol>.Builder parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
 
@@ -215,11 +218,14 @@ namespace Shore.CodeAnalysis.Binding
             }
 
             var type = LookupType(node.FType.Text) ?? TypeSymbol.Void;
-            
-            var function = new FunctionSymbol(node.Identifier.Text!, parameters.ToImmutable(), type, node);
+
+            var function = new FunctionSymbol(node.Identifier.Text!, parameters.ToImmutable(), type, isExtension, node);
             if (!_scope!.TryDeclareFunction(function))
                 _diagnostics.ReportSymbolAlreadyDeclared(node.Identifier.Location, function.Name);
         }
+        
+        private void BindExtendStatement(ExtendStatementNode node) =>
+            BindFunctionDeclaration(node.Function, true);
 
         private BoundStatement BindNullStatement()
         {
@@ -690,6 +696,12 @@ namespace Shore.CodeAnalysis.Binding
             if (!_scope!.TryLookupFunction(node.Identifier.Text, out var function))
             {
                 _diagnostics.ReportUndefinedFunction(node.Identifier.Location, node.Identifier.Text);
+                return new BoundNullExpression();
+            }
+
+            if (function.IsExtension)
+            {
+                _diagnostics.ReportCannotDirectlyCallExtensionFunction(node.Location, function);
                 return new BoundNullExpression();
             }
 

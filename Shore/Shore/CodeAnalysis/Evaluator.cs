@@ -12,7 +12,9 @@ namespace Shore.CodeAnalysis
         private readonly Dictionary<VariableSymbol, object[]> _globalArrays;
         private readonly Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _globalLists;
         private readonly Dictionary<VariableSymbol, Dictionary<object, object>> _globalDicts;
+        
         private readonly Dictionary<FunctionSymbol, BoundBlockStatement> _functions = new();
+        
         private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
         private readonly Stack<Dictionary<VariableSymbol, object[]>> _localArrays = new();
         private readonly Stack<Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>> _localLists = new();
@@ -42,7 +44,8 @@ namespace Shore.CodeAnalysis
                 {
                     var function = kv.Key;
                     var body = kv.Value;
-                    _functions.Add(function, body);
+                    if (function.IsExtension) AssignExtension(function, body);
+                    else _functions.Add(function, body);
                 }
 
                 current = current.Previous;
@@ -453,6 +456,9 @@ namespace Shore.CodeAnalysis
             
             throw new Exception($"Unexpected type {node.Type}");
         }
+
+        private void AssignExtension(FunctionSymbol function, BoundBlockStatement body) =>
+            function.Type.Extensions.Add(function, body);
 
         private void Assign(VariableSymbol? variable, object? value)
         {

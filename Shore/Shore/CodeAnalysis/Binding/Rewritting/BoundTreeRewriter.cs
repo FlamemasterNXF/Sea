@@ -90,7 +90,7 @@ namespace Shore.CodeAnalysis.Binding
 
             return new BoundForStatement(node.Variable, lowerBound, upperBound, body, node.BreakLabel, node.ContinueLabel);
         }
-
+        
         protected virtual BoundStatement RewriteLabelStatement(BoundLabelStatement node) => node;
 
         protected virtual BoundStatement RewriteGotoStatement(BoundGotoStatement node) => node;

@@ -252,5 +252,11 @@ namespace Shore.CodeAnalysis
             var message = $"'{accessor}' is not a valid Array Index.";
             ReportError(location, message);
         }
+
+        public void ReportCannotDirectlyCallExtensionFunction(TextLocation location, FunctionSymbol function)
+        {
+            var message = $"'{function.Name}' is an Extension of the {function.Type} Type and cannot be called without reference to that Type.";
+            ReportError(location, message);
+        }
     }
 }
