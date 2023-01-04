@@ -2,6 +2,19 @@
 
 namespace Shore.CodeAnalysis.Binding
 {
+    internal sealed class BoundExtendStatement : BoundStatement
+    {
+        public FunctionSymbol Function { get; }
+        public TypeSymbol Type { get; }
+
+        public override BoundNodeKind Kind => BoundNodeKind.ExtendStatement;
+
+        public BoundExtendStatement(FunctionSymbol function)
+        {
+            Function = function;
+            Type = function.Type;
+        }
+    }
     internal sealed class BoundForStatement : BoundLoopStatement
     {
         public VariableSymbol? Variable { get; }

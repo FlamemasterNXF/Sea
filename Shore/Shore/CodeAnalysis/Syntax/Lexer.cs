@@ -109,6 +109,10 @@ namespace Shore.CodeAnalysis.Syntax
                     _type = TokType.ColonToken;
                     _position++;
                     break;
+                case '.':
+                    _type = TokType.DotToken;
+                    _position++;
+                    break;
                 case '!':
                     _position++;
                     if (Current != '=') _type = TokType.BangToken;

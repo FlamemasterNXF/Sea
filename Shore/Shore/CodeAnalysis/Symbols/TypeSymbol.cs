@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using Shore.CodeAnalysis.Binding;
 
 namespace Shore.CodeAnalysis.Symbols
 {
@@ -6,14 +7,23 @@ namespace Shore.CodeAnalysis.Symbols
     {
         public TypeSymbol? ParentType { get; }
         public TypeSymbol HeadType { get; }
+        internal Dictionary<FunctionSymbol, BoundBlockStatement> Extensions { get; }
         public override SymbolKind Kind => SymbolKind.Type;
 
-        private TypeSymbol(string name) : this(name, Any, Any){}
-        private TypeSymbol(string name, TypeSymbol parentType) : this(name, parentType, Any){}
-        private TypeSymbol(string name, TypeSymbol? parentType, TypeSymbol headType) : base(name)
+        private TypeSymbol(string name) : this(name, Any, Any, new Dictionary<FunctionSymbol, BoundBlockStatement>()){}
+
+        private TypeSymbol(string name, TypeSymbol parentType) :
+            this(name, parentType, Any, new Dictionary<FunctionSymbol, BoundBlockStatement>()){}
+
+        private TypeSymbol(string name, TypeSymbol parentType, TypeSymbol headType) : this(name, parentType, headType,
+            new Dictionary<FunctionSymbol, BoundBlockStatement>()){}
+
+        private TypeSymbol(string name, TypeSymbol? parentType, TypeSymbol? headType,
+            Dictionary<FunctionSymbol, BoundBlockStatement> extensions) : base(name)
         {
             ParentType = parentType;
             HeadType = headType;
+            Extensions = extensions;
         }
         
         public static readonly TypeSymbol Null = new("null", null, null);

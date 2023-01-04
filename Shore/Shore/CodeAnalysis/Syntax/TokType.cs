@@ -98,6 +98,10 @@ namespace Shore.CodeAnalysis.Syntax
         IntDictKeyword,
         FloatDictKeyword,
         ColonToken,
-        DictDeclarationStatement
+        DictDeclarationStatement,
+        ExtendKeyword,
+        ExtendFunctionDeclaration,
+        DotToken,
+        ExtensionCallExpression
     }
 }

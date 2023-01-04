@@ -7,6 +7,7 @@ namespace Shore.CodeAnalysis.Binding
     {
         public FunctionSymbol? Function { get; }
         public ImmutableArray<BoundExpression> Arguments { get; }
+        public bool IsExtension { get; }
         public override TypeSymbol Type => Function!.Type;
         public override BoundNodeKind Kind => BoundNodeKind.CallExpression;
 
@@ -14,6 +15,7 @@ namespace Shore.CodeAnalysis.Binding
         {
             Function = function;
             Arguments = arguments;
+            IsExtension = function.IsExtension;
         }
     }
 }

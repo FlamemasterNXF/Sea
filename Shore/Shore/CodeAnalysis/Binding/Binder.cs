@@ -65,8 +65,11 @@ namespace Shore.CodeAnalysis.Binding
             var binder = new Binder(isScript, parentScope, null);
 
             var functionDeclarations = nodeTrees.SelectMany(nt => nt.Root.Members).OfType<FunctionDeclarationNode>();
+            var extensionFunctionDeclarations =
+                nodeTrees.SelectMany(nt => nt.Root.Members).OfType<ExtendStatementNode>();
 
             foreach (var function in functionDeclarations) binder.BindFunctionDeclaration(function);
+            foreach (var node in extensionFunctionDeclarations) binder.BindExtendStatement(node);
 
             var globalStatements = nodeTrees.SelectMany(nt => nt.Root.Members).OfType<GlobalStatementNode>();
 
@@ -193,7 +196,7 @@ namespace Shore.CodeAnalysis.Binding
             return result;
         }
 
-        private void BindFunctionDeclaration(FunctionDeclarationNode node)
+        private void BindFunctionDeclaration(FunctionDeclarationNode node, bool isExtension = false)
         {
             ImmutableArray<ParameterSymbol>.Builder parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
 
@@ -215,11 +218,14 @@ namespace Shore.CodeAnalysis.Binding
             }
 
             var type = LookupType(node.FType.Text) ?? TypeSymbol.Void;
-            
-            var function = new FunctionSymbol(node.Identifier.Text!, parameters.ToImmutable(), type, node);
+
+            var function = new FunctionSymbol(node.Identifier.Text!, parameters.ToImmutable(), type, isExtension, node);
             if (!_scope!.TryDeclareFunction(function))
                 _diagnostics.ReportSymbolAlreadyDeclared(node.Identifier.Location, function.Name);
         }
+        
+        private void BindExtendStatement(ExtendStatementNode node) =>
+            BindFunctionDeclaration(node.Function, true);
 
         private BoundStatement BindNullStatement()
         {
@@ -515,6 +521,7 @@ namespace Shore.CodeAnalysis.Binding
                 TokType.UnaryExpression => BindUnaryExpression((UnaryExpressionNode)node),
                 TokType.BinaryExpression => BindBinaryExpression((BinaryExpressionNode)node),
                 TokType.CallExpression => BindCallExpression((CallExpressionNode)node),
+                TokType.ExtensionCallExpression => BindExtensionCallExpression((ExtensionCallExpressionNode)node),
                 TokType.ParenthesisExpression => BindExpressionDistributor(((ParenthesisExpressionNode)node).Expression),
                 TokType.NameExpression => BindNameExpression((NameExpressionNode)node),
                 TokType.ArrayAccessExpression => BindArrayAccessExpression((ArrayAccessExpressionNode)node),
@@ -693,7 +700,61 @@ namespace Shore.CodeAnalysis.Binding
                 return new BoundNullExpression();
             }
 
+            if (function.IsExtension)
+            {
+                _diagnostics.ReportCannotDirectlyCallExtensionFunction(node.Location, function);
+                return new BoundNullExpression();
+            }
+
             if (node.Arguments.Count != function!.Parameters.Length)
+            {
+                _diagnostics.ReportWrongArgumentCount(node.Location, function.Name, function.Parameters.Length, node.Arguments.Count);
+                return new BoundNullExpression();
+            }
+
+            for (var i = 0; i < node.Arguments.Count; i++)
+            {
+                var argument = boundArguments[i];
+                var parameter = function.Parameters[i];
+                
+                if ((argument.Type != parameter.Type) && (argument.Type.ParentType != parameter.Type) && (argument.Type.HeadType != parameter.Type) && (parameter.Type != TypeSymbol.Any))
+                {
+                    _diagnostics.ReportWrongArgumentType(node.Arguments[i].Location, parameter.Name, parameter.Type, argument.Type);
+                    return new BoundNullExpression();
+                }
+            }
+
+            return new BoundCallExpression(function, boundArguments.ToImmutable());
+        }
+        
+        private BoundExpression BindExtensionCallExpression(ExtensionCallExpressionNode node)
+        {
+            if (node.Arguments.Count == 1 && LookupType(node.Identifier.Text) is TypeSymbol type)
+                return BindConversion(node.Arguments[0], type, allowExplicit: true);
+
+            ImmutableArray<BoundExpression>.Builder boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
+
+            foreach (var argument in node.Arguments)
+            {
+                var boundArgument = BindExpression(argument);
+                boundArguments.Add(boundArgument);
+            }
+
+            if (!_scope!.TryLookupFunction(node.Identifier.Text, out var function))
+            {
+                _diagnostics.ReportUndefinedFunction(node.Identifier.Location, node.Identifier.Text);
+                return new BoundNullExpression();
+            }
+
+            var calledType = LookupType(node.CType.Text);
+
+            if (!function.IsExtension || calledType != function.Type)
+            {
+                _diagnostics.ReportInvalidExtensionFunction(node.Location, function, calledType);
+                return new BoundNullExpression();
+            }
+
+            if (node.Arguments.Count != function.Parameters.Length)
             {
                 _diagnostics.ReportWrongArgumentCount(node.Location, function.Name, function.Parameters.Length, node.Arguments.Count);
                 return new BoundNullExpression();

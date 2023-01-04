@@ -12,7 +12,9 @@ namespace Shore.CodeAnalysis
         private readonly Dictionary<VariableSymbol, object[]> _globalArrays;
         private readonly Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>> _globalLists;
         private readonly Dictionary<VariableSymbol, Dictionary<object, object>> _globalDicts;
+        
         private readonly Dictionary<FunctionSymbol, BoundBlockStatement> _functions = new();
+        
         private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
         private readonly Stack<Dictionary<VariableSymbol, object[]>> _localArrays = new();
         private readonly Stack<Dictionary<VariableSymbol, Dictionary<VariableSymbol, object>>> _localLists = new();
@@ -42,7 +44,8 @@ namespace Shore.CodeAnalysis
                 {
                     var function = kv.Key;
                     var body = kv.Value;
-                    _functions.Add(function, body);
+                    if (function.IsExtension) AssignExtension(function, body);
+                    else _functions.Add(function, body);
                 }
 
                 current = current.Previous;
@@ -421,7 +424,7 @@ namespace Shore.CodeAnalysis
                 return 0;
             }
 
-            var locals = new Dictionary<VariableSymbol?, object?>();
+            var locals = new Dictionary<VariableSymbol, object>();
             for (var i = 0; i < node.Arguments.Length; i++)
             {
                 var parameter = node.Function.Parameters[i];
@@ -431,7 +434,9 @@ namespace Shore.CodeAnalysis
 
             _locals.Push(locals);
 
-            var statement = _functions[node.Function];
+            var statement = node.Function.IsExtension
+                ? node.Function.Type.Extensions[node.Function]
+                : _functions[node.Function];
             var result = EvaluateStatement(statement);
 
             _locals.Pop();
@@ -452,6 +457,11 @@ namespace Shore.CodeAnalysis
             if (node.Type == TypeSymbol.String) return Convert.ToString(value);
             
             throw new Exception($"Unexpected type {node.Type}");
+        }
+
+        private void AssignExtension(FunctionSymbol function, BoundBlockStatement body)
+        {
+            if (!function.Type.Extensions.ContainsKey(function)) function.Type.Extensions.Add(function, body);
         }
 
         private void Assign(VariableSymbol? variable, object? value)
