@@ -214,7 +214,7 @@ namespace Shore.CodeAnalysis.Syntax
                     TokType.StringArrayKeyword or TokType.BoolArrayKeyword or TokType.IntArrayKeyword or TokType.FloatArrayKeyword
                     or TokType.StringListKeyword or TokType.BoolListKeyword or TokType.IntListKeyword or TokType.FloatListKeyword
                     or TokType.StringDictKeyword or TokType.BoolDictKeyword or TokType.IntDictKeyword or TokType.FloatDictKeyword
-                    => ParseVariableDeclaration(),
+                    => PeekToken(1).Type == TokType.DotToken ? ParseExpressionStatement() : ParseVariableDeclaration(),
                 TokType.IfKeyword => ParseIfStatement(),
                 TokType.WhileKeyword => ParseWhileStatement(),
                 TokType.ForKeyword => ParseForStatement(),
@@ -446,6 +446,12 @@ namespace Shore.CodeAnalysis.Syntax
                 TokType.NumberToken => ParseNumberLiteral(forceFloat),
                 TokType.StringToken => ParseStringLiteral(),
                 TokType.IdentifierToken => ParseNameOrCallExpression(),
+                TokType.BoolKeyword or TokType.StringKeyword or TokType.Int64Keyword or TokType.Float64Keyword or 
+                    TokType.StringArrayKeyword or TokType.BoolArrayKeyword or TokType.IntArrayKeyword or TokType.FloatArrayKeyword
+                    or TokType.StringListKeyword or TokType.BoolListKeyword or TokType.IntListKeyword or TokType.FloatListKeyword
+                    or TokType.StringDictKeyword or TokType.BoolDictKeyword or TokType.IntDictKeyword or TokType.FloatDictKeyword
+                    when PeekToken(1).Type == TokType.DotToken
+                    => ParseExtensionCallExpression(),
                 _ => ParseNameExpression()
             };
         }
@@ -493,6 +499,17 @@ namespace Shore.CodeAnalysis.Syntax
             var arguments = ParseArguments();
             var closeParenToken = MatchToken(TokType.CloseParenToken);
             return new CallExpressionNode(_nodeTree, identifier, openParenToken, arguments, closeParenToken);
+        }
+        
+        private ExpressionNode ParseExtensionCallExpression()
+        {
+            var type = MatchToken(CurrentToken.Type);
+            var dotToken = MatchToken(TokType.DotToken);
+            var identifier = MatchToken(TokType.IdentifierToken);
+            var openParenToken = MatchToken(TokType.OpenParenToken);
+            var arguments = ParseArguments();
+            var closeParenToken = MatchToken(TokType.CloseParenToken);
+            return new ExtensionCallExpressionNode(_nodeTree, type, dotToken,identifier, openParenToken, arguments, closeParenToken);
         }
 
         private SeparatedNodeList<ExpressionNode> ParseArguments()

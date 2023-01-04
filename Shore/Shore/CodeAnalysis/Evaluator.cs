@@ -424,7 +424,7 @@ namespace Shore.CodeAnalysis
                 return 0;
             }
 
-            var locals = new Dictionary<VariableSymbol?, object?>();
+            var locals = new Dictionary<VariableSymbol, object>();
             for (var i = 0; i < node.Arguments.Length; i++)
             {
                 var parameter = node.Function.Parameters[i];
@@ -434,7 +434,9 @@ namespace Shore.CodeAnalysis
 
             _locals.Push(locals);
 
-            var statement = _functions[node.Function];
+            var statement = node.Function.IsExtension
+                ? node.Function.Type.Extensions[node.Function]
+                : _functions[node.Function];
             var result = EvaluateStatement(statement);
 
             _locals.Pop();
@@ -457,8 +459,10 @@ namespace Shore.CodeAnalysis
             throw new Exception($"Unexpected type {node.Type}");
         }
 
-        private void AssignExtension(FunctionSymbol function, BoundBlockStatement body) =>
-            function.Type.Extensions.Add(function, body);
+        private void AssignExtension(FunctionSymbol function, BoundBlockStatement body)
+        {
+            if (!function.Type.Extensions.ContainsKey(function)) function.Type.Extensions.Add(function, body);
+        }
 
         private void Assign(VariableSymbol? variable, object? value)
         {

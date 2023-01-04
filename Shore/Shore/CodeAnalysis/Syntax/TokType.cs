@@ -100,6 +100,8 @@ namespace Shore.CodeAnalysis.Syntax
         ColonToken,
         DictDeclarationStatement,
         ExtendKeyword,
-        ExtendFunctionDeclaration
+        ExtendFunctionDeclaration,
+        DotToken,
+        ExtensionCallExpression
     }
 }
