@@ -10,4 +10,4 @@ You can access a value at a given Index of an Array by using the `<name>[<number
 
 ## Notes
 Array values are immutable.<br>
-If you'd like to have an Array with mutable values you should use [The List Types](Lists.md).
+If you'd like to have an Array with mutable values you should use [The List Types](/#/docs/core/types/lists).

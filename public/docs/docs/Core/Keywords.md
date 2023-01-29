@@ -6,19 +6,20 @@ Sea has a variety of Keywords. Here is the full documentation of them all.<br>
 - `break`: Ends a loop early.
 - `return`: Returns a value.
 <br><br>
-Learn more about [Loops](./Loops.md)<br>
+Learn more about [Loops](/#/docs/core/loops)<br>
 
 ## Special Declarations
-- `if`: Declares an [If Statement](./Loops/For.md).
-- `else`: Declares an [Else Statement](./Loops/If.md).
+- `if`: Declares an [If Statement](/#/docs/core/loops/if).
+- `else`: Declares an [Else Statement](/#/docs/core/loops/if).
 <br><br>
-- `for`: Declares a [For Statement](./Loops/For.md).
-- `until`: Declares the upper limit in a [For Statement](./Loops/For.md).
+- `for`: Declares a [For Statement](/#/docs/core/loops/for).
+- `until`: Declares the upper limit in a [For Statement](/#/docs/core/loops/for).
 <br><br>
-- `while`: Declares a [While Statement](./Loops/While.md).
+- `while`: Declares a [While Statement](/#/docs/core/loops/for).
 <br><br>
-- `function`: Declares a [Function](./Functions.md).
-- `void`: Declares a Function return Type of the [Void Type](./Types/Void.md).
+- `function`: Declares a [Function](/#/docs/core/functions).
+- `extend`: Declares an [Extension Function](/#/docs/core/functions).
+- `void`: Declares a Function return Type of the [Void Type](/#/docs/core/types/void).
 
 ## Declarations
 - `string`: Declares a value of the String Type.
@@ -32,4 +33,4 @@ Learn more about [Loops](./Loops.md)<br>
 - `int`: Declares an Integral value of the Integer Type.
 - `long`: Declares an Integral value of the Long Type.
 <br><br>
-Learn more about [Types](./Types.md)
+Learn more about [Types](/#/docs/core/types)
