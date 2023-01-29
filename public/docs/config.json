@@ -1,0 +1,12 @@
+{
+    "settings": {
+        "logo": true,
+        "downloadAsPDF": true,
+        "articleSections": true,
+        "maxInThisArticleCount": 5
+    },
+
+    "title": "DocuDJ",
+    "logo": "https://media.discordapp.net/attachments/375936269907263489/1068258769793990779/image.png",
+    "downloadDocName": "docudj.pdf"
+}
