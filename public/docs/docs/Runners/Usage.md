@@ -11,7 +11,7 @@ Be sure to include the file extension in the file path.<br><br>
 Example: `sc ../Examples`
 
 ## Using the REPL
-Using the [Shore REPL](SR.md) is an easy way to quickly test Sea scripts.<br>
+Using the [Shore REPL](/#/docs/runners/SR) is an easy way to quickly test Sea scripts.<br>
 Though the REPL is typically used to test small scripts written directly within the REPL, you can use the `#load <path>` to load an entire script into the REPL<br>
 Note when using the REPL you can only load single files, not entire directories.<br>
 Be sure to include the file extension in the file path.<br><br>

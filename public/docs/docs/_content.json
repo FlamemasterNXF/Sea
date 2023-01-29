@@ -13,6 +13,11 @@
                 "title": "Usage",
                 "url": "runners/usage",
                 "file": "/Runners/Usage.md"
+            },
+            {
+                "title": "Shore REPL",
+                "url": "runners/SR",
+                "file": "/Runners/SR.md"
             }
         ]
     }
